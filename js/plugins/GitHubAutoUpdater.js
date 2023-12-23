@@ -181,6 +181,7 @@
         $gameMap._interpreter.pluginCommand("D_TEXT", [`1秒後にシャットダウンします。`, "20"]);
         $gameScreen.showPicture(55, null, 0, 10, 10, 100, 100, 255, 0);
         await shutdownAfterDelay(one_second);
+        this.wait(1200)
 
         window.close();
     }
@@ -199,15 +200,17 @@
     }
 
     async function getLastCommitSHA(filePath) {
-        try {
-            const util = require('util');
-            const readFileAsync = util.promisify(fs.readFile);
-            const fileData = await readFileAsync(filePath, 'utf8');
-            return fileData;
-        } catch (err) {
-            return initialSHA;
+            try {
+                const fs = require('fs');
+                const util = require('util');
+                const readFileAsync = util.promisify(fs.readFile);
+                const fileData = await readFileAsync(filePath, 'utf8');
+                return fileData;
+            } catch (err) {
+                console.log(err);
+                return initialSHA;
+            }
         }
-    }
 
     async function getCommitChanges(owner, repo, fromSHA, toSHA) {
         const url = `https://api.github.com/repos/${owner}/${repo}/compare/${fromSHA}...${toSHA}`;
