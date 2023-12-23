@@ -92,7 +92,7 @@
         else {
             console.log("ローカル取得");
             ImportQuestionFromLocal();
-            
+
         }
     };
 
@@ -463,16 +463,22 @@
                     }
                 }
             } catch (e) {
+              if ($gameVariables.value(1169) == 0) {
                 if (!(typeof cordova === "undefined")) {
                     $gameScreen.showPicture(100, "Tips_Error_sp", 1, 640, 360, 100, 100, 0, 0);
-                    $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 30);
+                    $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 10);
+                    this.wait(10);
                 } else if (Utils.isNwjs()) {
                     $gameScreen.showPicture(100, "Tips_Error_D", 1, 640, 360, 100, 100, 0, 0);
-                    $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 30);
+                    $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 10);
+                    this.wait(10);
                 } else {
                     $gameScreen.showPicture(100, "Tips_Error_W", 1, 640, 360, 100, 100, 0, 0);
-                    $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 30);
+                    $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 10);
+                    this.wait(10);
                 }
+              }
+                $gameVariables.setValue(1169,1);
             }
         }
         else if (command === 'ExQjson') {
