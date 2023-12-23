@@ -181,7 +181,6 @@
         $gameMap._interpreter.pluginCommand("D_TEXT", [`1秒後にシャットダウンします。`, "20"]);
         $gameScreen.showPicture(55, null, 0, 10, 10, 100, 100, 255, 0);
         await shutdownAfterDelay(one_second);
-        this.wait(1200)
 
         window.close();
     }
