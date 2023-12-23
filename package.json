@@ -1,0 +1,12 @@
+{
+    "name": "kanzidego",
+    "main": "index.html",
+    "js-flags": "--expose-gc",
+    "window": {
+        "title": "KanzideGo",
+        "width": 816,
+        "height": 624,
+        "position": "center",
+        "icon": "icon/icon.png"
+    }
+}
