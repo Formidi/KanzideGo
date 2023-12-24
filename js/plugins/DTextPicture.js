@@ -101,8 +101,8 @@
  * @text 接頭辞文字列
  * @desc すべての文字列ピクチャの前に挿入されるテキストです。主にデフォルトの制御文字などを指定します。
  * @default
- * 
- * 
+ *
+ *
  * @param n_value
  * @text アウトライン方向
  * @desc アウトライン方向をいくつの方向で埋めるか決める「変数の番号」です。
@@ -530,6 +530,10 @@
         var RubyOffset = 0;
         if ($gameScreen.isSettingDText() && !name) {
             this.isDTextPicture = true;
+            if ($gameVariables.value(1179) == 2 && $gameScreen.getDTextPictureInfo().originalValue.startsWith("\\oc[black]")) {
+                arguments[4] = scaleX * 5;
+                arguments[5] = scaleY * 5;
+            }
             if (origin === 0) {
                 if ($gameScreen.getDTextPictureInfo().size >= 100) {
                     RubyOffset = padempty;
@@ -555,6 +559,11 @@
     Game_Picture.prototype.move = function (origin, x, y, scaleX, scaleY, opacity, blendMode, duration) {
         var RubyOffset = 0;
         if (this.isDTextPicture) {
+            console.log(this.dTextInfo);
+            if ($gameVariables.value(1179) == 2 && this.dTextInfo.originalValue.startsWith("\\oc[black]")) {
+                arguments[3] = scaleX * 5;
+                arguments[4] = scaleY * 5;
+            }
             if (origin === 0) {
                 if (this.dTextInfo.size >= 100) {
                     RubyOffset = padempty;
@@ -1066,7 +1075,7 @@
             bitmap.textColor = this.hiddenWindow.textColor(15);
             OutlineText(textState, bitmap.outlineWidth / 1.3, bitmap, textState.inRubyTextString, w, center - textState.inRubyTextString.length * font_mini, textState.RubyStart_y + offset);
             bitmap.textColor = this.hiddenWindow.textColor(0);
-            
+
         } else {
             bitmap.drawText(textState.inRubyTextString, center - textState.inRubyTextString.length * font_mini, textState.RubyStart_y + offset, w * 2, textState.height, 'left');
         }

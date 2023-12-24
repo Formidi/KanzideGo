@@ -282,12 +282,12 @@
                 outline = $gameVariables.value(force) == 1 ? size2_long / 2 : size2_long / 10;
             }
             if ($gameVariables.value(1179) == 2) {
-                size = Math.ceil(size / 10);
-                outline = Math.ceil(outline / 10);
+                size = Math.ceil(size / 5);
+                outline = Math.ceil(outline / 5);
             }
             $gameMap._interpreter.pluginCommand("D_TEXT", [`\\oc[black]\\ow[${outline}]${pictureName}`, size.toString()]);
-
             originalShowPicture.call(this, pictureId, null, origin, x, y, scaleX, scaleY, opacity, blendMode);
+
         }
     };
     function pureText(text) {
@@ -392,7 +392,7 @@
         $gameMap._interpreter.pluginCommand("D_TEXT", [editstage_list[stage_index]["discription_2"], 24]);
         $gameScreen.showPicture(106, null, 0, 410, y - 40, 100, 100, 0, 0);
         $gameScreen.movePicture(106, 0, 410, y - 15, 100, 100, 255, 0, 10);
-        $gameScreen.showPicture(107, "Edit_Sheet_07", 0, 800, y - 50, 100, 100, 0, 0);
+        $gameScreen.showPicture(107, "Edit_Sheet_7", 0, 800, y - 50, 100, 100, 0, 0);
         $gameScreen.movePicture(107, 0, 800, y - 25, 100, 100, 255, 0, 10);
         $gameMap._interpreter.pluginCommand("P_CALL_SWITCH", ["107", `${offset_switch + 10}`, "1", "OFF"]);
         $gameScreen.showPicture(108, "Edit_Sheet_10", 0, 900, y - 50, 100, 100, 0, 0);
