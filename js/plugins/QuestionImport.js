@@ -467,15 +467,12 @@
                 if (!(typeof cordova === "undefined")) {
                     $gameScreen.showPicture(100, "Tips_Error_sp", 1, 640, 360, 100, 100, 0, 0);
                     $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 10);
-                    this.wait(10);
                 } else if (Utils.isNwjs()) {
                     $gameScreen.showPicture(100, "Tips_Error_D", 1, 640, 360, 100, 100, 0, 0);
                     $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 10);
-                    this.wait(10);
                 } else {
                     $gameScreen.showPicture(100, "Tips_Error_W", 1, 640, 360, 100, 100, 0, 0);
                     $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 10);
-                    this.wait(10);
                 }
               }
                 $gameVariables.setValue(1169,1);
@@ -673,7 +670,7 @@
         var fileNum;
         var retryCount = 0;
         var difficulty = 0;
-        if ($gameVariables.value(1117) >= 10 && $gameVariables.value(15) == 902) {
+        if ($gameVariables.value(1117) >= 10 && ($gameVariables.value(15) == 902 || $gameVariables.value(15) == 903)) {
             difficulty = $gameVariables.value(1117) - 10;
         } else if ($gameVariables.value(1117) == 1 && $gameVariables.value(15) == 902) {
             difficulty = $gameVariables.value(290) + 1;
