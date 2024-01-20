@@ -91,8 +91,7 @@
                 $gameVariables.setValue(mondai_index, quest);
                 $gameVariables.setValue(kotae_index, answer);
             }
-            if (true) {
-                console.log($gameVariables.value(mondai_index));
+            if ($gameVariables.value(1265) >= 1) {
                 $gameVariables.setValue(mondai_index, transformTextWithNumbers($gameVariables.value(mondai_index)));
             }
         }
