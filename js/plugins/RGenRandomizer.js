@@ -203,7 +203,7 @@
         const allNumbersInRange = Array.from({ length: b - a + 1 }, (_, index) => a + index);
         //過去問があるときは、a~bまでの数字が入ったリストを作成
         const matchingNumbersInRange = matchingNumbers.map(item => parseInt(item.split('_').slice(-1)[0]));
-        const availableNumbers = allNumbersInRange.filter(number => !matchingNumbersInRange.includes(number) && ($gameVariables.value(group) == 0 || questionList[`Lv0${identifier.replace(/\D/g, '')}_${String(number).padStart(4, '0')}`]["1087"].split(',').some(value => parseInt(value) == $gameVariables.value(group))));
+        const availableNumbers = allNumbersInRange.filter(number => !matchingNumbersInRange.includes(number) && ($gameVariables.value(group) == 0 || questionList[`Lv0${identifier.replace(/\D/g, '')}_${String(number).padStart(4, '0')}`]["1087"].split(',').some(value => value == $gameVariables.value(group))));
         //a~bまでの数字が入ったリストから、過去問で出た問題を除く
         if (availableNumbers.length === 0 && grad >= 1) {//もし利用できる乱数がなく、かつgradが1以上なら
             return getRandomNumberInIdentifierRangeNotInCustomlist(identifier, a_save, b, customlist, 0);
@@ -224,7 +224,9 @@
         const indexesToInclude = [];
         for (const key in ex_dict) {
             if (key.includes(stageName) && (level == parseInt(ex_dict[key]["Level"]) || parseInt(ex_dict[key]["Level"]) == 0) && (!doFilter || !Customlist.includes(key))) {
-                indexesToInclude.push(key);
+                if (!(ex_dict[key]["13"] == "植" && $gameVariables.value(1322) == 1) && !(ex_dict[key]["13"] == "生" && $gameVariables.value(1321) == 1)) {
+                    indexesToInclude.push(key);
+                }
             }
         }
         if (indexesToInclude.length == 0) {
@@ -240,7 +242,9 @@
         const indexesToInclude = [];
         for (const key in ex_dict) {
             if ((level == parseInt(ex_dict[key]["Level"]) || parseInt(ex_dict[key]["Level"]) == 0) && (!doFilter || !Customlist.includes(key))) {
-                indexesToInclude.push(key);
+                if (!(ex_dict[key]["13"] == "植" && $gameVariables.value(1322) == 1) && !(ex_dict[key]["13"] == "生" && $gameVariables.value(1321) == 1)) {
+                    indexesToInclude.push(key);
+                }
             }
         }
         if (indexesToInclude.length == 0) {
