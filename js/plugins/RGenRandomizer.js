@@ -14,13 +14,19 @@
  * @param group
  * @desc 制限時、どのグループであるかを示す「変数番号」。
  * @type number
- * @default 1188
+ * @default 1084
+ * 
+ * @param numofQ
+ * @desc 制限時の総問題数。
+ * @type number
+ * @default 1266
  */
 //=============================================================================
 (function () {
     var parameters = PluginManager.parameters('RGenRandomizer');
     var exported_value = Number(parameters['exported_value'] || 6);
-    var group = Number(parameters['group'] || 1188);
+    var group = Number(parameters['group'] || 1084);
+    var numofQ = Number(parameters['numofQ'] || 1266);
 
     //this._customListを初期化する関数
     DataManager.initCustomList = function () {
@@ -61,6 +67,7 @@
             if (!DataManager._customList) {
                 DataManager.initCustomList();
             }
+            const questionList = DataManager.loadCustomData();
             //ステージ判別用のアイデンティファイアー
             var variableId = args[0];
             var min = parseInt(args[1]);//問題抽選の最小値
@@ -70,6 +77,19 @@
             var addedQuestion_probability = args.length >= 5 ? parseInt(args[5]) : 0;
             var Customlist = DataManager.getCustomList();
             if (variableId && min && max && probability >= 0 && probability <= 100) {
+                if (variableId.startsWith("Ca")) {
+                    var plusnum = parseInt(0);
+                    if ($gameVariables.value(15) == 103) {
+                        plusnum = parseInt(2);
+                    } else if (104 <= $gameVariables.value(15) && $gameVariables.value(15) <= 109 && $gameVariables.value(15) != 105) {
+                        plusnum = parseInt(1);
+                    }
+                    variableId = `${variableId}_${String(parseInt($gameVariables.value(15)) - 100).padStart(3, '0')}_Lv${$gameVariables.value(290) + $gameVariables.value(757) + plusnum}`;
+                    max = $gameVariables.value(200 + parseInt($gameVariables.value(290) + $gameVariables.value(757) + plusnum));
+                    if ($gameVariables.value(290) + $gameVariables.value(757) + plusnum == 7) {
+                        max = $gameVariables.value(209);
+                    }
+                }
                 var value = 0;//まず0を付与
                 if (addedQuestion_probability > Math.random() * 100) {//もし新規問題割込みプログラムが起きたなら
                     value = getRandomNumberInIdentifierRangeNotInCustomlist(variableId, min, max, Customlist, addedQuestion_num);//新規問題優先で重複なしの抽選
@@ -80,6 +100,7 @@
                 } else {//どれにも引っかからない場合
                     value = generateRandomNumber(min, max);
                 }
+                //console.log(questionList[`Lv0${variableId.replace(/\D/g, '')}_${String(value).padStart(4, '0')}`]["1087"].split(','));
                 $gameVariables.setValue(exported_value, value);//最終的に出た値を代入する
             }
         }
@@ -112,10 +133,23 @@
                 //メイン、ラッシュはMa_Lv(レベル名の中にある数値)
                 //こうして得られた名前を過去問リストに登録
                 DataManager.addToCustomList(`${tag}_${$gameVariables.value(6)}`);
-                console.log(DataManager.getCustomList());
+                //console.log(DataManager.getCustomList());
                 //もし規定数を超えていた場合はリセットをかける
                 DataManager.SetCustomList(removeItemsWithSubstring(Customlist, tag, parseInt($gameVariables.value(681))));
             }
+        } else if (command === 'RGen_Count') {
+            const questionList = DataManager.loadCustomData();
+            //過去問リストの中から該当する問題のリストを作る
+            var level = args[0];
+            let count = 0;
+            for (let key in questionList) {
+                if (questionList.hasOwnProperty(key) && key.startsWith(`Lv0${level}`)) {
+                    if (questionList[key] && questionList[key]["1087"].split(',').some(value => value == $gameVariables.value(group))) {
+                        count++;
+                    }
+                }
+            }
+            $gameVariables.setValue(numofQ, count);
         }
         else if (command === 'RGen_reset') {
             if (!DataManager._customList) {
@@ -203,15 +237,21 @@
         const allNumbersInRange = Array.from({ length: b - a + 1 }, (_, index) => a + index);
         //過去問があるときは、a~bまでの数字が入ったリストを作成
         const matchingNumbersInRange = matchingNumbers.map(item => parseInt(item.split('_').slice(-1)[0]));
-        const availableNumbers = allNumbersInRange.filter(number => !matchingNumbersInRange.includes(number) && ($gameVariables.value(group) == 0 || questionList[`Lv0${identifier.replace(/\D/g, '')}_${String(number).padStart(4, '0')}`]["1087"].split(',').some(value => value == $gameVariables.value(group))));
+        const level = identifier.slice(-1);
+        //console.log(`${level}, ${$gameVariables.value(group)}`);
+        const availableNumbers = allNumbersInRange.filter(number => !matchingNumbersInRange.includes(number) && ($gameVariables.value(group) == 0 || questionList[`Lv0${level}_${String(number).padStart(4, '0')}`]["1087"].split(',').some(value => value == $gameVariables.value(group))));
+
+        //console.log(availableNumbers);
         //a~bまでの数字が入ったリストから、過去問で出た問題を除く
         if (availableNumbers.length === 0 && grad >= 1) {//もし利用できる乱数がなく、かつgradが1以上なら
+            //console.log("勾配無し");
             return getRandomNumberInIdentifierRangeNotInCustomlist(identifier, a_save, b, customlist, 0);
             //新問は出し切ったということなので、勾配をなくしてやり直す
         } else if (availableNumbers.length <= 1) {
-            //利用できる乱数が25以下になったら
-            DataManager.SetCustomList(removeItemsForceWithSubstring(DataManager.getCustomList(), args[0]));
+            //利用できる乱数が1以下になったら
+            DataManager.SetCustomList(removeItemsForceWithSubstring(DataManager.getCustomList(), identifier));
             //いったん過去問リストにリセットをかけて
+            console.log("リセット");
             return getRandomNumberInIdentifierRangeNotInCustomlist(identifier, a, b, customlist, 0);
             //再度この関数を実行する
         }

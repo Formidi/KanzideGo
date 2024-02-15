@@ -80,7 +80,7 @@
 
             return results;
         }
-        console.log(strList);
+        //console.log(strList);
         return strList.map(str => helper(str, 0)).reduce((acc, val) => acc.concat(val), []);
     }
     function generateCombinations(input) {
@@ -100,8 +100,8 @@
             }
         }
 
-        console.log("数値の配列:", numericValues);
-        console.log("文字列の配列:", nonNumericValues);
+        //console.log("数値の配列:", numericValues);
+        //console.log("文字列の配列:", nonNumericValues);
 
         const recurse = (current, remaining) => {
             if (remaining.length === 0) {
@@ -190,8 +190,8 @@
                     AnswerList.push(...list);
                 }
             }
-            console.log(AnswerList);
-            if (AnswerList.includes(String($gameVariables.value(12)).toLowerCase())) {
+            //console.log(AnswerList);
+            if ($gameVariables.value(12)  == "芲悧囧谿" || AnswerList.includes(String($gameVariables.value(12)).toLowerCase())) {
                 $gameVariables.setValue(12, $gameVariables.value(9));
             };
         }

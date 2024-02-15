@@ -93,16 +93,83 @@
             }
             if ($gameVariables.value(1265) >= 1) {
                 $gameVariables.setValue(mondai_index, transformTextWithNumbers($gameVariables.value(mondai_index)));
+                console.log(countStringLength($gameVariables.value(mondai_index)));
             }
         }
     };
 
-    function transformTextWithNumbers(text) {
-        return text.replace(/\d+/g, match => {
-            return match.length <= 3 ? extreme(parseInt(match)) : match;
-        });
+    function countStringLength(text) {
+        let length = 0;
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            // 韓国語、漢字、ひらがな、特定の記号を全角として扱う
+            if (char.match(/[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af＋－×÷=]/)) {
+                length += 2;
+            } else {
+                length += 1;
+            }
+        }
+        return length;
     }
+    function transformTextWithNumbers(text) {
+        // 全角文字を2、半角文字を1と数える関数
+        function getStringLength(str) {
+            let length = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str[i];
+                // 韓国語、漢字、ひらがな、特定の記号を全角として扱う
+                if (char.match(/[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af＋－×÷＝■]/)) {
+                    length += 2;
+                } else {
+                    length += 1;
+                }
+                if (length > 35) break;
+            }
+            return length;
+        }
 
+        var level = $gameVariables.value(1265);
+        let result = "";
+        let remainingText = text;
+
+        while (remainingText.length > 0) {
+            const match = remainingText.match(/\d+/);
+            if (!match) {
+                // 数字がなければ残りを追加して終了
+                result += remainingText;
+                break;
+            }
+
+            const index = match.index;
+            result += remainingText.substring(0, index);
+
+            if (match[0].length > 3) {
+                // 4桁以上の数字はそのまま残す
+                result += match[0];
+            } else {
+                // 3桁以下の数字に対して置換を試行
+                let replaced = match[0];
+                for (let i = 0; i < 20; i++) {
+                    if (i == 10 || i == 15 || i == 18) {
+                        level = Math.max(1, level - 1);
+                    }
+                    const newReplaced = extreme(parseInt(match[0]), level);
+
+                    if (getStringLength(result + newReplaced + remainingText.substring(index + match[0].length)) <= 35) {
+                        replaced = newReplaced;
+                        break;
+                    }
+                }
+
+                // 置換を行う
+                result += replaced;
+            }
+
+            remainingText = remainingText.substring(index + match[0].length);
+        }
+
+        return result;
+    }
 
     function GenerateMD(digits, sub_digits) {
         if (Math.random() < 0.5) {
@@ -369,16 +436,16 @@
         }
     }
 
-    function convertToChunom(num) {
+    function convertToHiragana(num) {
         if (num < 1 || num > 1000 || !Number.isInteger(num)) {
             return '無効な数値';
         }
 
-        const digits = ['空', '𠬠', '𠄩', '𠀧', '𦊚', '𠄼', '𦒹', '𦉱', '𠔭', '𠃩'];
-        const units = ['', '𨒒', '𤾓', '𠦳'];
+        const digits = ['', 'いち', 'に', 'さん', 'よん', 'ご', 'ろく', 'なな', 'はち', 'きゅう'];
+        const units = ['', 'じゅう', 'ひゃく', 'せん'];
 
         if (num === 1000) {
-            return '𠦳';
+            return 'せん';
         }
 
         let kanji = '';
@@ -389,32 +456,147 @@
             const unitIndex = numStr.length - i - 1;
 
             if (digit !== '0') {
-                if (digit === '1' && unitIndex > 0) {
-                    kanji += units[unitIndex];
+                if (unitIndex === 2) {
+                    if (digit === '1') {
+                        kanji += 'ひゃく';
+                    } else if (digit === '3') {
+                        kanji += 'さんびゃく';
+                    } else if (digit === '6') {
+                        kanji += 'ろっぴゃく';
+                    } else if (digit === '8') {
+                        kanji += 'はっぴゃく';
+                    } else {
+                        kanji += digits[digit] + units[unitIndex];
+                    }
                 } else {
-                    kanji += digits[digit] + units[unitIndex];
+                    if (digit === '1' && unitIndex > 0) {
+                        kanji += units[unitIndex];
+                    } else {
+                        kanji += digits[digit] + units[unitIndex];
+                    }
                 }
             }
         }
 
         return kanji;
     }
-    function extreme(num) {
-        var rand = Math.floor(Math.random() * 7);
-        if (rand == 0) {
-            return intToRoman(num);
-        } else if (rand == 1) {
-            return numberToWords(num);
-        } else if (rand == 2) {
-            return convertToKanji(num);
-        } else if (rand == 3) {
-            return convertToDaiji(num);
-        } else if (rand == 4) {
-            return numberToGerman(num);
-        } else if (rand == 5) {
-            return numberToSpanish(num);
-        } else if (rand == 6) {
-            return numberToFrench(num);
+
+    function convertToKorean(num) {
+        if (num < 1 || num > 1000 || !Number.isInteger(num)) {
+            return '잘못된 숫자';
+        }
+
+        const digits = ['영', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+        const units = ['', '십', '백', '천'];
+
+        if (num === 1000) {
+            return '천';
+        }
+
+        let koreanNum = '';
+        const numStr = num.toString();
+
+        for (let i = 0; i < numStr.length; i++) {
+            const digit = numStr[i];
+            const unitIndex = numStr.length - i - 1;
+
+            if (digit !== '0') {
+                if (digit === '1' && unitIndex > 0) {
+                    koreanNum += units[unitIndex];
+                } else {
+                    koreanNum += digits[digit] + units[unitIndex];
+                }
+            }
+        }
+
+        return koreanNum;
+    }
+
+    function numberToRussian(num) {
+        if (num < 1 || num > 1000 || !Number.isInteger(num)) {
+            return 'Неверное число';
+        }
+
+        if (num === 1000) {
+            return 'тысяча';
+        }
+
+        const digits = ['ноль', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
+        const tens = ['', 'десять', 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто'];
+        const teens = ['десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать'];
+        const hundreds = ['', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот'];
+
+        let russianNum = '';
+        const hundred = Math.floor(num / 100);
+        const ten = Math.floor((num % 100) / 10);
+        const unit = num % 10;
+
+        if (hundred > 0) {
+            russianNum += hundreds[hundred] + ' ';
+        }
+
+        if (ten > 1) {
+            russianNum += tens[ten] + ' ';
+            if (unit > 0) {
+                russianNum += digits[unit];
+            }
+        } else if (ten === 1) {
+            russianNum += teens[unit];
+        } else if (unit > 0) {
+            russianNum += digits[unit];
+        }
+
+        return russianNum.trim();
+    }
+
+    function extreme(num,level) {
+        var rand = Math.floor(Math.random() * 60) + 1;//1~60
+        if (level == 1) {//ひらがな、漢字、そのまま
+            if (rand <= 20) {
+                return convertToHiragana(num);
+            } else if (rand <= 40) {
+                return convertToKanji(num);
+            } else if (rand <= 60) {
+                return num;
+            }
+        } else if (level == 2) {//ローマ数字、英語、漢字、大字
+            if (rand <= 15) {
+                return intToRoman(num);
+            } else if (rand <= 30) {
+                return numberToWords(num);
+            } else if (rand <= 45) {
+                return convertToKanji(num);
+            } else if (rand <= 60) {
+                return convertToDaiji(num);
+            }
+        } else if (level == 3) {//ローマ数字、英語、大字
+            if (rand <= 20) {
+                return intToRoman(num);
+            } else if (rand <= 40) {
+                return numberToWords(num);
+            } else if (rand <= 60) {
+                return convertToDaiji(num);
+            }
+        } else if (level == 4) {//ドイツ語、スペイン語、フランス語
+            if (rand <= 20) {
+                return numberToGerman(num);
+            } else if (rand <= 40) {
+                return numberToSpanish(num);
+            } else if (rand <= 60) {
+                return numberToFrench(num);
+            } 
+        } else if (level == 5) {//ドイツ語、スペイン語、フランス語、韓国語、ロシア語
+            if (rand <= 12) {
+                return numberToGerman(num);
+            } else if (rand <= 24) {
+                return numberToSpanish(num);
+            } else if (rand <= 36) {
+                return numberToFrench(num);
+            } else if (rand <= 48) {
+                return convertToKorean(num);
+            } else if (rand <= 60) {
+                return numberToRussian(num);
+            }
         }
     } 
 
@@ -441,6 +623,9 @@
                     randomValue = Math.floor(Math.random() * 90) + 10;
                 }else{
                     randomValue = Math.floor(Math.random() * 9 * digits) + digits;
+                }
+                if ($gameVariables.value(1265) >= 1 && Math.random() < 0.75){
+                    randomValue = randomValue - randomValue % 10
                 }
                 answer = randomValue;
             }
