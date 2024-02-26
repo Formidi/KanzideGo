@@ -90,10 +90,12 @@
                 var quest = expression.join().replace(/,/g, '');
                 $gameVariables.setValue(mondai_index, quest);
                 $gameVariables.setValue(kotae_index, answer);
+                //console.log(quest);
             }
             if ($gameVariables.value(1265) >= 1) {
                 $gameVariables.setValue(mondai_index, transformTextWithNumbers($gameVariables.value(mondai_index)));
                 console.log(countStringLength($gameVariables.value(mondai_index)));
+                console.log($gameVariables.value(mondai_index));
             }
         }
     };
@@ -147,16 +149,18 @@
                 // 4桁以上の数字はそのまま残す
                 result += match[0];
             } else {
+                let isFirst = true;
                 // 3桁以下の数字に対して置換を試行
                 let replaced = match[0];
-                for (let i = 0; i < 20; i++) {
-                    if (i == 10 || i == 15 || i == 18) {
+                for (let i = 0; i < 60; i++) {
+                    if (i == 15 || i == 30 || i == 45) {
                         level = Math.max(1, level - 1);
                     }
-                    const newReplaced = extreme(parseInt(match[0]), level);
+                    const newReplaced = extreme(parseInt(match[0]), level,isFirst);
 
                     if (getStringLength(result + newReplaced + remainingText.substring(index + match[0].length)) <= 35) {
                         replaced = newReplaced;
+                        isFirst = false;
                         break;
                     }
                 }
@@ -175,16 +179,18 @@
         if (Math.random() < 0.5) {
             let YaYaBigNum = Math.floor(Math.random() * (5 * sub_digits + 3) * digits) + 2 * digits;
             if (YaYaBigNum % 10 == 0) YaYaBigNum += Math.floor(Math.random() * 9) + 1;
-            var SmallNum = Math.floor(Math.random() * 8) + 2;//small_numは難易度が5以下なら1桁。
-            if (digits >= 100 && sub_digits == 1) SmallNum += Math.floor(Math.random() * 10) * 10;//難易度6以上なら2桁に。容赦はない。
+            var SmallNum = Math.floor(Math.random() * 8) + 2;//small_numは難易度が5以下なら1桁の2以上。
+            if ((digits >= 100 && sub_digits == 1) || digits >= 1000) SmallNum += Math.floor(Math.random() * 7) * 10 + 20;//難易度6以上なら2桁に。容赦はない。
             if (SmallNum % 10 == 0 && digits >= 100) SmallNum += Math.floor(Math.random() * 9) + 1;
             return [`${YaYaBigNum} × ${SmallNum}`, YaYaBigNum * SmallNum];
         } else {
             var YaYaSmallNum = Math.floor(Math.random() * 7 * digits) + 2 * digits;//1→2~9、2→20~90、3→200~900
             if (digits == 100 && sub_digits == 0) YaYaSmallNum = Math.floor(Math.random() * 70) + 20;
+            if (YaYaSmallNum % 10 == 0) YaYaSmallNum += Math.floor(Math.random() * 9) + 1;
             var SmallNum = Math.floor(Math.random() * 8) + 2;
-            if (digits >= 100) SmallNum += Math.floor(Math.random() * digits / 10);
-            if (SmallNum % 10 == 0) SmallNum += Math.floor(Math.random() * 9) + 1;
+            SmallNum += Math.floor(Math.random() * digits / 10);
+            if (digits >= 100 && sub_digits == 1) SmallNum += Math.floor(Math.random() * digits * 9 / 10) + digits / 10;
+            if (SmallNum % 10 == 0 && digits >= 10) SmallNum += Math.floor(Math.random() * 9) + 1;
             if (Math.random() < 0.5 && digits <= 10) {
                 return [`${YaYaSmallNum * SmallNum} ÷ ${YaYaSmallNum}`, SmallNum];
             } else {
@@ -549,33 +555,36 @@
         return russianNum.trim();
     }
 
-    function extreme(num,level) {
+    function extreme(num,level,isFirst) {
         var rand = Math.floor(Math.random() * 60) + 1;//1~60
-        if (level == 1) {//ひらがな、漢字、そのまま
+        if (isFirst) {
+            rand = Math.floor(Math.random() * 30) + 31;
+        }
+        if (level == 1) {//そのまま、ひらがな、漢字
             if (rand <= 20) {
-                return convertToHiragana(num);
-            } else if (rand <= 40) {
-                return convertToKanji(num);
-            } else if (rand <= 60) {
                 return num;
-            }
-        } else if (level == 2) {//ローマ数字、英語、漢字、大字
-            if (rand <= 15) {
-                return intToRoman(num);
-            } else if (rand <= 30) {
-                return numberToWords(num);
-            } else if (rand <= 45) {
-                return convertToKanji(num);
-            } else if (rand <= 60) {
-                return convertToDaiji(num);
-            }
-        } else if (level == 3) {//ローマ数字、英語、大字
-            if (rand <= 20) {
-                return intToRoman(num);
             } else if (rand <= 40) {
+                return convertToHiragana(num);
+            } else if (rand <= 60) {
+                return convertToKanji(num);
+            }
+        } else if (level == 2) {//ひらがな、漢字、英語、大字
+            if (rand <= 15) {
+                return convertToHiragana(num);
+            } else if (rand <= 30) {
+                return convertToKanji(num);
+            } else if (rand <= 45) {
                 return numberToWords(num);
             } else if (rand <= 60) {
                 return convertToDaiji(num);
+            }
+        } else if (level == 3) {//英語、大字、ローマ数字
+            if (rand <= 20) {
+                return numberToWords(num);
+            } else if (rand <= 40) {
+                return convertToDaiji(num);
+            } else if (rand <= 60) {
+                return intToRoman(num);
             }
         } else if (level == 4) {//ドイツ語、スペイン語、フランス語
             if (rand <= 20) {
@@ -615,17 +624,21 @@
                 num_of_md -= 1;
             } else {
                 // digitsが1なら1~9、digitsが10なら10~99、100なら100~999の乱数。
-                if (i == 0 && digits == 1 && sub_digits == 1) {
-                    //難易度2かつ最初の数字の場合、10~20が抽選される。
-                    randomValue = Math.floor(Math.random() * 11) + 10;
+                if (i == 0 && sub_digits == 1) {
+                    //難易度が偶数かつ最初の数字の場合、一桁上の数字が抽選される。
+                    randomValue = Math.floor(Math.random() * 9 * digits) + digits;
                 } else if (i != 0 && digits == 100 && sub_digits == 0) {
                     //難易度5かつ最初の数字でない場合、10~99が抽選される。
                     randomValue = Math.floor(Math.random() * 90) + 10;
                 }else{
                     randomValue = Math.floor(Math.random() * 9 * digits) + digits;
                 }
-                if ($gameVariables.value(1265) >= 1 && Math.random() < 0.75){
-                    randomValue = randomValue - randomValue % 10
+                if ($gameVariables.value(1265) >= 1) {
+                    if (Math.random() < 0.5 && randomValue >= 10) {
+                        randomValue = Math.floor(randomValue / 10) * 10;
+                    } else if (Math.random() < 0.5 && randomValue >= 100) {
+                        randomValue = Math.floor(randomValue / 100) * 100;
+                    }
                 }
                 answer = randomValue;
             }

@@ -248,11 +248,11 @@
     }
 
     function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return string.toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
     function replaceAll(str, find, replace) {
-        return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+        return str.toString().replace(new RegExp(escapeRegExp(find), 'g'), replace);
     }
 
     function AddData(existing, d) {
@@ -282,7 +282,7 @@
                     if (keyDictionary[key] != undefined && keyDictionary[key] !== null && keyDictionary[key] !== "") {
                         existing[datakey][keyDictionary[key]] = value;
                         if (Replace == 0) {
-                            existing[datakey][keyDictionary[key]] = existing[datakey][keyDictionary[key]].replace(/I\[\d+\]/g, '');
+                            existing[datakey][keyDictionary[key]] = existing[datakey][keyDictionary[key]].toString().replace(/I\[\d+\]/g, '');
                         }
                     }
                 }
@@ -363,13 +363,13 @@
             }
             if (isAlphabet) {
                 if (chr_raw[2] != "") {
-                    chr = chr_raw[2].replace(/〇|○/g, '▮');
+                    chr = chr_raw[2].toString().replace(/〇|○/g, '▮');
                 } else if (chr_raw[1] != "" && !isNaN(chr_raw[1])) {
                     chr = '▮'.repeat(Number(chr_raw[1]));
                 }
             } else {
                 if (chr_raw[2] != "") {
-                    chr = chr_raw[2].replace(/〇|○/g, '●');
+                    chr = chr_raw[2].toString().replace(/〇|○/g, '●');
                 } else if (chr_raw[1] != "" && !isNaN(chr_raw[1])) {
                     chr = '●'.repeat(Number(chr_raw[1]));
                 }
@@ -399,8 +399,8 @@
             existing[parent_key]["13"] = genre_13 || "";
             existing[parent_key]["14"] = num_of_chr_14 || 0;
             existing[parent_key]["18"] = createString(questionText_e, questionText, questionText_a);
-            existing[parent_key]["19"] = comment1_19.replace(/，/g, `,`) || "　";
-            existing[parent_key]["20"] = comment2_20.replace(/，/g, `,`) || "　";
+            existing[parent_key]["19"] = comment1_19.toString().replace(/，/g, `,`) || "　";
+            existing[parent_key]["20"] = comment2_20.toString().replace(/，/g, `,`) || "　";
             existing[parent_key]["Level"] = level;
             if (parseInt(questionText_e.length) + parseInt(questionText.length) + parseInt(questionText_a.length) >= 8) {
                 existing[parent_key]["169"] = "2";
@@ -552,7 +552,7 @@
     }
 
     function convertToFullWidth(input) {
-        return input.replace(/[a-zA-Z]/g, function (char) {
+        return input.toString().replace(/[a-zA-Z]/g, function (char) {
             return String.fromCharCode(char.charCodeAt(0) + 0xfee0);
         });
     }
@@ -568,19 +568,19 @@
         } else if (text_split_num === 1) {
             if (text.charAt(0) === '(') {
                 var text_split = text.split(")");
-                x = text_split[0].replace("(", "");
+                x = text_split[0].toString().replace("(", "");
                 y = text_split[1];
             } else {
                 var text_split = text.split("(");
                 y = text_split[0];
-                z = text_split[1].replace(")", "");
+                z = text_split[1].toString().replace(")", "");
             }
         } else if (text_split_num >= 2) {
             var text_split_l = text.split(")");
-            x = text_split_l[0].replace("(", "");
+            x = text_split_l[0].toString().replace("(", "");
             y = text_split_l[1].split("(")[0];
             var text_split_r = text.split("(");
-            z = text_split_r[2].replace(")", "");
+            z = text_split_r[2].toString().replace(")", "");
         }
         return [x, y, z];
     }
@@ -879,12 +879,12 @@
             thresholds = [1, 2, 3, 4, 5, 6, 7];
             max = 6;
         } else if ($gameVariables.value(1102) == 1) {
-            thresholds = [1, 2, 4, 5, 7, 8, 10];
+            thresholds = [2, 3, 5, 6, 8, 9, 10];
             max = 6;
         }
         phase = max;
-        if ($gameVariables.value(1117) >= 10) {
-            phase = Math.min($gameVariables.value(1117) - 10,13);
+        if ($gameVariables.value(1117) >= 11) {
+            phase = Math.min($gameVariables.value(1117) - 11,13);
         } else {
             for (var i = 0; i < thresholds.length; i++) {
                 if (q <= thresholds[i]) {
@@ -897,6 +897,8 @@
             phase = Math.min(phase + 2, 13);
         } else if ($gameVariables.value(1117) == 2) {
             phase = Math.min(phase + 4, 13);
+        } else if ($gameVariables.value(1117) == 3) {
+            phase = Math.min(phase + 6, 13);
         }
         if ($gameVariables.value(1265) >= 1) {
             $gameMap._interpreter.pluginCommand("MakeMathQuestion", question_seed_extreme[phase][randomIndex]);
@@ -911,15 +913,15 @@
         [["1", "1", "1"], ["2", "2", "0"], ["2", "2", "0"], ["2", "1", "1"], ["1", "1", "1", "□"]],
         [["3", "2", "0"], ["3", "0", "1"], ["2", "1", "1"], ["1", "1", "2"], ["2", "1", "1", "□"]],
         [["3", "3", "0"], ["3", "1", "2"], ["4", "1", "1"], ["5", "2", "0"], ["3", "2", "0", "□"]],
-        [["5", "0", "1"], ["6", "1", "0"], ["4", "1", "1"], ["4", "1", "2"], ["4", "1", "1", "□"]],
-        [["5", "2", "0"], ["4", "2", "1"], ["4", "1", "2"], ["4", "1", "1", "□"], ["5", "2", "0", "□"]],
+        [["5", "0", "1"], ["6", "1", "0"], ["5", "1", "1"], ["4", "1", "2"], ["4", "1", "1", "□"]],
+        [["5", "2", "0"], ["4", "2", "1"], ["4", "1", "2"], ["5", "1", "1", "□"], ["5", "2", "0", "□"]],
         [["6", "0", "1"], ["7", "2", "0"], ["5", "1", "2"], ["7", "2", "0", "□"], ["6", "1", "1", "□"]],
-        [["7", "0", "1"], ["7", "1", "0"], ["7", "2", "0"], ["6", "1", "1", "□"], ["7", "2", "0", "□"]],
-        [["7", "1", "1"], ["8", "2", "0"], ["8", "2", "0"], ["8", "1", "1"], ["7", "1", "1", "□"]],
-        [["9", "2", "0"], ["9", "0", "1"], ["8", "1", "1"], ["7", "1", "2"], ["8", "1", "1", "□"]],
-        [["9", "3", "0"], ["9", "1", "2"], ["10", "1", "1"], ["11", "2", "0"], ["9", "2", "0", "□"]],
-        [["11", "0", "1"], ["12", "1", "0"], ["10", "1", "1"], ["10", "1", "2"], ["10", "1", "1", "□"]],
-        [["11", "2", "0"], ["10", "2", "1"], ["10", "1", "2"], ["10", "1", "1", "□"], ["11", "2", "0", "□"]],
+        [["7", "2", "0"], ["7", "0", "1"], ["6", "1", "2"], ["6", "1", "1", "□"], ["6", "3", "0"]],
+        [["8", "2", "0"], ["8", "0", "1"], ["6", "1", "2"], ["7", "1", "1", "□"], ["6", "2", "1"]],
+        [["9", "2", "0"], ["9", "0", "1"], ["7", "1", "2"], ["8", "1", "1", "□"], ["7", "3", "0"]],
+        [["10", "2", "0"], ["10", "0", "1"], ["8", "1", "2"], ["9", "1", "1", "□"], ["8", "3", "0"]],
+        [["11", "2", "0"], ["11", "0", "1"], ["9", "1", "1"], ["10", "1", "1", "□"], ["9", "3", "0"]],
+        [["12", "2", "0"], ["12", "0", "1"], ["10", "1", "1"], ["11", "1", "1", "□"], ["10", "3", "0"]],
         [["12", "0", "1"], ["12", "3", "0"], ["11", "1", "2"], ["12", "3", "0", "□"], ["12", "1", "1", "□"]]
     ];
 
@@ -942,7 +944,7 @@
 
 
     function pureText(text) {
-        return text.replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '');
+        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '');
     }
     async function waitForCommonEventToEnd(eventId) {
         return new Promise((resolve) => {
