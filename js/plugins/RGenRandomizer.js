@@ -57,6 +57,39 @@
         return this._CustomStageQuestion || null;
     }
 
+    var cachedResults = {};
+
+    function calculateC(a, b) {
+        // a と b の組み合わせをキーとして計算結果を保存しておく
+        const key = a.toString() + '|' + b.toString();
+
+        // キャッシュ内に計算結果が保存されていれば、それを返す
+        if (cachedResults.hasOwnProperty(key)) {
+            //console.log("算出済み！" + cachedResults[key]);
+            return cachedResults[key];
+        }
+
+        // 計算処理
+        const questionList = DataManager.loadCustomData();
+        //過去問リストの中から該当する問題のリストを作る
+        const level = a;
+        let count = 0;
+        for (let key in questionList) {
+            if (questionList.hasOwnProperty(key) && key.startsWith(`Lv0${level}`)) {
+                if (questionList[key] && questionList[key]["1087"].split(',').some(value => value == b)) {
+                    count++;
+                }
+            }
+        }
+        $gameVariables.setValue(numofQ, count);
+
+        // 計算結果をキャッシュに保存しておく
+        cachedResults[key] = count;
+
+        // 計算結果を返す
+        return count;
+    }
+
     //既存のプラグインコマンドを上書き
     var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
     Game_Interpreter.prototype.pluginCommand = function (command, args) {
@@ -138,18 +171,7 @@
                 DataManager.SetCustomList(removeItemsWithSubstring(Customlist, tag, parseInt($gameVariables.value(681))));
             }
         } else if (command === 'RGen_Count') {
-            const questionList = DataManager.loadCustomData();
-            //過去問リストの中から該当する問題のリストを作る
-            var level = args[0];
-            let count = 0;
-            for (let key in questionList) {
-                if (questionList.hasOwnProperty(key) && key.startsWith(`Lv0${level}`)) {
-                    if (questionList[key] && questionList[key]["1087"].split(',').some(value => value == $gameVariables.value(group))) {
-                        count++;
-                    }
-                }
-            }
-            $gameVariables.setValue(numofQ, count);
+            calculateC(args[0], $gameVariables.value(group));
         }
         else if (command === 'RGen_reset') {
             if (!DataManager._customList) {
@@ -229,7 +251,7 @@
             a = b - grad + 1;
         }
         //もし問題抽選に勾配がある(gradが1以上、つまり新問優先)なら、最小値をb - grad + 1まで上げる。
-
+        //console.log(customlist);
         const matchingNumbers = customlist.filter(item => item.startsWith(identifier));
         const questionList = DataManager.loadCustomData();
         //過去問リストの中から該当する問題のリストを作る

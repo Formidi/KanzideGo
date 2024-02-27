@@ -50,55 +50,251 @@
         pluginCommand.call(this, command, args);
         if (command === 'MakeMathQuestion') {
             Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774));
-            const [question, answer] = generateMathQuestion_PM(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]));
-            var expression = [question[0]];
-            for (let i = 1; i < question.length; i++) {
-                if (!isNaN(question[i])) {
-                    if (question[i] >= 0) {
-                        expression.push(" ＋ ");
-                        expression.push(question[i]);
+            phase = phaseChecker();
+            if ($gameVariables.value(1265) == 0 && phase >= 2 && phase <= 5 && Math.random() < 0.5) {
+                Ingenuity(phase);
+                //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
+            } else {
+                const [question, answer] = generateMathQuestion_PM(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]));
+                var expression = [question[0]];
+                for (let i = 1; i < question.length; i++) {
+                    if (!isNaN(question[i])) {
+                        if (question[i] >= 0) {
+                            expression.push(" ＋ ");
+                            expression.push(question[i]);
+                        } else {
+                            expression.push(" － ");
+                            expression.push(Math.abs(question[i]));
+                        }
                     } else {
-                        expression.push(" － ");
-                        expression.push(Math.abs(question[i]));
-                    }
-                } else {
-                    if (question[i].indexOf("－") !== -1) {
-                        expression.push(question[i]);
-                    } else {
-                        expression.push(" ＋ ");
-                        expression.push(question[i]);
-                    }
-                }
-            }
-            if (args.length >= 4) {
-                if (args[3] == "□") {
-                    const numberIndexes = [];
-                    for (let i = 0; i < expression.length; i++) {
-                        if (!isNaN(expression[i])) {
-                            numberIndexes.push(i);
+                        if (question[i].indexOf("－") !== -1) {
+                            expression.push(question[i]);
+                        } else {
+                            expression.push(" ＋ ");
+                            expression.push(question[i]);
                         }
                     }
-                    // リストからランダムなインデックスを選択
-                    const randomIndex = numberIndexes[Math.floor(Math.random() * numberIndexes.length)];
-                    var tmp = expression[randomIndex];
-                    expression[randomIndex] = "■";
-                    var quest = expression.join().replace(/,/g, '');
-                    $gameVariables.setValue(mondai_index, `${quest} ＝ ${answer}`);
-                    $gameVariables.setValue(kotae_index, tmp);
                 }
-            } else {
-                var quest = expression.join().replace(/,/g, '');
-                $gameVariables.setValue(mondai_index, quest);
-                $gameVariables.setValue(kotae_index, answer);
-                //console.log(quest);
-            }
-            if ($gameVariables.value(1265) >= 1) {
-                $gameVariables.setValue(mondai_index, transformTextWithNumbers($gameVariables.value(mondai_index)));
-                console.log(countStringLength($gameVariables.value(mondai_index)));
-                console.log($gameVariables.value(mondai_index));
+                if (args.length >= 4) {
+                    if (args[3] == "□") {
+                        const numberIndexes = [];
+                        for (let i = 0; i < expression.length; i++) {
+                            if (!isNaN(expression[i])) {
+                                numberIndexes.push(i);
+                            }
+                        }
+                        // リストからランダムなインデックスを選択
+                        const randomIndex = numberIndexes[Math.floor(Math.random() * numberIndexes.length)];
+                        var tmp = expression[randomIndex];
+                        expression[randomIndex] = "■";
+                        var quest = expression.join().replace(/,/g, '');
+                        $gameVariables.setValue(mondai_index, `${quest} ＝ ${answer}`);
+                        $gameVariables.setValue(kotae_index, tmp);
+                    }
+                } else {
+                    var quest = expression.join().replace(/,/g, '');
+                    $gameVariables.setValue(mondai_index, quest);
+                    $gameVariables.setValue(kotae_index, answer);
+                    //console.log(quest);
+                }
+                if ($gameVariables.value(1265) >= 1) {
+                    $gameVariables.setValue(mondai_index, transformTextWithNumbers($gameVariables.value(mondai_index)));
+                    //console.log(countStringLength($gameVariables.value(mondai_index)));
+                    //console.log($gameVariables.value(mondai_index));
+                }
             }
         }
     };
+
+    function isPrime(num) {
+        if (num <= 1) return false;
+        if (num <= 3) return true;
+        if (num % 2 === 0 || num % 3 === 0) return false;
+        let i = 5;
+        while (i * i <= num) {
+            if (num % i === 0 || num % (i + 2) === 0) return false;
+            i += 6;
+        }
+        return true;
+    }
+
+    function phaseChecker() {
+        var q = parseInt($gameVariables.value(7));
+        var thresholds = [2, 5, 7, 10, 12, 15, 16];
+        var max = 6;
+        if ($gameVariables.value(1102) == 0) {
+            thresholds = [1, 2, 3, 4, 5, 6, 7];
+            max = 6;
+        } else if ($gameVariables.value(1102) == 1) {
+            thresholds = [2, 3, 5, 6, 8, 9, 10];
+            max = 6;
+        }
+        phase = max;
+        if ($gameVariables.value(1117) >= 11) {
+            phase = Math.min($gameVariables.value(1117) - 11, 13);
+        } else {
+            for (var i = 0; i < thresholds.length; i++) {
+                if (q <= thresholds[i]) {
+                    phase = i;
+                    break;
+                }
+            }
+        }
+        if ($gameVariables.value(1117) == 1) {
+            phase = Math.min(phase + 2, 13);
+        } else if ($gameVariables.value(1117) == 2) {
+            phase = Math.min(phase + 4, 13);
+        } else if ($gameVariables.value(1117) == 3) {
+            phase = Math.min(phase + 6, 13);
+        }
+        return phase;
+    }
+
+    function getRandomPrime(difficulty) {
+        let min = 1;
+        let max = 100;
+        if (difficulty == 2) {
+            min = 10;
+            max = 30;
+        } else if (difficulty == 3) {
+            min = 30;
+            max = 50;
+        } else if (difficulty == 4) {
+            min = 50;
+            max = 200;
+        } else if (difficulty == 5) {
+            min = 200;
+            max = 999;
+        }
+        while (true) {
+            let num = Math.floor(Math.random() * (max - min + 1)) + min;
+            if (isPrime(num)) return num;
+        }
+    }
+    function getRandomNumber(digits) {
+        let min, max;
+
+        if (digits === 10) {
+            min = 2;
+            max = 4;
+        } else if (digits === 100) {
+            min = 11;
+            max = 30;
+        } else {
+            return "Unsupported digits value";
+        }
+
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function Ingenuity(difficulty) {
+        //difficultyが2~3なら2桁、4~5なら3桁、1か6以上なら無し
+        //3か5なら+
+        var digits = parseInt(Math.pow(10, Math.floor(difficulty / 2)));
+        var sub_digit = difficulty % 2;
+
+        var randomValue = Math.floor(Math.random() * 3 * digits) + digits;//10→10~30、100→100~300
+        var randomNormalValue = Math.floor(Math.random() * 9 * digits) + digits;//10→10~99、100→100~999
+        if (randomValue % 10 == 0) {
+            randomValue += Math.floor(Math.random() * 5) + 1;
+        }
+        var randomValue_one = getRandomNumber(digits);//10→2~4、100→11~30
+        var randomValue_two = getRandomNumber(digits);//10→2~4、100→11~30
+
+        var randomonedigitsValue = Math.floor(Math.random() * 7) + 2;//10→2~9
+
+        var randomValue_10n_minus_one_two = digits / 10 * (10 + randomonedigitsValue - 2) - randomValue_one - randomValue_two;
+        
+        var RandomValueNear10n = digits + Math.floor(Math.random() * difficulty) - 5;
+        if (RandomValueNear10n % 10 == 0) {
+            RandomValueNear10n += Math.floor(Math.random() * 5) + 1;
+        }
+
+        var RandomValueNear10n_sub = digits + Math.floor(Math.random() * 10) - 5;
+        if (RandomValueNear10n_sub % 10 == 0) {
+            RandomValueNear10n_sub += Math.floor(Math.random() * 5) + 1;
+        }
+
+        var randomPrimeValue = getRandomPrime(difficulty);
+
+        const just_num = [[5, 2], [5, 4], [25, 2], [25, 4], [125, 4], [125, 8], [45, 4], [45, 8], [75, 4], [75, 8]];
+        var just_num_index = Math.floor(Math.random() * 4) + 2 * (difficulty - 2);
+        var rand = Math.floor(Math.random() * 60) + 1;
+        var sign = parseInt(rand % 2);
+        var quest = "";
+        var answer = 0;
+
+        if (rand <= 10) {
+            quest = `${just_num[just_num_index][sign]} × ${randomValue_one} × ${just_num[just_num_index][1 - sign]}`;
+            answer = randomValue_one * just_num[just_num_index][0] * just_num[just_num_index][1];
+        } else if (rand <= 20) {
+            if (sub_digit == 1) {
+                quest = `${digits + randomValue_one} × ${randomValue_two} ＋ ${randomValue_10n_minus_one_two}`;
+                answer = (digits + randomValue_one) * randomValue_two + randomValue_10n_minus_one_two;
+            } else {
+                if (randomValue < randomValue_10n_minus_one_two + randomValue_one + randomValue_two) {
+                    quest = `${randomValue_10n_minus_one_two} － ${randomValue} ＋ ${randomValue_two} ＋ ${randomValue_one}`;
+                    answer = randomValue_10n_minus_one_two + randomValue_one + randomValue_two - randomValue;
+                } else {
+                    quest = `${randomValue_10n_minus_one_two} ＋ ${randomValue} ＋ ${randomValue_two} ＋ ${randomValue_one}`;
+                    answer = randomValue_10n_minus_one_two + randomValue_one + randomValue_two + randomValue;
+                }
+            }
+        } else if (rand <= 30) {
+            if (sub_digit == 1) {
+                quest = `${just_num[just_num_index][sign] * randomValue_two} × ${randomValue_one * just_num[just_num_index][1 - sign]} ÷ ${randomValue_two}`;
+                answer = randomValue_one * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign];
+            } else {
+                quest = `${randomValue_one * just_num[just_num_index][sign]} × ${just_num[just_num_index][1 - sign]}`;
+                answer = randomValue_one * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign];
+            }
+        } else if (rand <= 40) {
+            if (sub_digit == 1) {
+                quest = `${RandomValueNear10n} × ${RandomValueNear10n_sub * randomonedigitsValue}`;
+                answer = RandomValueNear10n * RandomValueNear10n_sub * randomonedigitsValue;
+            } else {
+                quest = `${RandomValueNear10n * 10} × ${randomValue_one}`;
+                answer = RandomValueNear10n * 10 * randomValue_one;
+            }
+        } else if (rand <= 50) {
+            if (rand <= 45) {
+                quest = `${randomNormalValue} × ${randomonedigitsValue} ＋ ${randomonedigitsValue} × ${randomPrimeValue}`;
+                answer = randomonedigitsValue * (randomNormalValue + randomPrimeValue);
+            } else {
+                quest = `${randomValue * randomonedigitsValue} ÷ ${randomonedigitsValue} ＋ ${randomPrimeValue * randomonedigitsValue} ÷ ${randomonedigitsValue}`;
+                answer = randomValue + randomPrimeValue;
+            }
+        } else if (rand <= 60) {
+            if (sub_digit == 1) {
+                if (randomPrimeValue * 3 - randomValue * 3 >= 1 && randomValue + RandomValueNear10n_sub >= 1 && randomPrimeValue + RandomValueNear10n >= 1 && randomValue - RandomValueNear10n_sub >= 1 && randomPrimeValue - RandomValueNear10n >= 1) {
+                    quest = `${randomPrimeValue + RandomValueNear10n} － ${randomValue + RandomValueNear10n_sub} ＋ ${randomPrimeValue} － ${randomValue} ＋ ${randomPrimeValue - RandomValueNear10n} － ${randomValue - RandomValueNear10n_sub}`;
+                    answer = randomPrimeValue * 3 - randomValue * 3;
+                } else if (randomPrimeValue - RandomValueNear10n * 2 >= 1 && randomPrimeValue + RandomValueNear10n * 2 >= 1) {
+                    quest = `${randomPrimeValue + RandomValueNear10n * 2} ＋ ${randomPrimeValue + RandomValueNear10n} ＋ ${randomPrimeValue} ＋ ${randomPrimeValue - RandomValueNear10n} ＋ ${randomPrimeValue - RandomValueNear10n * 2}`;
+                    answer = randomPrimeValue * 5;
+                } else if (randomPrimeValue - RandomValueNear10n >= 1 && randomPrimeValue + RandomValueNear10n >= 1) {
+                    quest = `${randomPrimeValue + RandomValueNear10n} ＋ ${randomPrimeValue} ＋ ${randomPrimeValue - RandomValueNear10n}`;
+                    answer = randomPrimeValue * 3;
+                } else {
+                    quest = `${randomPrimeValue * randomonedigitsValue} ÷ ${randomPrimeValue}`;
+                    answer = randomonedigitsValue;
+                }
+            } else {
+                if (randomPrimeValue - RandomValueNear10n * 2 >= 1 && randomPrimeValue + RandomValueNear10n * 2 >= 1) {
+                    quest = `${randomPrimeValue + RandomValueNear10n * 2} ＋ ${randomPrimeValue + RandomValueNear10n} ＋ ${randomPrimeValue} ＋ ${randomPrimeValue - RandomValueNear10n} ＋ ${randomPrimeValue - RandomValueNear10n * 2}`;
+                    answer = randomPrimeValue * 5;
+                } else if (randomPrimeValue - RandomValueNear10n >= 1 && randomPrimeValue + RandomValueNear10n >= 1) {
+                    quest = `${randomPrimeValue + RandomValueNear10n} ＋ ${randomPrimeValue} ＋ ${randomPrimeValue - RandomValueNear10n}`;
+                    answer = randomPrimeValue * 3;
+                } else {
+                    quest = `${randomPrimeValue * randomonedigitsValue} ÷ ${randomPrimeValue}`;
+                    answer = randomonedigitsValue;
+                }
+            }
+        }
+        $gameVariables.setValue(mondai_index, quest);
+        $gameVariables.setValue(kotae_index, answer);
+    }
 
     function countStringLength(text) {
         let length = 0;
@@ -555,10 +751,74 @@
         return russianNum.trim();
     }
 
+    function numberToGreekNumbers(num) {
+        if (num === 0) return "μηδέν";
+        if (num === 1000) return "χίλια";
+        const units = ["", "ένα", "δύο", "τρία", "τέσσερα", "πέντε", "έξι", "επτά", "οκτώ", "εννέα"];
+        const tens = ["", "δέκα", "είκοσι", "τριάντα", "σαράντα", "πενήντα", "εξήντα", "εβδομήντα", "ογδόντα", "ενενήντα"];
+        const hundreds = ["", "εκατό", "διακόσια", "τριακόσια", "τετρακόσια", "πεντακόσια", "εξακόσια", "επτακόσια", "οκτακόσια", "εννιακόσια"];
+
+        let result = "";
+        const hundredth = Math.floor(num / 100);
+        if (hundredth > 0) {
+            result += hundreds[hundredth] + " ";
+            num %= 100;
+        }
+
+        const tenth = Math.floor(num / 10);
+        if (tenth > 0) {
+            result += tens[tenth] + " ";
+            num %= 10;
+        }
+
+        if (num > 0) {
+            result += units[num];
+        }
+
+        return result;
+    }
+
+
+    function numberToGreekGlyph(num) {
+        if (num === 1000) return ",α'";
+        const greekUnits = [
+            "α", "β", "γ", "δ", "ε", "ϛ", "ζ", "η", "θ", "ι",
+        ];
+        const greekTens = [
+            "ι", "κ", "λ", "μ", "ν", "ξ", "ο", "π", "ϟ", "ρ",
+        ];
+        const greekHundreds = [
+            "ρ", "σ", "τ'", "υ", "φ", "χ", "ψ", "ω", "ϡ", "ϡ",
+        ];
+        let greekNum = "";
+
+        // Hundreds
+        const hundredsDigit = Math.floor(num / 100);
+        if (hundredsDigit > 0) {
+            greekNum += greekHundreds[hundredsDigit - 1];
+        }
+
+        // Tens
+        const tensDigit = Math.floor((num % 100) / 10);
+        if (tensDigit > 0) {
+            greekNum += greekTens[tensDigit - 1];
+        }
+
+        // Units
+        const unitsDigit = num % 10;
+        if (unitsDigit > 0) {
+            greekNum += greekUnits[unitsDigit - 1];
+        }
+
+        return greekNum + "'";
+    }
+
+
+
     function extreme(num,level,isFirst) {
         var rand = Math.floor(Math.random() * 60) + 1;//1~60
         if (isFirst) {
-            rand = Math.floor(Math.random() * 30) + 31;
+            rand = Math.floor(Math.random() * 30) + 31;//31~60
         }
         if (level == 1) {//そのまま、ひらがな、漢字
             if (rand <= 20) {
@@ -586,10 +846,12 @@
             } else if (rand <= 60) {
                 return intToRoman(num);
             }
-        } else if (level == 4) {//ドイツ語、スペイン語、フランス語
-            if (rand <= 20) {
+        } else if (level == 4) {//ローマ数字、ドイツ語、スペイン語、フランス語
+            if (rand <= 15) {
+                return intToRoman(num);
+            } else if (rand <= 30) {
                 return numberToGerman(num);
-            } else if (rand <= 40) {
+            } else if (rand <= 45) {
                 return numberToSpanish(num);
             } else if (rand <= 60) {
                 return numberToFrench(num);
@@ -605,6 +867,16 @@
                 return convertToKorean(num);
             } else if (rand <= 60) {
                 return numberToRussian(num);
+            }
+        } else if (level == 6) {//韓国語、ロシア語、ギリシャ語、ギリシャ文字
+            if (rand <= 15) {
+                return convertToKorean(num);
+            } else if (rand <= 30) {
+                return numberToRussian(num);
+            } else if (rand <= 45) {
+                return numberToGreekNumbers(num);
+            } else if (rand <= 60) {
+                return numberToGreekGlyph(num);
             }
         }
     } 
