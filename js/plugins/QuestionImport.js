@@ -874,15 +874,12 @@
         Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774));
         const randomIndex = Math.floor(Math.random() * 5);
         var thresholds = [2, 5, 7, 10, 12, 15, 16];
-        var max = 6;
         if ($gameVariables.value(1102) == 0) {
             thresholds = [1, 2, 3, 4, 5, 6, 7];
-            max = 6;
         } else if ($gameVariables.value(1102) == 1) {
             thresholds = [2, 3, 5, 6, 8, 9, 10];
-            max = 6;
         }
-        phase = max;
+        phase = 6;
         if ($gameVariables.value(1117) >= 11) {
             phase = Math.min($gameVariables.value(1117) - 11,13);
         } else {

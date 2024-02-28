@@ -20,6 +20,11 @@
  * @desc 制限時の総問題数。
  * @type number
  * @default 1266
+ * 
+ * @param seeds
+ * @desc シードを保存する変数番号。
+ * @type number
+ * @default 1264
  */
 //=============================================================================
 (function () {
@@ -27,6 +32,7 @@
     var exported_value = Number(parameters['exported_value'] || 6);
     var group = Number(parameters['group'] || 1084);
     var numofQ = Number(parameters['numofQ'] || 1266);
+    var seeds = Number(parameters['seeds'] || 1264);
 
     //this._customListを初期化する関数
     DataManager.initCustomList = function () {
@@ -90,6 +96,8 @@
         return count;
     }
 
+    var cash_seeds = [];
+
     //既存のプラグインコマンドを上書き
     var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
     Game_Interpreter.prototype.pluginCommand = function (command, args) {
@@ -100,7 +108,6 @@
             if (!DataManager._customList) {
                 DataManager.initCustomList();
             }
-            const questionList = DataManager.loadCustomData();
             //ステージ判別用のアイデンティファイアー
             var variableId = args[0];
             var min = parseInt(args[1]);//問題抽選の最小値
@@ -133,15 +140,27 @@
                 } else {//どれにも引っかからない場合
                     value = generateRandomNumber(min, max);
                 }
-                //console.log(questionList[`Lv0${variableId.replace(/\D/g, '')}_${String(value).padStart(4, '0')}`]["1087"].split(','));
                 $gameVariables.setValue(exported_value, value);//最終的に出た値を代入する
             }
+        }
+        else if (command === 'RGen_Seed') {
+            const numbers = [111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126,
+                546, 547, 548, 549,
+                804, 816, 828, 840, 852, 864, 876, 888, 900, 912, 924, 936];
+            let list = "";
+            numbers.forEach((number) => {
+                // ここで各数値に対して処理を行う
+                list += $gameVariables.value(number).toString().padStart(4, '0');
+            });
+            
+            $gameVariables.setValue(seeds, list);
         }
         else if (command === 'RGen_Record') {
             //もしリストがまだないなら初期化
             if (!DataManager._customList) {
                 DataManager.initCustomList();
             }
+            $gameVariables.setValue(seeds, 0);
             var Customlist = DataManager.getCustomList();//リストの取得
             if ($gameVariables.value(15) != 901) {
                 var tag;// = $gameVariables.value(8).split('_')[0];//ここでいうタグはレベル名。例えばLvEx004_0001ならLvEx004が抽出される。
