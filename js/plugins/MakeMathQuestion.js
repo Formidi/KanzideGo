@@ -50,11 +50,11 @@
         pluginCommand.call(this, command, args);
         if (command === 'MakeMathQuestion') {
             Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774));
-            phase = phaseChecker();
-            if (($gameVariables.value(1265) == 0 && phase >= 2 && phase <= 5 && Math.random() < 0.5)) {
-                Ingenuity(phase);
-                //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
-            } else if ($gameVariables.value(1265) == 0 && phase == 6 && Math.random() < 0.4 && $gameVariables.value(1117) == 0) {
+            var phase = phaseChecker();
+            if (($gameVariables.value(1265) == 0 && phase >= 2 && phase <= 5 && Math.random() < 0.5) || true) {
+                Ingenuity(3);
+                console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
+            } else if (($gameVariables.value(1265) == 0 && phase == 6 && Math.random() < 0.6 && $gameVariables.value(1117) == 0)) {
                 Ingenuity_Hard();
                 //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
             } else {
@@ -201,20 +201,20 @@
         var sub_digit = difficulty % 2;
 
         var randomValue = Math.floor(Math.random() * 3 * digits) + digits;//10→10~30、100→100~300
-        var randomNormalValue = Math.floor(Math.random() * 9 * digits) + digits;//10→10~99、100→100~999
         if (randomValue % 10 == 0) {
             randomValue += Math.floor(Math.random() * 5) + 1;
         }
         var randomValue_one = getRandomNumber(digits);//10→2~4、100→11~30
         var randomValue_two = getRandomNumber(digits);//10→2~4、100→11~30
 
-        var randomonedigitsValue = Math.floor(Math.random() * 7) + 2;//10→2~9
+        var randomonedigitsValue = Math.floor(Math.random() * 7) + 2;//2~9
+        var randomminidigitsValue = Math.floor(Math.random() * 3) + 2;//2~5
 
         var randomValue_10n_minus_one_two = digits / 10 * (10 + randomonedigitsValue - 2) - randomValue_one - randomValue_two;
         
         var RandomValueNear10n = digits + Math.floor(Math.random() * difficulty) - 3;
         if (RandomValueNear10n % 10 == 0) {
-            RandomValueNear10n += 1;
+            RandomValueNear10n += Math.floor(Math.random() * difficulty) * 10;
         }
 
         var RandomValueNear10n_sub = digits + Math.floor(Math.random() * 10);
@@ -223,6 +223,7 @@
         }
 
         var randomPrimeValue = getRandomPrime(difficulty);
+        var random10n_minus_randomPrimeValue = digits * (11 + Math.floor(Math.random() * 8)) - randomPrimeValue
 
         const just_num = [[5, 2], [5, 4], [25, 2], [25, 4], [125, 4], [125, 8], [45, 4], [45, 8], [75, 4], [75, 8]];
         var just_num_index = Math.floor(Math.random() * 4) + 2 * (difficulty - 2);
@@ -241,8 +242,8 @@
             answer = randomValue_one * just_num[just_num_index][0] * just_num[just_num_index][1];
         } else if (rand <= 20) {
             if (sub_digit == 1) {
-                quest = `${digits + randomValue_one} × ${randomValue_two} ＋ ${randomValue_10n_minus_one_two}`;
-                answer = (digits + randomValue_one) * randomValue_two + randomValue_10n_minus_one_two;
+                quest = `${digits * randomonedigitsValue + randomValue_one} × ${randomValue_two} － ${randomValue_one * randomValue_two}`;
+                answer = digits * randomonedigitsValue * randomValue_two;
             } else {
                 if (randomValue < randomValue_10n_minus_one_two + randomValue_one + randomValue_two) {
                     quest = `${randomValue_10n_minus_one_two} － ${randomValue} ＋ ${randomValue_two} ＋ ${randomValue_one}`;
@@ -270,11 +271,11 @@
             }
         } else if (rand <= 50) {
             if (rand <= 45) {
-                quest = `${randomNormalValue} × ${randomonedigitsValue} ＋ ${randomonedigitsValue} × ${randomPrimeValue}`;
-                answer = randomonedigitsValue * (randomNormalValue + randomPrimeValue);
+                quest = `${random10n_minus_randomPrimeValue} × ${randomonedigitsValue} ＋ ${randomonedigitsValue} × ${randomPrimeValue}`;
+                answer = randomonedigitsValue * (random10n_minus_randomPrimeValue + randomPrimeValue);
             } else {
-                quest = `${randomValue * randomonedigitsValue} ÷ ${randomonedigitsValue} ＋ ${randomPrimeValue * randomonedigitsValue} ÷ ${randomonedigitsValue}`;
-                answer = randomValue + randomPrimeValue;
+                quest = `${randomPrimeValue * randomminidigitsValue} ÷ ${randomminidigitsValue} ＋ ${randomValue_one * randomminidigitsValue * randomminidigitsValue} ÷ ${randomminidigitsValue * randomminidigitsValue}`;
+                answer = randomValue_one + randomPrimeValue;
             }
         } else if (rand <= 60) {
             if (sub_digit == 1) {
