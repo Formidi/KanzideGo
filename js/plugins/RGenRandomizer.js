@@ -96,7 +96,50 @@
         return count;
     }
 
-    var cash_seeds = [];
+    function toBase64(number, key) {
+        number = number ^ key
+        // 64進法の文字列
+        const base64Digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+        // 結果を格納する配列
+        const result = [];
+
+        // 数字が0になるまでループ
+        while (number > 0) {
+            // 余りを計算
+            const remainder = number % 64;
+            // 商を計算
+            number = Math.floor(number / 64);
+
+            // 余りに対応する文字を配列に追加
+            result.unshift(base64Digits[remainder]);
+        }
+
+        // 配列を文字列に変換して返す
+        return result.join("");
+    }
+    function fromBase64(str, key) {
+        // 64進法の文字列
+        const base64Digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+        // 結果を格納する変数
+        let result = 0;
+
+        // 文字列をループ
+        for (let i = 0; i < str.length; i++) {
+            // 文字列のインデックス
+            const index = base64Digits.indexOf(str[i]);
+
+            // 64^(文字列の長さ - インデックス - 1) を計算
+            const power = 64 ** (str.length - i - 1);
+
+            // 結果に 64^(文字列の長さ - インデックス - 1) * インデックス を加算
+            result += power * index;
+        }
+
+        // 結果を返す
+        return result ^ key;
+    }
 
     //既存のプラグインコマンドを上書き
     var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
@@ -148,11 +191,19 @@
                 546, 547, 548, 549,
                 804, 816, 828, 840, 852, 864, 876, 888, 900, 912, 924, 936];
             let list = "";
-            numbers.forEach((number) => {
-                // ここで各数値に対して処理を行う
-                list += $gameVariables.value(number).toString().padStart(4, '0');
+            const key = String($gameVariables.value(1177)).padStart(8,'0');
+            numbers.forEach((number, index) => {
+                const keyChunk = key.slice(index * 2, index * 2 + 2);
+                const base64String = toBase64($gameVariables.value(number), keyChunk).padStart(2, "_");
+                list += base64String;
             });
-            
+            const chunks = list.match(/.{1,2}/g);
+            let list2 = "";
+            chunks.forEach((number, index) => {
+                const keyChunk = key.slice(index * 2, index * 2 + 2);
+                const base64String = fromBase64(number.replace("_", ""), keyChunk);
+                list2 += base64String.toString().padStart(4,'0');
+            });
             $gameVariables.setValue(seeds, list);
         }
         else if (command === 'RGen_Record') {
@@ -160,7 +211,6 @@
             if (!DataManager._customList) {
                 DataManager.initCustomList();
             }
-            $gameVariables.setValue(seeds, 0);
             var Customlist = DataManager.getCustomList();//リストの取得
             if ($gameVariables.value(15) != 901) {
                 var tag;// = $gameVariables.value(8).split('_')[0];//ここでいうタグはレベル名。例えばLvEx004_0001ならLvEx004が抽出される。

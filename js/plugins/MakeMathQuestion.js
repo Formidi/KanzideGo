@@ -51,9 +51,9 @@
         if (command === 'MakeMathQuestion') {
             Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774));
             var phase = phaseChecker();
-            if (($gameVariables.value(1265) == 0 && phase >= 2 && phase <= 5 && Math.random() < 0.5) || true) {
-                Ingenuity(3);
-                console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
+            if (($gameVariables.value(1265) == 0 && phase >= 2 && phase <= 5 && Math.random() < 0.5)) {
+                Ingenuity(phase);
+                //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
             } else if (($gameVariables.value(1265) == 0 && phase == 6 && Math.random() < 0.6 && $gameVariables.value(1117) == 0)) {
                 Ingenuity_Hard();
                 //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
@@ -109,6 +109,97 @@
             }
         }
     };
+
+
+    // 問題文を生成する関数
+
+    function GenerateMD(digits, sub_digits) {
+        if (Math.random() < 0.5) {
+            let YaYaBigNum = Math.floor(Math.random() * (5 * sub_digits + 3) * digits) + 2 * digits;
+            if (YaYaBigNum % 10 == 0) YaYaBigNum += Math.floor(Math.random() * 9) + 1;
+            if (digits == 100 && sub_digits == 0) YaYaBigNum = YaYaBigNum % 100 + 100;
+            var SmallNum = Math.floor(Math.random() * 8) + 2;//small_numは難易度が5以下なら1桁の2以上。
+            if ((digits >= 100 && sub_digits == 1) || digits >= 1000) SmallNum += Math.floor(Math.random() * 7) * 10 + 20;//難易度6以上なら2桁に。容赦はない。
+            if (SmallNum % 10 == 0 && digits >= 100) SmallNum += Math.floor(Math.random() * 9) + 1;
+            return [`${YaYaBigNum} × ${SmallNum}`, YaYaBigNum * SmallNum];
+        } else {
+            var YaYaSmallNum = Math.floor(Math.random() * 7 * digits) + 2 * digits;//1→2~9、2→20~90、3→200~900
+            if (digits == 100 && sub_digits == 0) YaYaSmallNum = Math.floor(Math.random() * 70) + 20;
+            if (YaYaSmallNum % 10 == 0) YaYaSmallNum += Math.floor(Math.random() * 9) + 1;
+            var SmallNum = Math.floor(Math.random() * 8) + 2;
+            SmallNum += Math.floor(Math.random() * digits / 10);
+            if (digits >= 100 && sub_digits == 1) SmallNum += Math.floor(Math.random() * digits * 9 / 10) + digits / 10;
+            if (SmallNum % 10 == 0 && digits >= 10) SmallNum += Math.floor(Math.random() * 9) + 1;
+            if (Math.random() < 0.5 && digits <= 10) {
+                return [`${YaYaSmallNum * SmallNum} ÷ ${YaYaSmallNum}`, SmallNum];
+            } else {
+                return [`${YaYaSmallNum * SmallNum} ÷ ${SmallNum}`, YaYaSmallNum];
+            }
+        }
+    }
+
+    function generateMathQuestion_PM(level, num_of_pm, num_of_md) {
+        var digits = parseInt(Math.pow(10, Math.floor((level - 1) / 2)));//1~2なら1、3~4なら10、5~6なら100。
+        var sub_digits = parseInt(1 - level % 2);//2,4,6なら1、それ以外なら0。
+        const arr = [];
+        let ans = 0;
+        var randomValue;
+        var answer;
+        for (let i = 0; i < num_of_pm + 1; i++) {
+            if (Math.random() < num_of_md / (num_of_pm + 1 - i)) {
+                [randomValue, answer] = GenerateMD(digits, sub_digits);
+                num_of_md -= 1;
+            } else {
+                // digitsが1なら1~9、digitsが10なら10~99、100なら100~999の乱数。
+                if (i == 0 && sub_digits == 1) {
+                    //難易度が偶数かつ最初の数字の場合、一桁上の数字が抽選される。
+                    randomValue = Math.floor(Math.random() * 9 * digits) + digits;
+                } else if (i != 0 && digits == 100 && sub_digits == 0) {
+                    //難易度5かつ最初の数字でない場合、10~99が抽選される。
+                    randomValue = Math.floor(Math.random() * 90) + 10;
+                } else {
+                    randomValue = Math.floor(Math.random() * 9 * digits) + digits;
+                }
+                if ($gameVariables.value(1265) >= 1) {
+                    if (Math.random() < 0.5 && randomValue >= 10) {
+                        randomValue = Math.floor(randomValue / 10) * 10;
+                    } else if (Math.random() < 0.5 && randomValue >= 100) {
+                        randomValue = Math.floor(randomValue / 100) * 100;
+                    }
+                }
+                answer = randomValue;
+            }
+            arr.push(randomValue);
+            ans += answer;
+        }
+        if (arr.length == 1) {
+            if (isNaN(arr[0])) return [arr, ans];
+            arr.sort((a, b) => b - a);
+            if (Math.random() < 0.5) arr[1] = -1 * arr[1];
+            ans = arr[0] + arr[1];
+            return [arr, ans];
+        }
+        var per = 0.8;
+        while (Math.random() < per) {
+            var changeIndex = Math.floor(Math.random() * (arr.length - 1)) + 1;
+            var arrValue = calculateExpression(arr[changeIndex]);
+            if (arrValue < arr[0] && arrValue * 2 < ans && arrValue >= 1) {
+                ans -= 2 * arrValue;
+                if (!isNaN(arr[changeIndex])) {
+                    arr[changeIndex] = -1 * arr[changeIndex];
+                } else {
+                    arr[changeIndex] = ` － ${arr[changeIndex]}`;
+                }
+                per -= 0.2;
+            }
+            if (arrValue > arr[0]) {
+                var tmp = arr[0];
+                arr[0] = arr[changeIndex];
+                arr[changeIndex] = tmp;
+            }
+        }
+        return [arr, ans];
+    }
 
     function isPrime(num) {
         if (num <= 1) return false;
@@ -178,6 +269,7 @@
             if (isPrime(num)) return num;
         }
     }
+
     function getRandomNumber(digits) {
         let min, max;
 
@@ -297,6 +389,7 @@
         $gameVariables.setValue(mondai_index, quest);
         $gameVariables.setValue(kotae_index, answer);
     }
+
     function shuffleArray(array) {
         // Fisher-Yatesアルゴリズムを使って配列をランダムに並べ替える
         for (let i = array.length - 1; i > 0; i--) {
@@ -305,6 +398,7 @@
         }
         return array;
     }
+
     function Ingenuity_Hard() {
         var rand = Math.floor(Math.random() * 60) + 1;
         var quest = "";
@@ -316,12 +410,11 @@
             quest = `${shuffledArray[0] * randomPrimeValue} × ${shuffledArray[1]} × ${shuffledArray[2]}`;
             answer = 1001 * randomPrimeValue;
         } else if (rand <= 20) {
-            const randomPrimeValue_one = getRandomPrime(2);
-            const randomPrimeValue_two = getRandomPrime(2);
+            const randomPrimeValue = getRandomPrime(2);
             const myArray = [2, 8];
             const shuffledArray = shuffleArray(myArray);
-            quest = `${shuffledArray[0] * randomPrimeValue_one} × ${shuffledArray[1] * randomPrimeValue_two} × 625`;
-            answer = 10000 * randomPrimeValue_one * randomPrimeValue_two;
+            quest = `${shuffledArray[0]} × ${shuffledArray[1] * randomPrimeValue} × 625`;
+            answer = 10000 * randomPrimeValue;
         } else if (rand <= 30) {
             const randomTwoPower = Math.pow(2, Math.floor(Math.random() * 6) + 3);
             quest = `65536 ÷ ${randomTwoPower}`;
@@ -347,19 +440,7 @@
         $gameVariables.setValue(mondai_index, quest);
         $gameVariables.setValue(kotae_index, answer);
     }
-    function countStringLength(text) {
-        let length = 0;
-        for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            // 韓国語、漢字、ひらがな、特定の記号を全角として扱う
-            if (char.match(/[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af＋－×÷=]/)) {
-                length += 2;
-            } else {
-                length += 1;
-            }
-        }
-        return length;
-    }
+
     function transformTextWithNumbers(text) {
         // 全角文字を2、半角文字を1と数える関数
         function getStringLength(str) {
@@ -422,30 +503,6 @@
         return result;
     }
 
-    function GenerateMD(digits, sub_digits) {
-        if (Math.random() < 0.5) {
-            let YaYaBigNum = Math.floor(Math.random() * (5 * sub_digits + 3) * digits) + 2 * digits;
-            if (YaYaBigNum % 10 == 0) YaYaBigNum += Math.floor(Math.random() * 9) + 1;
-            if (digits == 100 && sub_digits == 0) YaYaBigNum = YaYaBigNum % 100 + 100;
-            var SmallNum = Math.floor(Math.random() * 8) + 2;//small_numは難易度が5以下なら1桁の2以上。
-            if ((digits >= 100 && sub_digits == 1) || digits >= 1000) SmallNum += Math.floor(Math.random() * 7) * 10 + 20;//難易度6以上なら2桁に。容赦はない。
-            if (SmallNum % 10 == 0 && digits >= 100) SmallNum += Math.floor(Math.random() * 9) + 1;
-            return [`${YaYaBigNum} × ${SmallNum}`, YaYaBigNum * SmallNum];
-        } else {
-            var YaYaSmallNum = Math.floor(Math.random() * 7 * digits) + 2 * digits;//1→2~9、2→20~90、3→200~900
-            if (digits == 100 && sub_digits == 0) YaYaSmallNum = Math.floor(Math.random() * 70) + 20;
-            if (YaYaSmallNum % 10 == 0) YaYaSmallNum += Math.floor(Math.random() * 9) + 1;
-            var SmallNum = Math.floor(Math.random() * 8) + 2;
-            SmallNum += Math.floor(Math.random() * digits / 10);
-            if (digits >= 100 && sub_digits == 1) SmallNum += Math.floor(Math.random() * digits * 9 / 10) + digits / 10;
-            if (SmallNum % 10 == 0 && digits >= 10) SmallNum += Math.floor(Math.random() * 9) + 1;
-            if (Math.random() < 0.5 && digits <= 10) {
-                return [`${YaYaSmallNum * SmallNum} ÷ ${YaYaSmallNum}`, SmallNum];
-            } else {
-                return [`${YaYaSmallNum * SmallNum} ÷ ${SmallNum}`, YaYaSmallNum];
-            }
-        }
-    }
 
     function calculateExpression(exp) {
         if (!isNaN(exp)) return exp;
@@ -513,7 +570,6 @@
 
         return "one thousand";
     }
-
 
     function convertToKanji(num) {
         if (num < 1 || num > 1000 || !Number.isInteger(num)) {
@@ -830,7 +886,6 @@
         return result;
     }
 
-
     function numberToGreekGlyph(num) {
         if (num === 1000) return ",α'";
         const greekUnits = [
@@ -864,8 +919,6 @@
 
         return greekNum + "'";
     }
-
-
 
     function extreme(num,level,isFirst) {
         var rand = Math.floor(Math.random() * 60) + 1;//1~60
@@ -933,68 +986,4 @@
         }
     } 
 
-
-    // 問題文を生成する関数
-    function generateMathQuestion_PM(level, num_of_pm, num_of_md) {
-        var digits = parseInt(Math.pow(10,Math.floor((level - 1) / 2)));//1~2なら1、3~4なら10、5~6なら100。
-        var sub_digits = parseInt(1 - level % 2);//2,4,6なら1、それ以外なら0。
-        const arr = [];
-        let ans = 0;
-        var randomValue;
-        var answer;
-        for (let i = 0; i < num_of_pm + 1; i++) {
-            if (Math.random() < num_of_md / (num_of_pm + 1 - i)) {
-                [randomValue, answer] = GenerateMD(digits, sub_digits);
-                num_of_md -= 1;
-            } else {
-                // digitsが1なら1~9、digitsが10なら10~99、100なら100~999の乱数。
-                if (i == 0 && sub_digits == 1) {
-                    //難易度が偶数かつ最初の数字の場合、一桁上の数字が抽選される。
-                    randomValue = Math.floor(Math.random() * 9 * digits) + digits;
-                } else if (i != 0 && digits == 100 && sub_digits == 0) {
-                    //難易度5かつ最初の数字でない場合、10~99が抽選される。
-                    randomValue = Math.floor(Math.random() * 90) + 10;
-                }else{
-                    randomValue = Math.floor(Math.random() * 9 * digits) + digits;
-                }
-                if ($gameVariables.value(1265) >= 1) {
-                    if (Math.random() < 0.5 && randomValue >= 10) {
-                        randomValue = Math.floor(randomValue / 10) * 10;
-                    } else if (Math.random() < 0.5 && randomValue >= 100) {
-                        randomValue = Math.floor(randomValue / 100) * 100;
-                    }
-                }
-                answer = randomValue;
-            }
-            arr.push(randomValue);
-            ans += answer;
-        }
-        if (arr.length == 1) {
-            if (isNaN(arr[0])) return [arr, ans];
-            arr.sort((a, b) => b - a);
-            if (Math.random() < 0.5) arr[1] = -1 * arr[1];
-            ans = arr[0] + arr[1];
-            return [arr, ans];
-        }
-        var per = 0.8;
-        while (Math.random() < per) {
-            var changeIndex = Math.floor(Math.random() * (arr.length - 1)) + 1;
-            var arrValue = calculateExpression(arr[changeIndex]);
-            if (arrValue < arr[0] && arrValue * 2 < ans && arrValue >= 1) {
-                ans -= 2 * arrValue;
-                if (!isNaN(arr[changeIndex])) {
-                    arr[changeIndex] = -1 * arr[changeIndex];
-                } else {
-                    arr[changeIndex] = ` － ${arr[changeIndex]}`;
-                }
-                per -= 0.2;
-            }
-            if (arrValue > arr[0]) {
-                var tmp = arr[0];
-                arr[0] = arr[changeIndex];
-                arr[changeIndex] = tmp;
-            }
-        }
-        return [arr, ans];
-    }
 })();

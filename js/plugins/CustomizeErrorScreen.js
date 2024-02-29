@@ -130,6 +130,7 @@
         this._setErrorPrinterStyle();
         if (this._errorPrinter) {
             this._makeMainMessage();
+            this._makeExtraInfo();
             if (param.HyperLink)    this._makeHyperLink();
             if (param.OutputDetail) {
                 var stack = String(e.stack) || '';
@@ -163,6 +164,16 @@
         hyperLink.addEventListener('click', this._openUrl.bind(this, param.HyperLink));
         hyperLink.innerHTML = param.HyperLink;
         this._errorPrinter.appendChild(hyperLink);
+    };
+
+    Graphics._makeExtraInfo = function () {
+        var mainMessage = document.createElement('div');
+        var style = mainMessage.style;
+        style.color = 'white';
+        style.textAlign = 'left';
+        style.fontSize = '18px';
+        mainMessage.innerHTML = '<hr>' + `${$gameVariables.value(1264)}-${$gameVariables.value(1177)}-${$gameVariables.value(15)}-${$gameVariables.value(6)}-${$gameVariables.value(12)}`;
+        this._errorPrinter.appendChild(mainMessage);
     };
 
     Graphics._openUrl = function(url) {
