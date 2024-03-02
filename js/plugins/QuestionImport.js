@@ -92,8 +92,8 @@
         else {
             console.log("ローカル取得");
             ImportQuestionFromLocal();
-
         }
+        $gameVariables.setValue(1275, Math.floor(Math.random() * 99999999) + 1);
     };
 
     function ImportQuestionFromGitHub(refShaOrBranch) {
@@ -101,6 +101,9 @@
         fetch(apiUrl)
             .then(response => {
                 if (response.ok) {
+                    console.log('制限数:', response.headers.get('X-RateLimit-Limit'));
+                    console.log('残りリクエスト数:', response.headers.get('X-RateLimit-Remaining'));
+                    console.log('リセットまで:', response.headers.get('X-RateLimit-Reset'));
                     return response.json();
                 } else {
                     throw new Error(`Failed to fetch folder list: ${apiUrl}`);
@@ -148,6 +151,8 @@
             })
             .catch(error => {
                 console.error(`Error: ${error}`);
+                console.log(`エラーが発生したため、ローカルでの読み込みに変更します。`);
+                ImportQuestionFromLocal();
             });
     }
 
@@ -159,6 +164,9 @@
             .then(response => {
                 if (response.ok) {
                     return response.text();
+                    console.log('制限数:', response.headers.get('X-RateLimit-Limit'));
+                    console.log('残りリクエスト数:', response.headers.get('X-RateLimit-Remaining'));
+                    console.log('リセットまで:', response.headers.get('X-RateLimit-Reset'));
                 } else {
                     throw new Error(`Failed to fetch file: ${fileUrl}`);
                 }

@@ -172,7 +172,7 @@
         style.color = 'white';
         style.textAlign = 'left';
         style.fontSize = '18px';
-        mainMessage.innerHTML = '<hr>' + `${$gameVariables.value(1264)}-${$gameVariables.value(1177)}-${$gameVariables.value(15)}-${$gameVariables.value(6)}-${$gameVariables.value(12)}`;
+        mainMessage.innerHTML = '<hr>' + `${$gameVariables.value(1264)}-${$gameVariables.value(1177)}-${$gameVariables.value(1275)}-${$gameVariables.value(15)}-${$gameVariables.value(6)}-${$gameVariables.value(12)}`;
         this._errorPrinter.appendChild(mainMessage);
     };
 

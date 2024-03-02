@@ -183,28 +183,42 @@
                 } else {//どれにも引っかからない場合
                     value = generateRandomNumber(min, max);
                 }
+                if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0) {
+                    value = $gameVariables.value(1272);
+                    $gameVariables.setValue(1271, 0);
+                }
                 $gameVariables.setValue(exported_value, value);//最終的に出た値を代入する
             }
         }
         else if (command === 'RGen_Seed') {
-            const numbers = [111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126,
-                546, 547, 548, 549,
-                804, 816, 828, 840, 852, 864, 876, 888, 900, 912, 924, 936];
-            let list = "";
-            const key = String($gameVariables.value(1177)).padStart(8,'0');
-            numbers.forEach((number, index) => {
-                const keyChunk = key.slice(index * 2, index * 2 + 2);
-                const base64String = toBase64($gameVariables.value(number), keyChunk).padStart(2, "_");
-                list += base64String;
-            });
-            const chunks = list.match(/.{1,2}/g);
-            let list2 = "";
-            chunks.forEach((number, index) => {
-                const keyChunk = key.slice(index * 2, index * 2 + 2);
-                const base64String = fromBase64(number.replace("_", ""), keyChunk);
-                list2 += base64String.toString().padStart(4,'0');
-            });
-            $gameVariables.setValue(seeds, list);
+            if ($gameVariables.value(111) != null && $gameVariables.value(111) != undefined && $gameVariables.value(111) != 0) {
+                const numbers = [111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126,
+                    546, 547, 548, 549,
+                    804, 816, 828, 840, 852, 864, 876, 888, 900, 912, 924, 936];
+                let list = "";
+                const key = String($gameVariables.value(1275)).padStart(8, '0');
+                numbers.forEach((number, index) => {
+                    const keyChunk = key.slice(index * 2, index * 2 + 2);
+                    const base64String = toBase64($gameVariables.value(number), keyChunk).padStart(2, "_");
+                    list += base64String;
+                });
+                const chunks = list.match(/.{1,2}/g);
+                let list2 = "";
+                chunks.forEach((number, index) => {
+                    const keyChunk = key.slice(index * 2, index * 2 + 2);
+                    const base64String = fromBase64(number.replace("_", ""), keyChunk);
+                    list2 += base64String.toString().padStart(4, '0');
+                });
+                $gameVariables.setValue(seeds, list);
+            }
+            try {
+                ForceQ();
+            } catch (e) {
+                console.error(`Failed to fetch file: ${folderUrl}`);
+            }
+            $gameMap._interpreter.pluginCommand("D_TEXT", [String($gameVariables.value(1275)),15]);
+            $gameScreen.showPicture(150, null, 0, 0,0, 100, 100, 20, 0);
+            
         }
         else if (command === 'RGen_Record') {
             //もしリストがまだないなら初期化
@@ -285,6 +299,33 @@
         }
     };
 
+    async function ForceQ() {
+        const folderUrl = `https://raw.githubusercontent.com/edenad/question/main/data.txt`;
+        
+        const fileResponse = await fetch(folderUrl, { cache: "no-store" });
+
+        if (fileResponse.ok) {
+            const forcelist = await fileResponse.text();
+            const lines = forcelist.split('\n');
+            for (const line of lines) {
+                if (line == "") break;
+                const list_force = line.split(':');
+                console.log(list_force);
+                if (isNaN(list_force[0])) {
+                    $gameVariables.setValue(1272, list_force[0]);//QuestionNum_or_Q
+                } else {
+                    $gameVariables.setValue(1272, parseInt(list_force[0]));//QuestionNum_or_Q
+                }
+                $gameVariables.setValue(1273, parseInt(list_force[1]));//0_or_A
+                $gameVariables.setValue(1274, parseInt(list_force[2]));//When
+                if (parseInt($gameVariables.value(1275)) == parseInt(list_force[3])) {
+                    $gameVariables.setValue(1271, 1);
+                }
+            }
+        } else {
+            console.error(`Failed to fetch file: ${folderUrl}`);
+        }
+    }
     function removeItemsForceWithSubstring(list, substring) {
         list = list.filter(function (currentItem) {
             return !currentItem.includes(substring);

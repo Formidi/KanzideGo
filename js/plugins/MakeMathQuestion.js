@@ -51,7 +51,11 @@
         if (command === 'MakeMathQuestion') {
             Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774));
             var phase = phaseChecker();
-            if (($gameVariables.value(1265) == 0 && phase >= 2 && phase <= 5 && Math.random() < 0.5)) {
+            if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0) {
+                $gameVariables.setValue(mondai_index, $gameVariables.value(1272));
+                $gameVariables.setValue(kotae_index, $gameVariables.value(1273));
+                $gameVariables.setValue(1271, 0);
+            } else if (($gameVariables.value(1265) == 0 && phase >= 2 && phase <= 5 && Math.random() < 0.5)) {
                 Ingenuity(phase);
                 //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
             } else if (($gameVariables.value(1265) == 0 && phase == 6 && Math.random() < 0.6 && $gameVariables.value(1117) == 0)) {
@@ -370,6 +374,22 @@
                 answer = randomValue_one + randomPrimeValue;
             }
         } else if (rand <= 60) {
+            if (sub_digit == 1) {
+                quest = `${randomValue_one * randomonedigitsValue} × ■ ＝ ${randomPrimeValue * randomonedigitsValue} × ${randomValue_one}`;
+                answer = randomPrimeValue;
+            } else {
+                if (randomPrimeValue - randomonedigitsValue * 2 >= 1 && randomPrimeValue + randomonedigitsValue * 2 >= 1) {
+                    quest = `${randomPrimeValue + randomonedigitsValue * 2} ＋ ${randomPrimeValue + randomonedigitsValue} ＋ ${randomPrimeValue} ＋ ${randomPrimeValue - randomonedigitsValue} ＋ ${randomPrimeValue - randomonedigitsValue * 2}`;
+                    answer = randomPrimeValue * 5;
+                } else if (randomPrimeValue - randomonedigitsValue >= 1 && randomPrimeValue + randomonedigitsValue >= 1) {
+                    quest = `${randomPrimeValue + randomonedigitsValue} ＋ ${randomPrimeValue} ＋ ${randomPrimeValue - randomonedigitsValue}`;
+                    answer = randomPrimeValue * 3;
+                } else {
+                    quest = `${randomPrimeValue * randomonedigitsValue} ÷ ${randomPrimeValue}`;
+                    answer = randomonedigitsValue;
+                }
+            }
+        } else if (rand <= 70) {
             if (sub_digit == 1) {
                 quest = `${randomValue * randomonedigitsValue} × ■ ＝ ${randomPrimeValue * randomonedigitsValue} × ${randomValue}`;
                 answer = randomPrimeValue;

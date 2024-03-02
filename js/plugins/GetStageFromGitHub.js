@@ -90,6 +90,7 @@
     var _Scene_Boot_start = Scene_Boot.prototype.start;
     Scene_Boot.prototype.start = function () {
         _Scene_Boot_start.call(this);
+        /*
         try {
             console.log("GitHubから問題一覧を取得");
             fetch(`https://api.github.com/repos/${userName}/${repoName}/contents`)
@@ -210,6 +211,7 @@
         } catch (e) {
 
         }
+        */
     };
 
     async function downloadStage(levelname) {
@@ -291,7 +293,7 @@
         }
     };
     function pureText(text) {
-        return text.replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '');
+        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '');
     }
 
     let previousProcess = Promise.resolve(); // 初期のPromise
@@ -848,7 +850,7 @@
             jsonData[parent_key] = {};
             var chr = "";
             if (chr_text != "") {
-                chr = chr_text.replace(/〇|○/g, '●');
+                chr = chr_text.toString().replace(/〇|○/g, '●');
             } else if (chr_raw[1] != "" && !isNaN(chr_raw[1])) {
                 chr = '●'.repeat(Number(chr_raw[1]));
             }
@@ -1100,19 +1102,19 @@
         } else if (text_split_num === 1) {
             if (text.charAt(0) === '(') {
                 var text_split = text.split(")");
-                x = text_split[0].replace("(", "");
+                x = text_split[0].toString().replace("(", "");
                 y = text_split[1];
             } else {
                 var text_split = text.split("(");
                 y = text_split[0];
-                z = text_split[1].replace(")", "");
+                z = text_split[1].toString().replace(")", "");
             }
         } else if (text_split_num >= 2) {
             var text_split_l = text.split(")");
-            x = text_split_l[0].replace("(", "");
+            x = text_split_l[0].toString().replace("(", "");
             y = text_split_l[1].split("(")[0];
             var text_split_r = text.split("(");
-            z = text_split_r[2].replace(")", "");
+            z = text_split_r[2].toString().replace(")", "");
         }
         return [x, y, z];
     }
