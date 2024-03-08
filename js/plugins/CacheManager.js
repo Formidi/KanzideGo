@@ -131,7 +131,7 @@
                     }
                     if (str.includes("_0000") && i != 1 && lighten == 2) continue;
                     Galv.CACHE.load('pictures', `${str}${i.toString().padStart(length, '0')}`);
-                    console.log(`${str}${i.toString().padStart(length, '0')} preloaded`);
+                    //console.log(`${str}${i.toString().padStart(length, '0')} preloaded`);
                 }
             }
             for (const picture of uniqueData) {

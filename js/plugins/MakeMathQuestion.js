@@ -263,7 +263,7 @@
 
     function Ingenuity(difficulty) {
         Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774));
-        console.log(`${$gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774) }`);
+        //console.log(`${$gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774) }`);
         //difficultyが2~3なら2桁、4~5なら3桁、1か6以上なら無し
         //3か5なら+
         var digits = parseInt(Math.pow(10, Math.floor(difficulty / 2)));
@@ -378,7 +378,7 @@
     }
 
     function Ingenuity_Hard(level) {
-        var rand = Math.floor(Math.random() * 60) + 1 + 50 * (difficulty - 6);
+        var rand = Math.floor(Math.random() * 60) + 1 + 50 * (parseInt(level) - 6);
         var quest = "";
         var answer = 0;
         if (rand <= 10) {
