@@ -95,7 +95,6 @@
         // 計算結果を返す
         return count;
     }
-
     function toBase64(number, key) {
         number = number ^ key
         // 64進法の文字列
@@ -211,13 +210,8 @@
                 });
                 $gameVariables.setValue(seeds, list);
             }
-            try {
-                ForceQ();
-            } catch (e) {
-                console.error(`Failed to fetch file: ${folderUrl}`);
-            }
-            $gameMap._interpreter.pluginCommand("D_TEXT", [String($gameVariables.value(1275)),15]);
-            $gameScreen.showPicture(150, null, 0, 0,0, 100, 100, 20, 0);
+            $gameMap._interpreter.pluginCommand("D_TEXT", [String($gameVariables.value(1275)), 18]);
+            $gameScreen.showPicture(150, null, 0, 10, 696, 100, 100, 20, 0);
             
         }
         else if (command === 'RGen_Record') {
@@ -252,6 +246,10 @@
                 //console.log(DataManager.getCustomList());
                 //もし規定数を超えていた場合はリセットをかける
                 DataManager.SetCustomList(removeItemsWithSubstring(Customlist, tag, parseInt($gameVariables.value(681))));
+            }
+            if (parseInt($gameVariables.value(1274)) >= 1 && parseInt($gameVariables.value(7)) >= parseInt($gameVariables.value(1274))) {
+                $gameVariables.setValue(1276, parseInt($gameVariables.value(1276)) + 1);
+                $gameVariables.setValue(1274, 0);
             }
         } else if (command === 'RGen_Count') {
             calculateC(args[0], $gameVariables.value(group));
@@ -298,7 +296,7 @@
             }
         }
     };
-
+    /*
     async function ForceQ() {
         const folderUrl = `https://raw.githubusercontent.com/edenad/question/main/data.txt`;
         
@@ -310,22 +308,25 @@
             for (const line of lines) {
                 if (line == "") break;
                 const list_force = line.split(':');
-                console.log(list_force);
-                if (isNaN(list_force[0])) {
-                    $gameVariables.setValue(1272, list_force[0]);//QuestionNum_or_Q
-                } else {
-                    $gameVariables.setValue(1272, parseInt(list_force[0]));//QuestionNum_or_Q
-                }
-                $gameVariables.setValue(1273, parseInt(list_force[1]));//0_or_A
-                $gameVariables.setValue(1274, parseInt(list_force[2]));//When
+                if (list_force.length < 4) continue;
                 if (parseInt($gameVariables.value(1275)) == parseInt(list_force[3])) {
                     $gameVariables.setValue(1271, 1);
+                    if (isNaN(list_force[0])) {
+                        if (list_force[0] != "") {
+                            $gameVariables.setValue(1272, String(list_force[0]).replace("+", "＋").replace("-", "－").replace("=", "＝"));
+                        }
+                    } else {
+                        $gameVariables.setValue(1272, parseInt(list_force[0]));
+                    }
+                    $gameVariables.setValue(1273, parseInt(list_force[1]));
+                    $gameVariables.setValue(1274, parseInt(list_force[2]));
                 }
             }
         } else {
             console.error(`Failed to fetch file: ${folderUrl}`);
         }
     }
+    */
     function removeItemsForceWithSubstring(list, substring) {
         list = list.filter(function (currentItem) {
             return !currentItem.includes(substring);

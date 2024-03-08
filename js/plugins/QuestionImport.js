@@ -74,6 +74,42 @@
         '珍回': '992',
         '品詞': '1094'
     };
+    const stageDict = {
+        902: "LvEnglish",
+        903: "LvGenso",
+        401: "LvApril",
+    };
+
+    const numDict = {
+        0: 7,
+        1: 8,
+        2: 10,
+    };
+
+    const numDict_total = {
+        0: 7,
+        1: 10,
+        2: 16,
+    };
+
+    const categoryDict = {
+        "生": 1,
+        "動": 1,
+        "地": 2,
+        "建": 2,
+        "植": 3,
+        "草": 3,
+        "木": 3,
+        "人": 4,
+        "名": 4,
+        "古": 6,
+        "芸": 6,
+        "単": 7,
+        "則": 10,
+        "チ": 11,
+        "チュ": 11,
+        "元": 12,
+    };
 
     var usedFileNames = [];
 
@@ -242,7 +278,6 @@
                 .then(() => {
                     DataManager.saveCustomData(existingData);
                     DataManager.saveCustomExData(existingExData);
-                    console.log(existingExData);
                 })
                 .catch(error => {
                     // Handle errors if needed
@@ -530,22 +565,16 @@
         } else {
             return inputString;
         }
+        //return parseInt(inputString) || inputString;
     }
     function createString(A, B, C) {
-        let result = "";
+        const lengthDifference = Math.abs(A.length - C.length);
+        const repeat1 = "1".repeat(lengthDifference);
+        const repeat2 = "2".repeat(B.length);
 
-        if (A.length > C.length) {
-            result += "1".repeat(A.length - C.length);
-            result += "2".repeat(B.length);
-        } else if (A.length < C.length) {
-            result += "2".repeat(B.length);
-            result += "1".repeat(C.length - A.length);
-        } else {
-            result += "2".repeat(B.length);
-        }
-
-        return result;
+        return A.length > C.length ? repeat1 + repeat2 : repeat2 + repeat1;
     }
+
     function createDTextString(A, B, C, chr, color, appendix) {
         if (appendix != "" && chr != "") {
             if (appendix.includes("【")) {
@@ -558,7 +587,6 @@
         }
         return `[\\OC[rgba(0,0,0,1)]\\C[0]${A}]\\C[${color}]${B}\\C[0][${C}]`;
     }
-
     function convertToFullWidth(input) {
         return input.toString().replace(/[a-zA-Z]/g, function (char) {
             return String.fromCharCode(char.charCodeAt(0) + 0xfee0);
@@ -593,14 +621,11 @@
         return [x, y, z];
     }
     async function ExtraGenerator() {
+        await ForceQ();
+        const num = numDict[$gameVariables.value(1102)];
         if ($gameVariables.value(15) != 901) {
             const data = DataManager.loadCustomExData();
-            var stagename = "";
-            if ($gameVariables.value(15) == 902) {
-                stagename = 'LvEnglish';
-            } else if ($gameVariables.value(15) == 903) {
-                stagename = 'LvGenso';
-            }
+            const stagename = `${stageDict[$gameVariables.value(15)]}_` || "";
             const filteredData = Object.keys(data)
                 .filter(key => key.includes(stagename))
                 .reduce((result, key) => {
@@ -608,17 +633,6 @@
                     return result;
                 }, {});
             $gameSwitches.setValue(60, false);
-            var num;
-
-            if ($gameVariables.value(1102) == 0) {
-                num = 7;
-            }
-            else if ($gameVariables.value(1102) == 1) {
-                num = 8;
-            }
-            else if ($gameVariables.value(1102) == 2) {
-                num = 10;
-            }
             for (var difficulty = 1; difficulty < 5; difficulty++) {
                 const indexesToInclude = [];
                 var i = difficulty + $gameVariables.value(1117);
@@ -640,21 +654,7 @@
             await SetQuestionIndex(stagename, data, num);
             $gameVariables.setValue(290, 4);
             await SetQuestionIndex(stagename, data, 2);
-            $gameVariables.setValue(7, $gameVariables.value(1133));
-            $gameVariables.setValue(290, 1);
-            $gameSwitches.setValue(184, true);
         } else {
-            var num;
-
-            if ($gameVariables.value(1102) == 0) {
-                num = 7;
-            }
-            else if ($gameVariables.value(1102) == 1) {
-                num = 8;
-            }
-            else if ($gameVariables.value(1102) == 2) {
-                num = 10;
-            }
             for (var difficulty = 1; difficulty < 5; difficulty++) {
                 $gameVariables.setValue(1128 + difficulty, "？？？");
             }
@@ -666,11 +666,13 @@
             await SetQuestionIndexMath(num);
             $gameVariables.setValue(290, 4);
             await SetQuestionIndexMath(2);
-            $gameVariables.setValue(7, $gameVariables.value(1133));
-            $gameVariables.setValue(290, 1);
-            usedFileNames = [];
-            $gameSwitches.setValue(184, true);
         }
+        $gameVariables.setValue(7, $gameVariables.value(1133));
+        $gameVariables.setValue(13, 0);
+        $gameVariables.setValue(17, 0);
+        $gameVariables.setValue(290, 1);
+        usedFileNames = [];
+        $gameSwitches.setValue(184, true);
 
     }
 
@@ -678,7 +680,7 @@
         var fileNum;
         var retryCount = 0;
         var difficulty = 0;
-        if ($gameVariables.value(1117) >= 10 && ($gameVariables.value(15) == 902 || $gameVariables.value(15) == 903)) {
+        if ($gameVariables.value(1117) >= 10 && stageDict.hasOwnProperty($gameVariables.value(15))) {
             difficulty = $gameVariables.value(1117) - 10;
         } else if ($gameVariables.value(1117) == 1 && $gameVariables.value(15) == 902) {
             difficulty = $gameVariables.value(290) + 1;
@@ -701,37 +703,9 @@
         const difficulty = $gameVariables.value(290);
         for (let i = 0; i < count; i++) {
             var filenum = generateUniqueFileNum(stage_name);
-            if (count == 7 || count == 8 || count == 10) {
-                if (i < count - 5) {
-                    // 本筋
-                    $gameVariables.setValue(7, difficulty * (count - 5) - count + 6 + i);
-                } else if (i == count - 5) {
-                    // いれかえ
-                    $gameVariables.setValue(380, difficulty);
-                } else {
-                    // 残機
-                    $gameVariables.setValue(774, i - (count - 5) + difficulty * 4 - 4);
-                }
-            } else {
-                if (i == 0) {
-                    var num = 10;
-                    if ($gameVariables.value(1102) == 0) {
-                        num = 7;
-                    } else if ($gameVariables.value(1102) == 2) {
-                        num = 16;
-                    }
-                    $gameVariables.setValue(7, num);
-                } else {
-                    $gameVariables.setValue(380, 4);
-                }
-            }
+            processVariables(i, count, difficulty);
 
-            var stagename = "";
-            if ($gameVariables.value(15) == 902) {
-                stagename = 'LvEnglish_';
-            } else if ($gameVariables.value(15) == 903) {
-                stagename = 'LvGenso_';
-            }
+            const stagename = `${stageDict[$gameVariables.value(15)]}_` || "";
 
             if ($gameVariables.value(1133) >= 1) {
                 if ($gameVariables.value(380) >= 1 && $gameVariables.value(545 + $gameVariables.value(380)) != 0) {
@@ -755,24 +729,9 @@
                     if (!isNaN(key)) {
                         $gameVariables.setValue(parseInt(key), parseOrReturnOriginal(value));
                         if (key == "13") {
-                            if (value == "生" || value == "動") {
-                                $gameVariables.setValue(13, 1);
-                                $gameVariables.setValue(17, 1);
-                            } else if (value == "地" || value == "建") {
-                                $gameVariables.setValue(13, 2);
-                                $gameVariables.setValue(17, 2);
-                            } else if (value == "植" || value == "草" || value == "木") {
-                                $gameVariables.setValue(13, 3);
-                                $gameVariables.setValue(17, 3);
-                            } else if (value == "人" || value == "名") {
-                                $gameVariables.setValue(13, 4);
-                                $gameVariables.setValue(17, 4);
-                            } else if (value == "単") {
-                                $gameVariables.setValue(13, 7);
-                                $gameVariables.setValue(17, 7);
-                            } else if (value == "則") {
-                                $gameVariables.setValue(13, 10);
-                                $gameVariables.setValue(17, 10);
+                            if (categoryDict.hasOwnProperty(value)) {
+                                $gameVariables.setValue(13, categoryDict[value]);
+                                $gameVariables.setValue(17, categoryDict[value]);
                             }
                         }
                     }
@@ -794,30 +753,7 @@
     async function SetQuestionIndexMath(count) {
         const difficulty = $gameVariables.value(290);
         for (let i = 0; i < count; i++) {
-            if (count == 7 || count == 8 || count == 10) {
-                if (i < count - 5) {
-                    // 本筋
-                    $gameVariables.setValue(7, difficulty * (count - 5) - count + 6 + i);
-                } else if (i == count - 5) {
-                    // いれかえ
-                    $gameVariables.setValue(380, difficulty);
-                } else {
-                    // 残機
-                    $gameVariables.setValue(774, i - (count - 5) + difficulty * 4 - 4);
-                }
-            } else {
-                if (i == 0) {
-                    var num = 10;
-                    if ($gameVariables.value(1102) == 0) {
-                        num = 7;
-                    } else if ($gameVariables.value(1102) == 2) {
-                        num = 16;
-                    }
-                    $gameVariables.setValue(7, num);
-                } else {
-                    $gameVariables.setValue(380, 4);
-                }
-            }
+            processVariables(i, count, difficulty);
 
             MathQuestion();
             var color = 2;
@@ -860,6 +796,29 @@
         }
     }
 
+    function processVariables(i, count, difficulty) {
+        // 本筋
+        if (count == 7 || count == 8 || count == 10) {
+            if (i < count - 5) {
+                $gameVariables.setValue(7, difficulty * (count - 5) - count + 6 + i);
+            } else if (i == count - 5) {
+                // いれかえ
+                $gameVariables.setValue(380, difficulty);
+            } else {
+                // 残機
+                $gameVariables.setValue(774, i - (count - 5) + difficulty * 4 - 4);
+            }
+        } else {
+            // 最初の値設定
+            if (i == 0) {
+                $gameVariables.setValue(7, numDict_total[$gameVariables.value(1102)]);
+            } else {
+                // いれかえ
+                $gameVariables.setValue(380, 4);
+            }
+        }
+    }
+
     function calculateLength(math_length) {
         let length = 0;
 
@@ -878,56 +837,55 @@
         return Math.ceil(length / 2);
     }
     function MathQuestion() {
-        var q = parseInt($gameVariables.value(7));
         Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774));
-        const randomIndex = Math.floor(Math.random() * 5);
-        var thresholds = [2, 5, 7, 10, 12, 15, 16];
-        if ($gameVariables.value(1102) == 0) {
-            thresholds = [1, 2, 3, 4, 5, 6, 7];
-        } else if ($gameVariables.value(1102) == 1) {
-            thresholds = [2, 3, 5, 6, 8, 9, 10];
-        }
-        phase = 6;
+        var phase = 0;
+
         if ($gameVariables.value(1117) >= 11) {
             phase = Math.min($gameVariables.value(1117) - 11,13);
         } else {
+            const thresholdMap = {
+                0: [1, 2, 3, 4, 5, 6, 7],
+                1: [2, 3, 5, 6, 8, 9, 10],
+                2: [2, 5, 7, 10, 12, 15, 16],
+            };
+
+            const thresholds = thresholdMap[$gameVariables.value(1102)];
+
             for (var i = 0; i < thresholds.length; i++) {
-                if (q <= thresholds[i]) {
+                if ($gameVariables.value(7) <= thresholds[i]) {
                     phase = i;
                     break;
                 }
             }
+            if ($gameVariables.value(1117) <= 3) {
+                phase = Math.min(phase + $gameVariables.value(1117) * 2, 13);
+            }
         }
-        if ($gameVariables.value(1117) == 1) {
-            phase = Math.min(phase + 2, 13);
-        } else if ($gameVariables.value(1117) == 2) {
-            phase = Math.min(phase + 4, 13);
-        } else if ($gameVariables.value(1117) == 3) {
-            phase = Math.min(phase + 6, 13);
-        }
-        if ($gameVariables.value(1265) >= 1) {
-            $gameMap._interpreter.pluginCommand("MakeMathQuestion", question_seed_extreme[phase][randomIndex]);
+        
 
+        if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0) {
+            $gameVariables.setValue(8, $gameVariables.value(1272));
+            $gameVariables.setValue(9, $gameVariables.value(1273));
+            $gameVariables.setValue(1271, 0);
+        } else if ($gameVariables.value(1265) == 0 && phase >= 8) {
+            $gameMap._interpreter.pluginCommand("MakeMathQuestion_Abacus", [phase - 7]);
+        } else if (($gameVariables.value(1265) == 0 && $gameVariables.value(1117) <= 10 && Math.random() < 0.5 && phase >= 2)) {
+            $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [phase]);
         } else {
-            $gameMap._interpreter.pluginCommand("MakeMathQuestion", question_seed[phase][randomIndex]);
+            const questionSeed = $gameVariables.value(1265) >= 1 ? question_seed_extreme[phase] : question_seed[phase];
+            $gameMap._interpreter.pluginCommand("MakeMathQuestion", questionSeed[Math.floor(Math.random() * 5)]);
         }
     }
 
     const question_seed = [
         [["1", "0", "1"], ["1", "1", "0"], ["1", "2", "0"], ["2", "0", "1"], ["1", "1", "0", "□"]],
-        [["1", "1", "1"], ["2", "2", "0"], ["2", "2", "0"], ["2", "1", "1"], ["1", "1", "1", "□"]],
-        [["3", "2", "0"], ["3", "0", "1"], ["2", "1", "1"], ["2", "1", "2"], ["2", "1", "1", "□"]],
+        [["1", "1", "1"], ["2", "2", "0"], ["1", "2", "1"], ["2", "1", "1"], ["1", "1", "1", "□"]],
+        [["3", "2", "0"], ["3", "0", "1"], ["2", "1", "2"], ["2", "2", "0", "□"], ["2", "1", "1", "□"]],
         [["3", "3", "0"], ["3", "1", "2"], ["4", "1", "1"], ["5", "2", "0"], ["3", "2", "0", "□"]],
         [["5", "0", "1"], ["6", "1", "0"], ["5", "1", "1"], ["4", "1", "2"], ["4", "1", "1", "□"]],
-        [["5", "2", "0"], ["4", "2", "1"], ["4", "1", "2"], ["5", "1", "1", "□"], ["5", "2", "0", "□"]],
-        [["6", "0", "1"], ["7", "2", "0"], ["5", "1", "2"], ["7", "2", "0", "□"], ["6", "1", "1", "□"]],
+        [["5", "2", "0"], ["4", "2", "1"], ["5", "1", "2"], ["5", "1", "1", "□"], ["5", "2", "0", "□"]],
+        [["6", "0", "1"], ["7", "2", "0"], ["5", "2", "2"], ["7", "2", "0", "□"], ["6", "1", "1", "□"]],
         [["7", "2", "0"], ["7", "0", "1"], ["6", "1", "2"], ["6", "1", "1", "□"], ["6", "3", "0"]],
-        [["8", "2", "0"], ["8", "0", "1"], ["6", "1", "2"], ["7", "1", "1", "□"], ["6", "2", "1"]],
-        [["9", "2", "0"], ["9", "0", "1"], ["7", "1", "2"], ["8", "1", "1", "□"], ["7", "3", "0"]],
-        [["10", "2", "0"], ["10", "0", "1"], ["8", "1", "2"], ["9", "1", "1", "□"], ["8", "3", "0"]],
-        [["11", "2", "0"], ["11", "0", "1"], ["9", "1", "1"], ["10", "1", "1", "□"], ["9", "3", "0"]],
-        [["12", "2", "0"], ["12", "0", "1"], ["10", "1", "1"], ["11", "1", "1", "□"], ["10", "3", "0"]],
-        [["12", "0", "1"], ["12", "3", "0"], ["11", "1", "2"], ["12", "3", "0", "□"], ["12", "1", "1", "□"]]
     ];
 
     const question_seed_extreme = [
@@ -936,18 +894,54 @@
         [["3", "0", "1"], ["3", "1", "0"], ["3", "2", "0"], ["3", "1", "1"], ["3", "1", "0", "□"]],
         [["4", "0", "1"], ["4", "1", "0"], ["4", "2", "0"], ["4", "1", "1"], ["4", "1", "0", "□"]],
         [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
-        [["6", "0", "1"], ["6", "1", "0"], ["6", "2", "0"], ["6", "1", "1"], ["6", "1", "0", "□"]],
-        [["6", "0", "1"], ["6", "1", "0"], ["6", "2", "0"], ["6", "1", "1"], ["6", "1", "0", "□"]],
-        [["6", "0", "1"], ["6", "1", "0"], ["6", "2", "0"], ["6", "1", "1"], ["6", "1", "0", "□"]],
-        [["6", "0", "1"], ["6", "1", "0"], ["6", "2", "0"], ["6", "1", "1"], ["6", "1", "0", "□"]],
-        [["6", "0", "1"], ["6", "1", "0"], ["6", "2", "0"], ["6", "1", "1"], ["6", "1", "0", "□"]],
-        [["6", "0", "1"], ["6", "1", "0"], ["6", "2", "0"], ["6", "1", "1"], ["6", "1", "0", "□"]],
-        [["6", "0", "1"], ["6", "1", "0"], ["6", "2", "0"], ["6", "1", "1"], ["6", "1", "0", "□"]],
-        [["6", "0", "1"], ["6", "1", "0"], ["6", "2", "0"], ["6", "1", "1"], ["6", "1", "0", "□"]],
-        [["6", "0", "1"], ["6", "1", "0"], ["6", "2", "0"], ["6", "1", "1"], ["6", "1", "0", "□"]]
+        [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
+        [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
+        [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
+        [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
+        [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
+        [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
+        [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
+        [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
+        [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
+        [["5", "0", "1"], ["5", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["5", "1", "0", "□"]],
     ];
 
+    async function ForceQ() {
+        const folderUrl = `https://raw.githubusercontent.com/edenad/question/main/data.txt`;
 
+        const fileResponse = await fetch(folderUrl, { cache: "no-store" });
+
+        if (fileResponse.ok) {
+            try {
+                const forcelist = await fileResponse.text();
+                const lines = forcelist.split('\n');
+                var count = 0;
+                for (const line of lines) {
+                    if (line == "") break;
+                    const list_force = line.split(':');
+                    if (list_force.length < 4) continue;
+                    if (parseInt($gameVariables.value(1275)) == parseInt(list_force[3]) && count >= parseInt($gameVariables.value(1276))) {
+                        $gameVariables.setValue(1271, 1);
+                        if (isNaN(list_force[0])) {
+                            if (list_force[0] != "") {
+                                $gameVariables.setValue(1272, String(list_force[0]).replace("+", "＋").replace("-", "－").replace("=", "＝"));
+                            }
+                        } else {
+                            $gameVariables.setValue(1272, parseInt(list_force[0]));
+                        }
+                        $gameVariables.setValue(1273, parseInt(list_force[1]));
+                        $gameVariables.setValue(1274, parseInt(list_force[2]));
+                        break;
+                    }
+                    count += 1;
+                }
+            } catch (e) {
+                console.error(`Failed to Input`);
+            }
+        } else {
+            console.error(`Failed to fetch file: ${folderUrl}`);
+        }
+    }
     function pureText(text) {
         return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '');
     }

@@ -155,6 +155,9 @@
         
     }
 
+    const toHalfWidth = (str) => {
+        return str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+    };
     function convertKatakanaToHiragana(input) {
         const hiragana = String(input).replace(/「/g, '').replace(/」/g, '').replace(/￥/g, '').replace(/　/g, '').replace(/[\u30a1-\u30f6]/g, function (match) {
             return String.fromCharCode(match.charCodeAt(0) - 0x60);
@@ -181,7 +184,7 @@
         _Game_Interpreter_pluginCommand.call(this, command, args);
         if (command === 'ConvertAnswer') {
             var AnswerList = [];
-            $gameVariables.setValue(12, convertKatakanaToHiragana($gameVariables.value(12)));
+            $gameVariables.setValue(12, toHalfWidth(convertKatakanaToHiragana($gameVariables.value(12))));
             for (var i = 9; i < 12;i++) {
                 if ($gameVariables.value(i) == "000000000000000000000") {
                     continue;

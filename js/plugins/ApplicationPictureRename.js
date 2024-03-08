@@ -31,7 +31,6 @@
             if (navigator.userAgent.match(/android|iphone|ios|ipod|ipad/i)) {
                 originalShowPicture.call(this, pictureId, pictureName + "_sp", origin, x, y, scaleX, scaleY, opacity, blendMode);
             } else {
-                console.log("スマホなら置換されるべき画像です:" + pictureName);
                 originalShowPicture.call(this, pictureId, pictureName, origin, x, y, scaleX, scaleY, opacity, blendMode);
             }
 

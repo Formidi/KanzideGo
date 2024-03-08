@@ -93,8 +93,11 @@
         windowHeight = screenHeight;
     }
 
-
-    ImageCache.limit = cacheLimit * 1000 * 1000;
+    if (navigator.userAgent.match(/android|iphone|ios|ipod|ipad/i)) {
+        ImageCache.limit = 10 * 1000 * 1000;
+    } else {
+        ImageCache.limit = 30 * 1000 * 1000;
+    }
     SceneManager._screenWidth = screenWidth;
     SceneManager._screenHeight = screenHeight;
     SceneManager._boxWidth = screenWidth;

@@ -50,67 +50,65 @@
         pluginCommand.call(this, command, args);
         if (command === 'MakeMathQuestion') {
             Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774));
-            var phase = phaseChecker();
-            if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0) {
-                $gameVariables.setValue(mondai_index, $gameVariables.value(1272));
-                $gameVariables.setValue(kotae_index, $gameVariables.value(1273));
-                $gameVariables.setValue(1271, 0);
-            } else if (($gameVariables.value(1265) == 0 && phase >= 2 && phase <= 5 && Math.random() < 0.5)) {
-                Ingenuity(phase);
-                //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
-            } else if (($gameVariables.value(1265) == 0 && phase == 6 && Math.random() < 0.6 && $gameVariables.value(1117) == 0)) {
-                Ingenuity_Hard();
-                //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
-            } else {
-                const [question, answer] = generateMathQuestion_PM(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]));
-                var expression = [question[0]];
-                for (let i = 1; i < question.length; i++) {
-                    if (!isNaN(question[i])) {
-                        if (question[i] >= 0) {
-                            expression.push(" ＋ ");
-                            expression.push(question[i]);
-                        } else {
-                            expression.push(" － ");
-                            expression.push(Math.abs(question[i]));
-                        }
+            const [question, answer] = generateMathQuestion_PM(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]));
+            var expression = [question[0]];
+            for (let i = 1; i < question.length; i++) {
+                if (!isNaN(question[i])) {
+                    if (question[i] >= 0) {
+                        expression.push(" ＋ ");
+                        expression.push(question[i]);
                     } else {
-                        if (question[i].indexOf("－") !== -1) {
-                            expression.push(question[i]);
-                        } else {
-                            expression.push(" ＋ ");
-                            expression.push(question[i]);
-                        }
-                    }
-                }
-                if (args.length >= 4) {
-                    if (args[3] == "□") {
-                        const numberIndexes = [];
-                        for (let i = 0; i < expression.length; i++) {
-                            if (!isNaN(expression[i])) {
-                                numberIndexes.push(i);
-                            }
-                        }
-                        // リストからランダムなインデックスを選択
-                        const randomIndex = numberIndexes[Math.floor(Math.random() * numberIndexes.length)];
-                        var tmp = expression[randomIndex];
-                        expression[randomIndex] = "■";
-                        var quest = expression.join().replace(/,/g, '');
-                        $gameVariables.setValue(mondai_index, `${quest} ＝ ${answer}`);
-                        $gameVariables.setValue(kotae_index, tmp);
-                        //console.log(`${quest} ＝ ${answer}`);
+                        expression.push(" － ");
+                        expression.push(Math.abs(question[i]));
                     }
                 } else {
-                    var quest = expression.join().replace(/,/g, '');
-                    $gameVariables.setValue(mondai_index, quest);
-                    $gameVariables.setValue(kotae_index, answer);
-                    //console.log(quest);
-                }
-                if ($gameVariables.value(1265) >= 1) {
-                    $gameVariables.setValue(mondai_index, transformTextWithNumbers($gameVariables.value(mondai_index)));
-                    //console.log(countStringLength($gameVariables.value(mondai_index)));
-                    //console.log($gameVariables.value(mondai_index));
+                    if (question[i].indexOf("－") !== -1) {
+                        expression.push(question[i]);
+                    } else {
+                        expression.push(" ＋ ");
+                        expression.push(question[i]);
+                    }
                 }
             }
+            if (args.length >= 4) {
+                if (args[3] == "□") {
+                    const numberIndexes = [];
+                    for (let i = 0; i < expression.length; i++) {
+                        if (!isNaN(expression[i])) {
+                            numberIndexes.push(i);
+                        }
+                    }
+                    // リストからランダムなインデックスを選択
+                    const randomIndex = numberIndexes[Math.floor(Math.random() * numberIndexes.length)];
+                    var tmp = expression[randomIndex];
+                    expression[randomIndex] = "■";
+                    var quest = expression.join().replace(/,/g, '');
+                    $gameVariables.setValue(mondai_index, `${quest} ＝ ${answer}`);
+                    $gameVariables.setValue(kotae_index, tmp);
+                    //console.log(`${quest} ＝ ${answer}`);
+                }
+            } else {
+                var quest = expression.join().replace(/,/g, '');
+                $gameVariables.setValue(mondai_index, quest);
+                $gameVariables.setValue(kotae_index, answer);
+            }
+            if ($gameVariables.value(1265) >= 1) {
+                $gameVariables.setValue(mondai_index, transformTextWithNumbers($gameVariables.value(mondai_index)));
+            }
+        } else if (command === 'MakeMathQuestion_Original') {
+            const difficulty = parseInt(args[0]);
+            if (difficulty >= 0 && difficulty <= 1) {
+                Ingenuity_Easy();
+                //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
+            } else if (difficulty >= 2 && difficulty <= 5) {
+                Ingenuity(difficulty);
+                //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
+            } else if (difficulty >= 6) {
+                Ingenuity_Hard(difficulty);
+                //console.log(`特殊問題:${$gameVariables.value(mondai_index)} ＝ ${$gameVariables.value(kotae_index)}`);
+            }
+        } else if (command === 'MakeMathQuestion_Abacus') {
+            Abacus(parseInt(args[0]));
         }
     };
 
@@ -217,47 +215,20 @@
         return true;
     }
 
-    function phaseChecker() {
-        var q = parseInt($gameVariables.value(7));
-        var thresholds = [2, 5, 7, 10, 12, 15, 16];
-        var max = 6;
-        if ($gameVariables.value(1102) == 0) {
-            thresholds = [1, 2, 3, 4, 5, 6, 7];
-            max = 6;
-        } else if ($gameVariables.value(1102) == 1) {
-            thresholds = [2, 3, 5, 6, 8, 9, 10];
-            max = 6;
-        }
-        phase = max;
-        if ($gameVariables.value(1117) >= 11) {
-            phase = Math.min($gameVariables.value(1117) - 11, 13);
-        } else {
-            for (var i = 0; i < thresholds.length; i++) {
-                if (q <= thresholds[i]) {
-                    phase = i;
-                    break;
-                }
-            }
-        }
-        if ($gameVariables.value(1117) == 1) {
-            phase = Math.min(phase + 2, 13);
-        } else if ($gameVariables.value(1117) == 2) {
-            phase = Math.min(phase + 4, 13);
-        } else if ($gameVariables.value(1117) == 3) {
-            phase = Math.min(phase + 6, 13);
-        }
-        return phase;
+    function getRandomDigits(digits) {
+        return Math.floor(Math.random() * Math.pow(10, digits - 1) * 9) + Math.pow(10, digits - 1);
     }
+
 
     function getRandomPrime(difficulty) {
         let min = 1;
         let max = 100;
         if (difficulty == 2) {
             min = 10;
-            max = 30;
+            max = 40;
         } else if (difficulty == 3) {
-            min = 30;
-            max = 50;
+            min = 20;
+            max = 70;
         } else if (difficulty == 4) {
             min = 50;
             max = 100;
@@ -291,6 +262,8 @@
     }
 
     function Ingenuity(difficulty) {
+        Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774));
+        console.log(`${$gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774) }`);
         //difficultyが2~3なら2桁、4~5なら3桁、1か6以上なら無し
         //3か5なら+
         var digits = parseInt(Math.pow(10, Math.floor(difficulty / 2)));
@@ -321,7 +294,7 @@
         var randomPrimeValue = getRandomPrime(difficulty);
         var random10n_minus_randomPrimeValue = digits * (11 + Math.floor(Math.random() * 8)) - randomPrimeValue
 
-        const just_num = [[5, 2], [5, 4], [25, 2], [25, 4], [125, 4], [125, 8], [45, 4], [45, 8], [75, 4], [75, 8]];
+        const just_num = [[5, 2], [5, 4], [25, 2], [25, 4], [125, 4], [125, 8], [75, 4], [75, 8], [45, 4], [45, 8]];
         var just_num_index = Math.floor(Math.random() * 4) + 2 * (difficulty - 2);
         if (just_num_index < 0) {
             just_num_index = 0
@@ -389,23 +362,8 @@
                     answer = randomonedigitsValue;
                 }
             }
-        } else if (rand <= 70) {
-            if (sub_digit == 1) {
-                quest = `${randomValue * randomonedigitsValue} × ■ ＝ ${randomPrimeValue * randomonedigitsValue} × ${randomValue}`;
-                answer = randomPrimeValue;
-            } else {
-                if (randomPrimeValue - randomonedigitsValue * 2 >= 1 && randomPrimeValue + randomonedigitsValue * 2 >= 1) {
-                    quest = `${randomPrimeValue + randomonedigitsValue * 2} ＋ ${randomPrimeValue + randomonedigitsValue} ＋ ${randomPrimeValue} ＋ ${randomPrimeValue - randomonedigitsValue} ＋ ${randomPrimeValue - randomonedigitsValue * 2}`;
-                    answer = randomPrimeValue * 5;
-                } else if (randomPrimeValue - randomonedigitsValue >= 1 && randomPrimeValue + randomonedigitsValue >= 1) {
-                    quest = `${randomPrimeValue + randomonedigitsValue} ＋ ${randomPrimeValue} ＋ ${randomPrimeValue - randomonedigitsValue}`;
-                    answer = randomPrimeValue * 3;
-                } else {
-                    quest = `${randomPrimeValue * randomonedigitsValue} ÷ ${randomPrimeValue}`;
-                    answer = randomonedigitsValue;
-                }
-            }
         }
+
         $gameVariables.setValue(mondai_index, quest);
         $gameVariables.setValue(kotae_index, answer);
     }
@@ -419,8 +377,8 @@
         return array;
     }
 
-    function Ingenuity_Hard() {
-        var rand = Math.floor(Math.random() * 60) + 1;
+    function Ingenuity_Hard(level) {
+        var rand = Math.floor(Math.random() * 60) + 1 + 50 * (difficulty - 6);
         var quest = "";
         var answer = 0;
         if (rand <= 10) {
@@ -430,11 +388,13 @@
             quest = `${shuffledArray[0] * randomPrimeValue} × ${shuffledArray[1]} × ${shuffledArray[2]}`;
             answer = 1001 * randomPrimeValue;
         } else if (rand <= 20) {
-            const randomPrimeValue = getRandomPrime(2);
-            const myArray = [2, 8];
-            const shuffledArray = shuffleArray(myArray);
-            quest = `${shuffledArray[0]} × ${shuffledArray[1] * randomPrimeValue} × 625`;
-            answer = 10000 * randomPrimeValue;
+            const randomPrimeBigValue = getRandomPrime(6) * (Math.floor(Math.random() * 20) + 10);
+            const randomPrimeValue = getRandomPrime(3);
+            const randomonedigitsValue = Math.floor(Math.random() * 3);
+            const quotient = Math.floor(randomPrimeBigValue / randomPrimeValue);
+            const surplus = randomPrimeBigValue % randomPrimeValue;
+            quest = `${randomPrimeBigValue} ÷ ${randomPrimeValue} ＝ ${quotient - randomonedigitsValue} ＋ ■ ÷ ${randomPrimeValue}`;
+            answer = surplus + randomonedigitsValue * randomPrimeValue;
         } else if (rand <= 30) {
             const randomTwoPower = Math.pow(2, Math.floor(Math.random() * 6) + 3);
             quest = `65536 ÷ ${randomTwoPower}`;
@@ -447,19 +407,93 @@
             quest = `${10000 - randomPrimeValue_one} ＋ ${10000 - randomPrimeValue_two} ＋ ${10000 - randomPrimeValue_three} ＋ ${10000 - randomPrimeValue_four}`;
             answer = 40000 - randomPrimeValue_one - randomPrimeValue_two - randomPrimeValue_three - randomPrimeValue_four;
         } else if (rand <= 50) {
+            const randomPrimeValue_one = getRandomPrime(6) * (Math.floor(Math.random() * 7) + 2);
+            const randomPrimeValue_two = getRandomPrime(4);
+            const randomonedigitsValue = Math.floor(Math.random() * 3) + 2;
+            quest = `${randomPrimeValue_one * randomonedigitsValue} ÷ ■ ＝ ${randomPrimeValue_one} ÷ ${randomPrimeValue_two}`;
+            answer = randomPrimeValue_two * randomonedigitsValue;
+        } else if (rand <= 60) {
+            const randomPrimeValue = getRandomPrime(3);
+            quest = `${1000 + randomPrimeValue} × ${1000 - randomPrimeValue}`;
+            answer = 1000000 - randomPrimeValue * randomPrimeValue;
+        } else if (rand <= 70) {
+            const randomThreePower = Math.pow(3, Math.floor(Math.random() * 4) + 3);
+            quest = `59049 ÷ ${randomThreePower}`;
+            answer = parseInt(59049 / randomThreePower);
+        } else if (rand <= 80) {
+            const randomPrimeValue_one = getRandomPrime(3);
+            const randomPrimeValue_two = getRandomPrime(3);
+            const randomPrimeValue_three = getRandomPrime(3);
+            const randomPrimeValue_four = getRandomPrime(4);
+            quest = `${10000 - randomPrimeValue_one} ＋ ${10000 - randomPrimeValue_two} ＋ ${10000 - randomPrimeValue_three} ＋ ${10000 - randomPrimeValue_four}`;
+            answer = 40000 - randomPrimeValue_one - randomPrimeValue_two - randomPrimeValue_three - randomPrimeValue_four;
+        } else if (rand <= 90) {
+            const randomPrimeValue = getRandomPrime(3);
+            const myArray = [2, 8];
+            const shuffledArray = shuffleArray(myArray);
+            quest = `${shuffledArray[0]} × ${shuffledArray[1] * randomPrimeValue} × 625`;
+            answer = 10000 * randomPrimeValue;
+        } else if (rand <= 100) {
             const randomPrimeValue = getRandomPrime(6);
             const myArray = [73, 137, randomPrimeValue];
             const shuffledArray = shuffleArray(myArray);
             quest = `${shuffledArray[0]} × ${shuffledArray[1]} × ${shuffledArray[2]}`;
             answer = 10001 * randomPrimeValue;
-        } else if (rand <= 60) {
-            const randomPrimeValue = getRandomPrime(4);
-            quest = `${1000 + randomPrimeValue} × ${1000 - randomPrimeValue}`;
-            answer = 1000000 - randomPrimeValue * randomPrimeValue;
+        } else if (rand <= 110) {
+            const randomPrimeValue = getRandomPrime(6);
+            const myArray = [7, 11, 13];
+            const shuffledArray = shuffleArray(myArray);
+            quest = `${shuffledArray[0] * randomPrimeValue} × ${shuffledArray[1] * shuffledArray[2]}`;
+            answer = 1001 * randomPrimeValue;
+
         }
         $gameVariables.setValue(mondai_index, quest);
         $gameVariables.setValue(kotae_index, answer);
     }
+
+    function Abacus(level) {
+        var quest = "";
+        var answer = 0;
+        var multi = [[6, 4], [5, 5], [4, 6]];
+        var divide = [[3, 6], [4, 5], [5, 4], [6, 3]];
+        if (level == 1) {
+            multi = [[2, 4], [3, 3], [4, 2]];
+            divide = [[2, 4], [3, 3], [4, 2]];
+        } else if (level == 2) {
+            multi = [[2, 5], [3, 4], [4, 3], [5, 2]];
+            divide = [[2, 4], [3, 3], [4, 2]];
+        } else if (level == 3) {
+            multi = [[3, 5], [4, 4], [5, 3]];
+            divide = [[2, 5], [3, 4], [4, 3], [5, 2]];
+        } else if (level == 4) {
+            multi = [[3, 6], [4, 5], [5, 4], [6, 3]];
+            divide = [[3, 5], [4, 4], [5, 3]];
+        }
+
+        const randomIndex_multi = Math.floor(Math.random() * multi.length);
+        const randomElement_multi = multi[randomIndex_multi];
+        const randomIndex_divide = Math.floor(Math.random() * divide.length);
+        const randomElement_divide = divide[randomIndex_divide];
+
+        if (Math.random() < 0.5) {
+            const num1 = getRandomDigits(randomElement_multi[0]);
+            const num2 = getRandomDigits(randomElement_multi[1]);
+            quest = `${num1} × ${num2}`;
+            answer = num1 * num2;
+        } else {
+
+            const num1 = getRandomDigits(randomElement_divide[0]);
+            const num2 = getRandomDigits(randomElement_divide[1]);
+            quest = `${num1 * num2} ÷ ${num2}`;
+            answer = num1;
+        }
+        $gameVariables.setValue(mondai_index, quest);
+        $gameVariables.setValue(kotae_index, answer);
+
+    }
+
+
+
 
     function transformTextWithNumbers(text) {
         // 全角文字を2、半角文字を1と数える関数
