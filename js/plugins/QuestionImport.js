@@ -74,178 +74,130 @@
         '珍回': '992',
         '品詞': '1094'
     };
+    const stageDict = {
+        902: "LvEnglish",
+        903: "LvGenso",
+        401: "LvApril",
+    };
+
+    const numDict = {
+        0: 7,
+        1: 8,
+        2: 10,
+    };
+
+    const numDict_total = {
+        0: 7,
+        1: 10,
+        2: 16,
+    };
+
+    const categoryDict = {
+        "生": 1,
+        "動": 1,
+        "地": 2,
+        "建": 2,
+        "植": 3,
+        "草": 3,
+        "木": 3,
+        "人": 4,
+        "名": 4,
+        "古": 6,
+        "芸": 6,
+        "単": 7,
+        "則": 10,
+        "チ": 11,
+        "チュ": 11,
+        "元": 12,
+    };
 
     var usedFileNames = [];
 
     // ゲーム開始時の処理
     var _Scene_Boot_start = Scene_Boot.prototype.start;
-    Scene_Boot.prototype.start = function () {
+    Scene_Boot.prototype.start = function() {
         _Scene_Boot_start.call(this);
         const isSmartphoneApp = isApp() && navigator.userAgent.match(/android|iphone|ios|ipod|ipad/i);
         const fromGitHub = (!isSmartphoneApp && navigator.onLine && !$gameTemp.isPlaytest() && IsLocal != 1) || IsLocal == 2;
         if (fromGitHub) {
-            // HEAD 以外の commit ID を利用したい場合は、ここで指定
             const refShaOrBranch = "main";
             console.log(`GitHub取得 (対象 SHA or ブランチ : ${refShaOrBranch})`);
             ImportQuestionFromGitHub(refShaOrBranch);
-        }
-        else {
+        } else {
             console.log("ローカル取得");
             ImportQuestionFromLocal();
-
         }
-    };
-
+    }
+    ;
     function ImportQuestionFromGitHub(refShaOrBranch) {
-        
         directoryPath = 'excelData';
-
-            const existingData = {};
-            const existingExData = {};
-            const promises = [];
-            var files = ["Lv01.txt","Lv02.txt","Lv03.txt","Lv04.txt","Lv05.txt","Lv06.txt","Lv07.txt","LvCa004.txt","LvEnglish.csv","LvGenso.csv","question.json"];
-            
-            const filePromises = files.map(async (file) => {
-                const filePath = directoryPath + "/" + file;
-                        
-                const fileResponse = await fetch(filePath);
-
-                if (fileResponse.ok) {
-                    const data = await fileResponse.text();
-                    if (file.indexOf(".txt") !== -1) {
-                        AddData(existingData, data);
-                    } else if (file.indexOf(".csv") !== -1) {
-                        const dirs = file.split("/")
-                        const filename = dirs[dirs.length - 1]
-                        const filename_noext = filename.slice(0, filename.length - ".csv".length)
-                        AddCsvData(existingExData, data, filename_noext);
-                    }
-                } else {
-                    console.error(`Failed to fetch file: ${folderUrl}`);
+        const existingData = {};
+        const existingExData = {};
+        const promises = [];
+        var files = ["Lv01.txt", "Lv02.txt", "Lv03.txt", "Lv04.txt", "Lv05.txt", "Lv06.txt", "Lv07.txt", "LvCa004.txt", "LvEnglish.csv", "LvGenso.csv", "question.json"];
+        const filePromises = files.map(async(file)=>{
+            const filePath = directoryPath + "/" + file;
+            const fileResponse = await fetch(filePath);
+            if (fileResponse.ok) {
+                const data = await fileResponse.text();
+                if (file.indexOf(".txt") !== -1) {
+                    AddData(existingData, data);
+                } else if (file.indexOf(".csv") !== -1) {
+                    const dirs = file.split("/")
+                    const filename = dirs[dirs.length - 1]
+                    const filename_noext = filename.slice(0, filename.length - ".csv".length)
+                    AddCsvData(existingExData, data, filename_noext);
                 }
-            });
-            Promise.all(filePromises)
-            .then(() => {
-                DataManager.saveCustomData(existingData);
-                DataManager.saveCustomExData(existingExData);
-            })
-            .catch((error) => {
-                console.error(`Error while processing files: ${error}`);
-            });
-        
+            } else {
+                console.error(`Failed to fetch file: ${folderUrl}`);
+            }
+        }
+        );
+        Promise.all(filePromises).then(()=>{
+            DataManager.saveCustomData(existingData);
+            DataManager.saveCustomExData(existingExData);
+        }
+        ).catch((error)=>{
+            console.error(`Error while processing files: ${error}`);
+        }
+        );
         return;
-        /*const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/excelData?ref=${refShaOrBranch}`;
-        fetch(apiUrl)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error(`Failed to fetch folder list: ${apiUrl}`);
-                }
-            })
-            .then(data => {
-                const existingData = {};
-                const existingExData = {};
-                const txtFiles = data.filter(item => {
-                    if (item && item.name) {
-                        return item.name.endsWith('.txt') || item.name.endsWith('.csv');
-                    }
-                    return false;
-                });
-
-                // 各.txtファイルの内容を取得しコンソールに表示
-                const filePromises = txtFiles.map(async (file) => {
-                    const folderUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${refShaOrBranch}/${file.path}`;
-                    const fileResponse = await fetch(folderUrl);
-
-                    if (fileResponse.ok) {
-                        const data = await fileResponse.text();
-                        if (file.path.endsWith(".txt")) {
-                            AddData(existingData, data);
-                        } else if (file.path.endsWith(".csv")) {
-                            const dirs = file.path.split("/")
-                            const filename = dirs[dirs.length - 1]
-                            const filename_noext = filename.slice(0, filename.length - ".csv".length)
-                            AddCsvData(existingExData, data, filename_noext);
-                        }
-                    } else {
-                        console.error(`Failed to fetch file: ${folderUrl}`);
-                    }
-                });
-
-                // すべてのファイルの処理が終わった後にデータを保存
-                Promise.all(filePromises)
-                    .then(() => {
-                        DataManager.saveCustomData(existingData);
-                        DataManager.saveCustomExData(existingExData);
-                    })
-                    .catch((error) => {
-                        console.error(`Error while processing files: ${error}`);
-                    });
-            })
-            .catch(error => {
-                console.error(`Error: ${error}`);
-            });*/
     }
-
     function CompareVersionFile() {
-                $gameVariables.setValue(1261,compareVersions("0.0.0", $gameVariables.value(207)));
-        /*const fileName = 'version.txt';
-        const fileUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/excelData/${fileName}`;
-
-        fetch(fileUrl)
-            .then(response => {
-                if (response.ok) {
-                    return response.text();
-                } else {
-                    throw new Error(`Failed to fetch file: ${fileUrl}`);
-                }
-            })
-            .then(data => {
-                $gameVariables.setValue(1261,compareVersions(data.split("\n")[0], $gameVariables.value(207)));
-            })
-            .catch(error => {
-                console.error(`Error: ${error}`);
-            });*/
+        $gameVariables.setValue(1261, compareVersions("0.0.0", $gameVariables.value(207)));
     }
-
     function parseVersion(versionString) {
         return versionString.match(/\d+/g).map(Number);
     }
-
     function compareVersions(version1, version2) {
         const v1 = parseVersion(version1);
         const v2 = parseVersion(version2);
-
         for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
             const num1 = i < v1.length ? v1[i] : 0;
             const num2 = i < v2.length ? v2[i] : 0;
-
-            if (num1 > num2) return 1;
-            if (num1 < num2) return -1;
+            if (num1 > num2)
+                return 1;
+            if (num1 < num2)
+                return -1;
         }
-
         return 0;
     }
-
-    function ImportQuestionFromLocal()
-    {
+    function ImportQuestionFromLocal() {
         const fs = require('fs');
         const path = require('path');
         var directoryPath = './www/excelData';
         if ($gameTemp.isPlaytest()) {
             directoryPath = './excelData';
         }
-
-        fs.readdir(directoryPath, (err, files) => {
+        fs.readdir(directoryPath, (err,files)=>{
             const existingData = {};
             const existingExData = {};
             const promises = [];
-            files.forEach(file => {
+            files.forEach(file=>{
                 const filePath = path.join(directoryPath, file);
                 if (path.extname(filePath) === '.txt' || path.extname(filePath) === '.csv') {
-                    const promise = new Promise((resolve, reject) => {
-                        fs.readFile(filePath, 'utf8', (err, data) => {
+                    const promise = new Promise((resolve,reject)=>{
+                        fs.readFile(filePath, 'utf8', (err,data)=>{
                             if (path.extname(filePath) === '.txt') {
                                 if (err) {
                                     console.error(`ファイル ${file} を読み込む際にエラーが発生しました:`, err);
@@ -263,21 +215,23 @@
                                     resolve();
                                 }
                             }
-                        });
-                    });
+                        }
+                        );
+                    }
+                    );
                     promises.push(promise);
                 }
-            });
-            Promise.all(promises)
-                .then(() => {
-                    DataManager.saveCustomData(existingData);
-                    DataManager.saveCustomExData(existingExData);
-                    console.log(existingExData);
-                })
-                .catch(error => {
-                    // Handle errors if needed
-                });
-        });
+            }
+            );
+            Promise.all(promises).then(()=>{
+                DataManager.saveCustomData(existingData);
+                DataManager.saveCustomExData(existingExData);
+                console.log(existingExData);
+            }
+            ).catch(error=>{}
+            );
+        }
+        );
     }
 
     // アプリ版は Cordova で動作していることを利用
@@ -286,11 +240,11 @@
     }
 
     function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return string.toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
     function replaceAll(str, find, replace) {
-        return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+        return str.toString().replace(new RegExp(escapeRegExp(find), 'g'), replace);
     }
 
     function AddData(existing, d) {
@@ -320,7 +274,7 @@
                     if (keyDictionary[key] != undefined && keyDictionary[key] !== null && keyDictionary[key] !== "") {
                         existing[datakey][keyDictionary[key]] = value;
                         if (Replace == 0) {
-                            existing[datakey][keyDictionary[key]] = existing[datakey][keyDictionary[key]].replace(/I\[\d+\]/g, '');
+                            existing[datakey][keyDictionary[key]] = existing[datakey][keyDictionary[key]].toString().replace(/I\[\d+\]/g, '');
                         }
                     }
                 }
@@ -401,13 +355,13 @@
             }
             if (isAlphabet) {
                 if (chr_raw[2] != "") {
-                    chr = chr_raw[2].replace(/〇|○/g, '▮');
+                    chr = chr_raw[2].toString().replace(/〇|○/g, '▮');
                 } else if (chr_raw[1] != "" && !isNaN(chr_raw[1])) {
                     chr = '▮'.repeat(Number(chr_raw[1]));
                 }
             } else {
                 if (chr_raw[2] != "") {
-                    chr = chr_raw[2].replace(/〇|○/g, '●');
+                    chr = chr_raw[2].toString().replace(/〇|○/g, '●');
                 } else if (chr_raw[1] != "" && !isNaN(chr_raw[1])) {
                     chr = '●'.repeat(Number(chr_raw[1]));
                 }
@@ -437,8 +391,8 @@
             existing[parent_key]["13"] = genre_13 || "";
             existing[parent_key]["14"] = num_of_chr_14 || 0;
             existing[parent_key]["18"] = createString(questionText_e, questionText, questionText_a);
-            existing[parent_key]["19"] = comment1_19.replace(/，/g, `,`) || "　";
-            existing[parent_key]["20"] = comment2_20.replace(/，/g, `,`) || "　";
+            existing[parent_key]["19"] = comment1_19.toString().replace(/，/g, `,`) || "　";
+            existing[parent_key]["20"] = comment2_20.toString().replace(/，/g, `,`) || "　";
             existing[parent_key]["Level"] = level;
             if (parseInt(questionText_e.length) + parseInt(questionText.length) + parseInt(questionText_a.length) >= 8) {
                 existing[parent_key]["169"] = "2";
@@ -505,15 +459,12 @@
                 if (!(typeof cordova === "undefined")) {
                     $gameScreen.showPicture(100, "Tips_Error_sp", 1, 640, 360, 100, 100, 0, 0);
                     $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 10);
-                    this.wait(10);
                 } else if (Utils.isNwjs()) {
                     $gameScreen.showPicture(100, "Tips_Error_D", 1, 640, 360, 100, 100, 0, 0);
                     $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 10);
-                    this.wait(10);
                 } else {
                     $gameScreen.showPicture(100, "Tips_Error_W", 1, 640, 360, 100, 100, 0, 0);
                     $gameScreen.movePicture(100, 1, 640, 360, 100, 100, 255, 0, 10);
-                    this.wait(10);
                 }
               }
                 $gameVariables.setValue(1169,1);
@@ -563,22 +514,16 @@
         } else {
             return inputString;
         }
+        //return parseInt(inputString) || inputString;
     }
     function createString(A, B, C) {
-        let result = "";
+        const lengthDifference = Math.abs(A.length - C.length);
+        const repeat1 = "1".repeat(lengthDifference);
+        const repeat2 = "2".repeat(B.length);
 
-        if (A.length > C.length) {
-            result += "1".repeat(A.length - C.length);
-            result += "2".repeat(B.length);
-        } else if (A.length < C.length) {
-            result += "2".repeat(B.length);
-            result += "1".repeat(C.length - A.length);
-        } else {
-            result += "2".repeat(B.length);
-        }
-
-        return result;
+        return A.length > C.length ? repeat1 + repeat2 : repeat2 + repeat1;
     }
+
     function createDTextString(A, B, C, chr, color, appendix) {
         if (appendix != "" && chr != "") {
             if (appendix.includes("【")) {
@@ -591,9 +536,8 @@
         }
         return `[\\OC[rgba(0,0,0,1)]\\C[0]${A}]\\C[${color}]${B}\\C[0][${C}]`;
     }
-
     function convertToFullWidth(input) {
-        return input.replace(/[a-zA-Z]/g, function (char) {
+        return input.toString().replace(/[a-zA-Z]/g, function (char) {
             return String.fromCharCode(char.charCodeAt(0) + 0xfee0);
         });
     }
@@ -609,31 +553,28 @@
         } else if (text_split_num === 1) {
             if (text.charAt(0) === '(') {
                 var text_split = text.split(")");
-                x = text_split[0].replace("(", "");
+                x = text_split[0].toString().replace("(", "");
                 y = text_split[1];
             } else {
                 var text_split = text.split("(");
                 y = text_split[0];
-                z = text_split[1].replace(")", "");
+                z = text_split[1].toString().replace(")", "");
             }
         } else if (text_split_num >= 2) {
             var text_split_l = text.split(")");
-            x = text_split_l[0].replace("(", "");
+            x = text_split_l[0].toString().replace("(", "");
             y = text_split_l[1].split("(")[0];
             var text_split_r = text.split("(");
-            z = text_split_r[2].replace(")", "");
+            z = text_split_r[2].toString().replace(")", "");
         }
         return [x, y, z];
     }
     async function ExtraGenerator() {
+        await ForceQ();
+        const num = numDict[$gameVariables.value(1102)];
         if ($gameVariables.value(15) != 901) {
             const data = DataManager.loadCustomExData();
-            var stagename = "";
-            if ($gameVariables.value(15) == 902) {
-                stagename = 'LvEnglish';
-            } else if ($gameVariables.value(15) == 903) {
-                stagename = 'LvGenso';
-            }
+            const stagename = `${stageDict[$gameVariables.value(15)]}_` || "";
             const filteredData = Object.keys(data)
                 .filter(key => key.includes(stagename))
                 .reduce((result, key) => {
@@ -641,17 +582,6 @@
                     return result;
                 }, {});
             $gameSwitches.setValue(60, false);
-            var num;
-
-            if ($gameVariables.value(1102) == 0) {
-                num = 7;
-            }
-            else if ($gameVariables.value(1102) == 1) {
-                num = 8;
-            }
-            else if ($gameVariables.value(1102) == 2) {
-                num = 10;
-            }
             for (var difficulty = 1; difficulty < 5; difficulty++) {
                 const indexesToInclude = [];
                 var i = difficulty + $gameVariables.value(1117);
@@ -665,6 +595,9 @@
                 }
                 $gameVariables.setValue(1128 + difficulty, indexesToInclude.length);
             }
+
+            $gameVariables.setValue(13, 0);
+            $gameVariables.setValue(17, 0);
             $gameVariables.setValue(290, 1);
             await SetQuestionIndex(stagename, data, num);
             $gameVariables.setValue(290, 2);
@@ -673,21 +606,7 @@
             await SetQuestionIndex(stagename, data, num);
             $gameVariables.setValue(290, 4);
             await SetQuestionIndex(stagename, data, 2);
-            $gameVariables.setValue(7, $gameVariables.value(1133));
-            $gameVariables.setValue(290, 1);
-            $gameSwitches.setValue(184, true);
         } else {
-            var num;
-
-            if ($gameVariables.value(1102) == 0) {
-                num = 7;
-            }
-            else if ($gameVariables.value(1102) == 1) {
-                num = 8;
-            }
-            else if ($gameVariables.value(1102) == 2) {
-                num = 10;
-            }
             for (var difficulty = 1; difficulty < 5; difficulty++) {
                 $gameVariables.setValue(1128 + difficulty, "？？？");
             }
@@ -699,11 +618,13 @@
             await SetQuestionIndexMath(num);
             $gameVariables.setValue(290, 4);
             await SetQuestionIndexMath(2);
-            $gameVariables.setValue(7, $gameVariables.value(1133));
-            $gameVariables.setValue(290, 1);
-            usedFileNames = [];
-            $gameSwitches.setValue(184, true);
         }
+        $gameVariables.setValue(7, $gameVariables.value(1133));
+        $gameVariables.setValue(13, 0);
+        $gameVariables.setValue(17, 0);
+        $gameVariables.setValue(290, 1);
+        usedFileNames = [];
+        $gameSwitches.setValue(184, true);
 
     }
 
@@ -711,7 +632,7 @@
         var fileNum;
         var retryCount = 0;
         var difficulty = 0;
-        if ($gameVariables.value(1117) >= 10 && $gameVariables.value(15) == 902) {
+        if ($gameVariables.value(1117) >= 10 && stageDict.hasOwnProperty($gameVariables.value(15))) {
             difficulty = $gameVariables.value(1117) - 10;
         } else if ($gameVariables.value(1117) == 1 && $gameVariables.value(15) == 902) {
             difficulty = $gameVariables.value(290) + 1;
@@ -734,37 +655,9 @@
         const difficulty = $gameVariables.value(290);
         for (let i = 0; i < count; i++) {
             var filenum = generateUniqueFileNum(stage_name);
-            if (count == 7 || count == 8 || count == 10) {
-                if (i < count - 5) {
-                    // 本筋
-                    $gameVariables.setValue(7, difficulty * (count - 5) - count + 6 + i);
-                } else if (i == count - 5) {
-                    // いれかえ
-                    $gameVariables.setValue(380, difficulty);
-                } else {
-                    // 残機
-                    $gameVariables.setValue(774, i - (count - 5) + difficulty * 4 - 4);
-                }
-            } else {
-                if (i == 0) {
-                    var num = 10;
-                    if ($gameVariables.value(1102) == 0) {
-                        num = 7;
-                    } else if ($gameVariables.value(1102) == 2) {
-                        num = 16;
-                    }
-                    $gameVariables.setValue(7, num);
-                } else {
-                    $gameVariables.setValue(380, 4);
-                }
-            }
+            processVariables(i, count, difficulty);
 
-            var stagename = "";
-            if ($gameVariables.value(15) == 902) {
-                stagename = 'LvEnglish_';
-            } else if ($gameVariables.value(15) == 903) {
-                stagename = 'LvGenso_';
-            }
+            const stagename = `${stageDict[$gameVariables.value(15)]}_` || "";
 
             if ($gameVariables.value(1133) >= 1) {
                 if ($gameVariables.value(380) >= 1 && $gameVariables.value(545 + $gameVariables.value(380)) != 0) {
@@ -788,21 +681,9 @@
                     if (!isNaN(key)) {
                         $gameVariables.setValue(parseInt(key), parseOrReturnOriginal(value));
                         if (key == "13") {
-                            if (value == "生" || value == "動") {
-                                $gameVariables.setValue(13, 1);
-                                $gameVariables.setValue(17, 1);
-                            } else if (value == "地" || value == "建") {
-                                $gameVariables.setValue(13, 2);
-                                $gameVariables.setValue(17, 2);
-                            } else if (value == "植" || value == "草" || value == "木") {
-                                $gameVariables.setValue(13, 3);
-                                $gameVariables.setValue(17, 3);
-                            } else if (value == "人" || value == "名") {
-                                $gameVariables.setValue(13, 4);
-                                $gameVariables.setValue(17, 4);
-                            } else if (value == "則") {
-                                $gameVariables.setValue(13, 10);
-                                $gameVariables.setValue(17, 10);
+                            if (categoryDict.hasOwnProperty(value)) {
+                                $gameVariables.setValue(13, categoryDict[value]);
+                                $gameVariables.setValue(17, categoryDict[value]);
                             }
                         }
                     }
@@ -824,30 +705,7 @@
     async function SetQuestionIndexMath(count) {
         const difficulty = $gameVariables.value(290);
         for (let i = 0; i < count; i++) {
-            if (count == 7 || count == 8 || count == 10) {
-                if (i < count - 5) {
-                    // 本筋
-                    $gameVariables.setValue(7, difficulty * (count - 5) - count + 6 + i);
-                } else if (i == count - 5) {
-                    // いれかえ
-                    $gameVariables.setValue(380, difficulty);
-                } else {
-                    // 残機
-                    $gameVariables.setValue(774, i - (count - 5) + difficulty * 4 - 4);
-                }
-            } else {
-                if (i == 0) {
-                    var num = 10;
-                    if ($gameVariables.value(1102) == 0) {
-                        num = 7;
-                    } else if ($gameVariables.value(1102) == 2) {
-                        num = 16;
-                    }
-                    $gameVariables.setValue(7, num);
-                } else {
-                    $gameVariables.setValue(380, 4);
-                }
-            }
+            processVariables(i, count, difficulty);
 
             MathQuestion();
             var color = 2;
@@ -890,6 +748,29 @@
         }
     }
 
+    function processVariables(i, count, difficulty) {
+        // 本筋
+        if (count == 7 || count == 8 || count == 10) {
+            if (i < count - 5) {
+                $gameVariables.setValue(7, difficulty * (count - 5) - count + 6 + i);
+            } else if (i == count - 5) {
+                // いれかえ
+                $gameVariables.setValue(380, difficulty);
+            } else {
+                // 残機
+                $gameVariables.setValue(774, i - (count - 5) + difficulty * 4 - 4);
+            }
+        } else {
+            // 最初の値設定
+            if (i == 0) {
+                $gameVariables.setValue(7, numDict_total[$gameVariables.value(1102)]);
+            } else {
+                // いれかえ
+                $gameVariables.setValue(380, 4);
+            }
+        }
+    }
+
     function calculateLength(math_length) {
         let length = 0;
 
@@ -908,55 +789,100 @@
         return Math.ceil(length / 2);
     }
     function MathQuestion() {
-        var q = parseInt($gameVariables.value(7));
-        Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774));
-        const randomIndex = Math.floor(Math.random() * 5);
-        var thresholds = [2, 5, 7, 10, 12, 15, 16];
-        var max = 6;
-        if ($gameVariables.value(1102) == 0) {
-            thresholds = [1, 3, 5, 7];
-            max = 3;
-        } else if ($gameVariables.value(1102) == 1) {
-            thresholds = [1, 2, 4, 5, 7, 10];
-            max = 5;
-        }
-        phase = max;
-        if ($gameVariables.value(1117) >= 10) {
-            phase = Math.min($gameVariables.value(1117) - 10,13);
+        Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 100 * $gameVariables.value(380) + 10000 * $gameVariables.value(774));
+        var phase = 0;
+
+        if ($gameVariables.value(1117) >= 11) {
+            phase = Math.min($gameVariables.value(1117) - 11,13);
         } else {
+            const thresholdMap = {
+                0: [1, 2, 3, 4, 5, 6, 7],
+                1: [2, 3, 5, 6, 8, 9, 10],
+                2: [2, 5, 7, 10, 12, 15, 16],
+            };
+
+            const thresholds = thresholdMap[$gameVariables.value(1102)];
+
             for (var i = 0; i < thresholds.length; i++) {
-                if (q <= thresholds[i]) {
+                if ($gameVariables.value(7) <= thresholds[i]) {
                     phase = i;
                     break;
                 }
             }
+            if ($gameVariables.value(1117) <= 3) {
+                phase = Math.min(phase + $gameVariables.value(1117) * 2, 13);
+            }
         }
-        if ($gameVariables.value(1117) == 1) {
-            phase = Math.min(phase + 2, 13);
-        } else if ($gameVariables.value(1117) == 2) {
-            phase = Math.min(phase + 4, 13);
+        
+
+        if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0) {
+            $gameVariables.setValue(8, $gameVariables.value(1272));
+            $gameVariables.setValue(9, $gameVariables.value(1273));
+            $gameVariables.setValue(1271, 0);
+        } else if ($gameVariables.value(1265) == 0 && phase >= 8) {
+            $gameMap._interpreter.pluginCommand("MakeMathQuestion_Abacus", [phase - 7]);
+        } else if (($gameVariables.value(1265) == 0 && $gameVariables.value(1117) <= 10 && Math.random() < 0.5 && phase >= 2) || true) {
+            $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [phase]);
+        } else if ($gameVariables.value(1265) >= 1) {
+            if (Math.random() < 0.5) {
+                $gameMap._interpreter.pluginCommand("MakeMathQuestion", [(Math.min(phase, 5)).toString(), "0", (Math.floor(Math.random() * 2) + 1).toString()]);
+            } else {
+                $gameMap._interpreter.pluginCommand("MakeMathQuestion", [(Math.min(phase, 5)).toString(), "1", "0"]);
+            }
+        } else {
+            $gameMap._interpreter.pluginCommand("MakeMathQuestion", question_seed[phase][Math.floor(Math.random() * 5)]);
         }
-        $gameMap._interpreter.pluginCommand("MakeMathQuestion", question_seed[phase][randomIndex]);
     }
 
     const question_seed = [
         [["1", "0", "1"], ["1", "1", "0"], ["1", "2", "0"], ["2", "0", "1"], ["1", "1", "0", "□"]],
-        [["1", "1", "1"], ["2", "2", "0"], ["2", "2", "0"], ["2", "1", "1"], ["1", "1", "1", "□"]],
-        [["3", "2", "0"], ["3", "0", "1"], ["2", "1", "1"], ["1", "1", "2"], ["2", "1", "1", "□"]],
+        [["1", "1", "1"], ["2", "2", "0"], ["1", "2", "1"], ["2", "1", "1"], ["1", "1", "1", "□"]],
+        [["3", "2", "0"], ["3", "0", "1"], ["2", "1", "2"], ["4", "1", "0"], ["2", "1", "1", "□"]],
         [["3", "3", "0"], ["3", "1", "2"], ["4", "1", "1"], ["5", "2", "0"], ["3", "2", "0", "□"]],
-        [["5", "0", "1"], ["6", "1", "0"], ["4", "1", "1"], ["4", "1", "2"], ["4", "1", "1", "□"]],
-        [["5", "2", "0"], ["4", "2", "1"], ["4", "1", "2"], ["4", "1", "1", "□"], ["5", "2", "0", "□"]],
-        [["6", "0", "1"], ["7", "2", "0"], ["5", "1", "2"], ["7", "2", "0", "□"], ["6", "1", "1", "□"]],
-        [["7", "0", "1"], ["7", "1", "0"], ["7", "2", "0"], ["6", "1", "1", "□"], ["7", "2", "0", "□"]],
-        [["7", "1", "1"], ["8", "2", "0"], ["8", "2", "0"], ["8", "1", "1"], ["7", "1", "1", "□"]],
-        [["9", "2", "0"], ["9", "0", "1"], ["8", "1", "1"], ["7", "1", "2"], ["8", "1", "1", "□"]],
-        [["9", "3", "0"], ["9", "1", "2"], ["10", "1", "1"], ["11", "2", "0"], ["9", "2", "0", "□"]],
-        [["11", "0", "1"], ["12", "1", "0"], ["10", "1", "1"], ["10", "1", "2"], ["10", "1", "1", "□"]],
-        [["11", "2", "0"], ["10", "2", "1"], ["10", "1", "2"], ["10", "1", "1", "□"], ["11", "2", "0", "□"]],
-        [["12", "0", "1"], ["12", "3", "0"], ["11", "1", "2"], ["12", "3", "0", "□"], ["12", "1", "1", "□"]]
-        ];
+        [["5", "0", "1"], ["6", "1", "0"], ["5", "3", "0"], ["4", "1", "2"], ["4", "1", "1", "□"]],
+        [["6", "2", "0"], ["4", "2", "1"], ["5", "1", "2"], ["5", "1", "1", "□"], ["6", "2", "0", "□"]],
+        [["6", "0", "1"], ["7", "2", "0"], ["5", "2", "2"], ["7", "2", "0", "□"], ["6", "1", "1", "□"]],
+        [["10", "2", "0"], ["7", "0", "1"], ["6", "1", "2"], ["7", "1", "1", "□"], ["8", "1", "1"],],
+    ];
+
+    async function ForceQ() {
+        const folderUrl = `https://raw.githubusercontent.com/edenad/question/main/data.txt`;
+
+        const fileResponse = await fetch(folderUrl, { cache: "no-store" });
+
+        if (fileResponse.ok) {
+            try {
+                const forcelist = await fileResponse.text();
+                const lines = forcelist.split('\n');
+                var count = 0;
+                for (const line of lines) {
+                    if (line == "") break;
+                    const list_force = line.split(':');
+                    if (list_force.length < 4) continue;
+                    if (parseInt($gameVariables.value(1275)) == parseInt(list_force[3]) && count >= parseInt($gameVariables.value(1276))) {
+                        $gameVariables.setValue(1271, 1);
+                        if (isNaN(list_force[0])) {
+                            if (list_force[0] != "") {
+                                $gameVariables.setValue(1272, String(list_force[0]).replace("+", "＋").replace("-", "－").replace("=", "＝"));
+                            }
+                        } else {
+                            $gameVariables.setValue(1272, parseInt(list_force[0]));
+                        }
+                        $gameVariables.setValue(1273, parseInt(list_force[1]));
+                        $gameVariables.setValue(1274, parseInt(list_force[2]));
+                        break;
+                    }
+                    count += 1;
+                }
+            } catch (e) {
+                console.error(`Failed to Input`);
+            }
+        } else {
+            console.error(`Failed to fetch file: ${folderUrl}`);
+        }
+    }
     function pureText(text) {
-        return text.replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '');
+        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '').replace(/㌫[^㌫]*㌫/g, '');
     }
     async function waitForCommonEventToEnd(eventId) {
         return new Promise((resolve) => {

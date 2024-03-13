@@ -44,7 +44,7 @@
 
     const isLong = 7;
     const isTooLong = 11;
-    const isVeryLong = 15;
+    const isVeryLong = 19;
     const size1_default = 250;
     const size2_long = 200;
     const size3_toolong = 150;
@@ -293,7 +293,7 @@
         }
     };
     function pureText(text) {
-        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '');
+        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '').replace(/㌫[^㌫]*㌫/g, '');
     }
 
     let previousProcess = Promise.resolve(); // 初期のPromise

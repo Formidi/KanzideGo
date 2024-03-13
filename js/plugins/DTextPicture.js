@@ -531,8 +531,8 @@
         if ($gameScreen.isSettingDText() && !name) {
             this.isDTextPicture = true;
             if ($gameVariables.value(1179) == 2 && $gameScreen.getDTextPictureInfo().originalValue.startsWith("\\oc[black]")) {
-                arguments[4] = scaleX * 5;
-                arguments[5] = scaleY * 5;
+                arguments[4] = scaleX * 10;
+                arguments[5] = scaleY * 10;
             }
             if (origin === 0) {
                 if ($gameScreen.getDTextPictureInfo().size >= 100) {
@@ -561,8 +561,8 @@
         if (this.isDTextPicture) {
             //console.log(this.dTextInfo);
             if ($gameVariables.value(1179) == 2 && this.dTextInfo.originalValue.startsWith("\\oc[black]")) {
-                arguments[3] = scaleX * 5;
-                arguments[4] = scaleY * 5;
+                arguments[3] = scaleX * 10;
+                arguments[4] = scaleY * 10;
             }
             if (origin === 0) {
                 if (this.dTextInfo.size >= 100) {
@@ -908,6 +908,14 @@
             var c = textState.text[textState.index++];
         } else if (textState.text[textState.index] === '₨') {
             var c = textState.text[textState.index++];
+        } else if (textState.text[textState.index] === '㌫') {
+            bitmap.fontSize = this.hiddenWindow.contents.fontSize;
+            if (textState.inPercentage === true) {
+                this._endPercentageText(textState, bitmap);
+            } else {
+                this._startPercentageText(textState, bitmap);
+            }
+            var c = textState.text[textState.index++];
         } else if (textState.text[textState.index] === '㊦') {
             if (textState.inUnder === true) {
                 this._endUnderText(textState, bitmap);
@@ -921,16 +929,11 @@
                 this._RubyTextAdd(textState, c);
             }
             else if (textState.inMini === true) {
-
                 var c = textState.text[textState.index++];
                 var w = Math.floor(this.hiddenWindow.textWidth(c) * 3 / 4);
                 var newFontSize = Math.floor(this.hiddenWindow.contents.fontSize * 3 / 4);
                 bitmap.fontSize = newFontSize;
-                if (bitmap.outlineWidth >= 50) {
-                    OutlineText(textState, bitmap.outlineWidth * 3 / 4, bitmap, c, w, textState.x, textState.y + newFontSize / 8);
-                } else {
-                    bitmap.drawText(c, textState.x, textState.y + newFontSize / 8, w * 2, textState.height, 'left');
-                }
+                DrawText(c, w, textState.x, textState.y + newFontSize / 8, bitmap.outlineWidth * 3 / 4, textState, bitmap);
                 textState.x += w;
 
             }
@@ -938,15 +941,16 @@
                 var c = textState.text[textState.index++];
                 this._UnderTextAdd(textState, c);
             }
+            else if (textState.inPercentage === true) {
+                var c = textState.text[textState.index++];
+                this._PercentageTextAdd(textState, c);
+            }
             else {
                 var c = textState.text[textState.index++];
                 var w = this.hiddenWindow.textWidth(c);
                 bitmap.fontSize = this.hiddenWindow.contents.fontSize;
-                if (bitmap.outlineWidth >= 50) {
-                    OutlineText(textState, bitmap.outlineWidth, bitmap, c, w, textState.x, textState.y);
-                } else {
-                    bitmap.drawText(c, textState.x, textState.y, w * 2, textState.height, 'left');
-                }
+                DrawText(c,w, textState.x, textState.y, bitmap.outlineWidth, textState, bitmap);
+
                 textState.x += w;
                 if (textState.inRuby === true) {
                     textState.RubyCount += 1;
@@ -955,14 +959,14 @@
         }
     };
 
-    function OutlineText(textState,width, bitmap,c,w,x,y) {
+    function OutlineText(textState,bitmap,outline_degree,c,w,x,y) {
         const bitmaptmp = bitmap.outlineWidth;
         bitmap.outlineWidth = 0;
         const bitmapcolortmp = bitmap.textColor;
         bitmap.textColor = 'rgba(0,0,0,1)';
         const n_value = $gameVariables.value(param.n_value);
         for (var angle = 0; angle < n_value; angle++) {
-            bitmap.drawText(c, x + width / 10 * Math.cos(2 * 3.1415 * angle / n_value), y + width / 10 * Math.sin(2 * 3.1415 * angle / n_value), w * 2, textState.height, 'left');
+            bitmap.drawText(c, x + outline_degree / 10 * Math.cos(2 * 3.1415 * angle / n_value), y + outline_degree / 10 * Math.sin(2 * 3.1415 * angle / n_value), w * 2, textState.height, 'left');
         }
         bitmap.textColor = bitmapcolortmp;
         bitmap.drawText(c, x, y, w * 2, textState.height, 'left');
@@ -972,27 +976,58 @@
 
     Sprite_Picture.prototype._startUnderText = function (textState, bitmap) {
         textState.inUnder = true;
-        textState.inUnderTextString = "";
+        textState.inSpecificTextString = "";
     };
 
     Sprite_Picture.prototype._UnderTextAdd = function (textState, textToAdd) {
-        textState.inUnderTextString += textToAdd;
+        textState.inSpecificTextString += textToAdd;
     };
 
     Sprite_Picture.prototype._endUnderText = function (textState, bitmap) {
         if (bitmap.textColor) {
-            var w = this.hiddenWindow.textWidth(textState.inUnderTextString);
+            var w = this.hiddenWindow.textWidth(textState.inSpecificTextString);
             var originalFontSize = bitmap.fontSize;
             bitmap.fontSize = originalFontSize / 2.6;
             var font_mini = originalFontSize / 5.2;
-            if (bitmap.outlineWidth >= 50) {
-                OutlineText(textState, bitmap.outlineWidth / 2.6, bitmap, textState.inUnderTextString, w, bitmap.width / 2 - textState.inUnderTextString.length * font_mini, textState.y + originalFontSize / 2 + font_mini);
-            } else {
-                bitmap.drawText(textState.inUnderTextString, bitmap.width / 2 - textState.inUnderTextString.length * font_mini, textState.y + originalFontSize / 2 + font_mini, w * 2, textState.height, 'left');
-            }
-
+            DrawText(textState.inSpecificTextString,w, bitmap.width / 2 - textState.inSpecificTextString.length * font_mini, textState.y + originalFontSize / 2 + font_mini, bitmap.outlineWidth / 2.6, textState, bitmap);
             bitmap.fontSize = originalFontSize;
             textState.inUnder = false;
+        }
+    };
+
+    function DrawText(c, w, x, y, outline,textState, bitmap) {
+        const outlineWidth = bitmap.outlineWidth;
+        if (outlineWidth >= 50) {
+            // アウトライン付きテキストを描画
+            OutlineText(textState, bitmap, outline, c, w, x, y);
+        } else {
+            // アウトラインなしのテキストを描画
+            bitmap.drawText(c, x, y, w * 2, textState.height, 'left');
+        }
+    }
+
+    Sprite_Picture.prototype._startPercentageText = function (textState, bitmap) {
+        textState.inPercentage = true;
+        textState.inSpecificTextString = "";
+    };
+    Sprite_Picture.prototype._PercentageTextAdd = function (textState, textToAdd) {
+        textState.inSpecificTextString += textToAdd;
+    };
+    Sprite_Picture.prototype._endPercentageText = function (textState, bitmap) {
+        if (bitmap.textColor) {
+            const [denominator, numerator] = textState.inSpecificTextString.split("/");
+            var line = "─".repeat(Math.floor((Math.max(denominator.length, numerator.length) + 1) / 2));
+            var originalFontSize = bitmap.fontSize;
+            var w = this.hiddenWindow.textWidth(line);
+            bitmap.fontSize = originalFontSize / 1.5;
+            var w1 = this.hiddenWindow.textWidth(denominator) / 1.5;
+            var w2 = this.hiddenWindow.textWidth(numerator) / 1.5;
+            DrawText(denominator, w, textState.x + (w - w1) / 2, textState.y - bitmap.fontSize * 0.6, bitmap.outlineWidth, textState, bitmap);
+            DrawText(numerator, w, textState.x + (w - w2) / 2, textState.y + bitmap.fontSize * 0.6, bitmap.outlineWidth, textState, bitmap);
+            bitmap.fontSize = originalFontSize;
+            DrawText(line, w, textState.x, textState.y, bitmap.outlineWidth, textState, bitmap);
+            textState.inPercentage = false;
+            textState.x += w;
         }
     };
 
@@ -1065,15 +1100,12 @@
                 if (result_reverse) {
                     textState.inRubyTextString = result_reverse.join('　');
                     bitmap.textColor = this.hiddenWindow.textColor(15);
-                    OutlineText(textState, bitmap.outlineWidth / 1.3, bitmap, textState.inRubyTextString, w, center - textState.inRubyTextString.length * font_mini, textState.RubyStart_y + offset);
+                    DrawText(textState.inRubyTextString, w, center - textState.inRubyTextString.length * font_mini, textState.RubyStart_y + offset, bitmap.outlineWidth / 1.3, textState, bitmap);
                 }
                 textState.inRubyTextString = result.join('　');
-            } else {
-                // matches がない場合は何もしない
-                console.error('No matches found.');
             }
             bitmap.textColor = this.hiddenWindow.textColor(15);
-            OutlineText(textState, bitmap.outlineWidth / 1.3, bitmap, textState.inRubyTextString, w, center - textState.inRubyTextString.length * font_mini, textState.RubyStart_y + offset);
+            DrawText(textState.inRubyTextString, w, center - textState.inRubyTextString.length * font_mini, textState.RubyStart_y + offset, bitmap.outlineWidth / 1.3, textState, bitmap);
             bitmap.textColor = this.hiddenWindow.textColor(0);
             
         } else {
