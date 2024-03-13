@@ -72,6 +72,7 @@
         // キャッシュ内に計算結果が保存されていれば、それを返す
         if (cachedResults.hasOwnProperty(key)) {
             //console.log("算出済み！" + cachedResults[key]);
+            $gameVariables.setValue(numofQ, cachedResults[key]);
             return cachedResults[key];
         }
 

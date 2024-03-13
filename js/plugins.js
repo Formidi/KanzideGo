@@ -40,7 +40,7 @@ var $plugins =
 {"name":"StringSearchReplace","status":true,"description":"","parameters":{}},
 {"name":"Torigoya_RetryLoadPlus","status":false,"description":"ファイルの読み込み失敗時にリトライします","parameters":{"Retry Max":"10","Retry Message Text":"ファイルの読み込みに失敗しました。\\nネットワーク状況を確認して、リトライしてください。","Retry Button Text":"リトライする"}},
 {"name":"SNZ_randomXorshiftOnline","status":false,"description":"ランダムに何かをする処理の精度を上げます　ブラウザプレイ対応","parameters":{}},
-{"name":"RGenRandomizer","status":true,"description":"ランダムな変数出力","parameters":{"exported_value":"6","group":"1084","numofQ":"681"}},
+{"name":"RGenRandomizer","status":true,"description":"ランダムな変数出力","parameters":{"exported_value":"6","group":"1084","numofQ":"681","seeds":"1264"}},
 {"name":"GetStageFromGitHub","status":true,"description":"GitHubからエディットステージを持ってくる関数。","parameters":{"extra_page":"1172","extra_sub_place":"1173","font_edit":"NotoSansJP-Bold","font_outline":"1179"}},
 {"name":"CognitiveOpenedRuby","status":true,"description":"ルビの感知+入力された文字列の処理","parameters":{"replacehalf":"272"}},
 {"name":"QuestionImport","status":true,"description":"jsonで問題保存","parameters":{"Owner":"Formidi","Repo":"KanzideGoQuestion","SHAForApp":"","IsLocal":"0","length_tmp":"1167","Replace":"1"}},
