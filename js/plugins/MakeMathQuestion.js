@@ -153,14 +153,15 @@
                 num_of_md -= 1;
             } else {
                 // digitsが1なら1~9、digitsが10なら10~99、100なら100~999の乱数。
-                if (i == 0 && sub_digits == 1) {
-                    //難易度が偶数かつ最初の数字の場合、ちょっと大きくする。
-                    randomValue += digits * 10;
-                } else if (i != 0 && digits == 100 && sub_digits == 0) {
+                if (i != 0 && digits == 100 && sub_digits == 0) {
                     //難易度5かつ最初の数字でない場合、10~99が抽選される。
                     randomValue = Math.floor(Math.random() * 90) + 10;
                 } else {
                     randomValue = Math.floor(Math.random() * 9 * digits) + digits;
+                }
+                if (i == 0 && sub_digits == 1) {
+                    //難易度が偶数かつ最初の数字の場合、ちょっと大きくする。
+                    randomValue += digits * 10;
                 }
                 if ($gameVariables.value(1265) >= 1) {
                     if (Math.random() < 0.5 && randomValue >= 10) {
