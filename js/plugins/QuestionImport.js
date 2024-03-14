@@ -821,7 +821,7 @@
             $gameVariables.setValue(1271, 0);
         } else if ($gameVariables.value(1265) == 0 && phase >= 8) {
             $gameMap._interpreter.pluginCommand("MakeMathQuestion_Abacus", [phase - 7]);
-        } else if (($gameVariables.value(1265) == 0 && $gameVariables.value(1117) <= 10 && Math.random() < 0.5 && phase >= 2) || true) {
+        } else if ($gameVariables.value(1265) == 0 && $gameVariables.value(1117) <= 10 && Math.random() < 0.6 && phase >= 2) {
             $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [phase]);
         } else if ($gameVariables.value(1265) >= 1) {
             if (Math.random() < 0.5) {

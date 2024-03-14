@@ -315,7 +315,7 @@
         const randomonedigitsValue = Math.floor(Math.random() * 7) + 2;//2~9
         const randomminidigitsValue = Math.floor(Math.random() * 3) + 2;//2~5
         
-        const RandomValueNear10n = digits + Math.floor(Math.random() * difficulty) - 3;
+        var RandomValueNear10n = digits + Math.floor(Math.random() * difficulty) - 3;
         if (RandomValueNear10n % 10 == 0) {
             RandomValueNear10n += Math.floor(Math.random() * difficulty) * 10;
         }
