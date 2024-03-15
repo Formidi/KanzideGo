@@ -254,7 +254,7 @@
             max = 4;
         } else if (digits === 100) {
             min = 11;
-            max = 30;
+            max = 20;
         } else {
             return "Unsupported digits value";
         }
@@ -297,7 +297,29 @@
             denominator: reducedDenominator,
         };
     }
+    function Ingenuity_Easy() {
+        Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 100 * $gameVariables.value(380) + 10000 * $gameVariables.value(774));
+        const num = Math.floor(Math.random() * 7) + 2;//2~9
+        const mini = Math.floor(Math.random() * 3) + 1;//1~3
+        const rand = Math.floor(Math.random() * 40) + 1;
+        const randomValue = Math.floor(Math.random() * 9000) + 1000;
+        if (rand <= 10) {
+            quest = `${num} ＋ ${num} ＋ ${num} ＋ ${num} ＋ ${num}`;
+            answer = num * 5;
+        }else if (rand <= 20){
+            quest = `${num + mini} － ${num} ＋ ${num + mini * 3} － ${num + mini * 2} ＋ ${num + mini * 5} － ${num + mini * 4}`;
+            answer = 3 * mini;
+        }else if (rand <= 30){
+            quest = `${randomValue} × 0 ＋ ${num} ＋ ${mini}`;
+            answer = num + mini;
+        }else if (rand <= 40){
+            quest = `${num} － ${randomValue} ÷ ${randomValue}`;
+            answer = num - 1;
+        }
 
+        $gameVariables.setValue(mondai_index, quest);
+        $gameVariables.setValue(kotae_index, answer);
+    }
     function Ingenuity(difficulty) {
         Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 100 * $gameVariables.value(380) + 10000 * $gameVariables.value(774));
         //console.log(`${$gameVariables.value(1177) + $gameVariables.value(7) + 10 * $gameVariables.value(380) + 100 * $gameVariables.value(774) }`);
@@ -310,11 +332,11 @@
         if (randomValue % 10 == 0) {
             randomValue += Math.floor(Math.random() * 5) + 1;
         }
-        const randomValue_one = getRandomNumber(digits);//10→2~4、100→11~30
-        const randomValue_two = getRandomNumber(digits);//10→2~4、100→11~30
+        const randomValue_one = getRandomNumber(digits);//10→2~4、100→11~20
+        const randomValue_two = getRandomNumber(digits);//10→2~4、100→11~20
 
         const randomonedigitsValue = Math.floor(Math.random() * 7) + 2;//2~9
-        const randomminidigitsValue = Math.floor(Math.random() * 3) + 2;//2~5
+        const randomminidigitsValue = Math.floor(Math.random() * 4) + 2;//2~5
         
         var RandomValueNear10n = digits + Math.floor(Math.random() * difficulty) - 3;
         if (RandomValueNear10n % 10 == 0) {
@@ -349,13 +371,16 @@
             if (rand <= 5 || difficulty == 2) {
                 quest = `${just_num[just_num_index][sign]} × ${randomValue_one * 2 - 1} × ${just_num[just_num_index][1 - sign]}`;
                 answer = (randomValue_one * 2 - 1) * just_num[just_num_index][0] * just_num[just_num_index][1];
-            } else if (difficulty == 5) {
+            } else if (difficulty == 3) {
                 if (Math.random() < 0.7) {
                     quest = `㌫${b * d}/${a}㌫ × ㌫${c * e}/${b}㌫ × ㌫${a * f}/${c}㌫`;
                 } else {
                     quest = `㌫${b * d}/${a}㌫ × ㌫${c * e}/${b}㌫ ÷ ㌫${c}/${a * f}㌫`;
                 }
                 answer = d * e * f;
+            } else if (difficulty == 5){
+                quest = `${d}${e}${f} ＋ ${e}${f}${d} ＋ ${f}${d}${e} ＋ ${d}${f}${e} ＋${f}${e}${d} ＋ ${e}${d}${f}`;
+                answer = 222 * (d + e + f);
             } else {
                 if (Math.random() < 0.7) {
                     quest = `㌫${b * d}/${a}㌫ × ㌫${a * e}/${b}㌫`;
@@ -386,17 +411,17 @@
                     answer = e;
                 }
             } else {
-                quest = `${digits * randomonedigitsValue + randomValue_one} × ${randomValue_two} － ${randomValue_one * randomValue_two}`;
-                answer = digits * randomonedigitsValue * randomValue_two;
+                quest = `${digits * randomminidigitsValue + randomonedigitsValue} × ${randomValue_two} － ${randomonedigitsValue * randomValue_two}`;
+                answer = digits * randomminidigitsValue * randomValue_two;
             }
         } else if (rand <= 30) {
             if (sub_digit == 1) {
                 if (Math.random() < 0.7) {
-                    quest = `${just_num[just_num_index][sign] * randomValue_two} × ㌫${randomValue_one * just_num[just_num_index][1 - sign]}/${randomValue_two}㌫`;
+                    quest = `${just_num[just_num_index][sign] * randomValue_two} × ㌫${randomonedigitsValue * just_num[just_num_index][1 - sign]}/${randomValue_two}㌫`;
                 } else {
-                    quest = `${just_num[just_num_index][sign] * randomValue_two} × ${randomValue_one * just_num[just_num_index][1 - sign]} ÷ ${randomValue_two}`;
+                    quest = `${just_num[just_num_index][sign] * randomValue_two} × ${randomonedigitsValue * just_num[just_num_index][1 - sign]} ÷ ${randomValue_two}`;
                 }
-                answer = randomValue_one * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign];
+                answer = randomonedigitsValue * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign];
             } else {
                 quest = `${randomValue_one * just_num[just_num_index][sign]} × ${just_num[just_num_index][1 - sign]}`;
                 answer = randomValue_one * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign];
@@ -415,14 +440,14 @@
         } else if (rand <= 50) {
             if (rand <= 45) {
                 if (randomonedigitsValue <= 5 && difficulty >= 4 && Math.random() < 0.7) {
-                    quest = `${random10n_minus_randomPrimeValue} × ${randomonedigitsValue} ＋ ${randomonedigitsValue + randomminidigitsValue * 10} × ${randomPrimeValue}`;
+                    quest = `${random10n_minus_randomPrimeValue} × ${randomonedigitsValue} ＋ ${randomonedigitsValue} × ${randomPrimeValue + randomminidigitsValue * 10}`;
                     answer = randomonedigitsValue * (random10n_minus_randomPrimeValue + randomminidigitsValue * 10 + randomPrimeValue);
                 } else {
                     quest = `${random10n_minus_randomPrimeValue} × ${randomonedigitsValue} ＋ ${randomonedigitsValue} × ${randomPrimeValue}`;
                     answer = randomonedigitsValue * (random10n_minus_randomPrimeValue + randomPrimeValue);
                 }
             } else {
-                quest = `${randomPrimeValue * randomminidigitsValue} ÷ ${randomminidigitsValue} ＋ ${random10n_minus_randomPrimeValue * randomminidigitsValue * randomminidigitsValue} ÷ ${randomminidigitsValue * randomminidigitsValue}`;
+                quest = `${randomPrimeValue * randomminidigitsValue} ÷ ${randomminidigitsValue} ＋ ${random10n_minus_randomPrimeValue * randomminidigitsValue} × ${randomminidigitsValue} ÷ ${randomminidigitsValue * randomminidigitsValue}`;
                 answer = random10n_minus_randomPrimeValue + randomPrimeValue;
             }
         } else if (rand <= 60) {
@@ -452,7 +477,7 @@
     }
 
     function Ingenuity_Hard(level) {
-        var rand = Math.floor(Math.random() * 70) + 1 + 60 * (parseInt(level) - 6);
+        var rand = Math.floor(Math.random() * 60) + 1 + 60 * (parseInt(level) - 6);
         var quest = "";
         var answer = 0;
         if (rand <= 10) {
@@ -524,13 +549,6 @@
             const v_differ = Math.floor(Math.random() * 3) + 1;
             quest = `㌫${v_differ}/${v_start * (v_start + v_differ)}㌫ ＋ ㌫${v_differ}/${(v_start + v_differ) * (v_start + v_differ * 2)}㌫ ＋ ㌫${v_differ}/${(v_start + v_differ * 2) * (v_start + v_differ * 3)}㌫ ＝ ㌫${3 * v_differ}/■㌫`;
             answer = v_start * (v_start + 3 * v_differ);
-        } else if (rand <= 130) {
-            const numbers = [2, 3, 4, 5, 6, 7, 8, 9];
-            const a = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
-            const b = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
-            const c = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
-            quest = `${a}${b}${c} ＋ ${b}${c}${a} ＋ ${c}${a}${b} ＋ ${a}${c}${b} ＋${c}${b}${a} ＋ ${b}${a}${c}`;
-            answer = 222 * (a + b + c);
         }
         $gameVariables.setValue(mondai_index, quest);
         $gameVariables.setValue(kotae_index, answer);

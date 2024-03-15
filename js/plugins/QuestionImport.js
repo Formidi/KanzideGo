@@ -815,13 +815,13 @@
         }
         
 
-        if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0) {
+        if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0 && phase == 6) {
             $gameVariables.setValue(8, $gameVariables.value(1272));
             $gameVariables.setValue(9, $gameVariables.value(1273));
             $gameVariables.setValue(1271, 0);
         } else if ($gameVariables.value(1265) == 0 && phase >= 8) {
             $gameMap._interpreter.pluginCommand("MakeMathQuestion_Abacus", [phase - 7]);
-        } else if ($gameVariables.value(1265) == 0 && (($gameVariables.value(1117) <= 10 && Math.random() < 0.6 && phase >= 2) || ($gameVariables.value(1117) >= 11 && Math.random() < 0.4 && phase >= 2))) {
+        } else if ($gameVariables.value(1265) == 0 && (($gameVariables.value(1117) <= 10 && Math.random() < 0.6 && phase >= 2) || ($gameVariables.value(1117) >= 11 && Math.random() < 0.4 && phase >= 2) || (Math.random() < 0.1 && phase == 1))) {
             $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [phase]);
         } else if ($gameVariables.value(1265) >= 1) {
             if (Math.random() < 0.5) {
