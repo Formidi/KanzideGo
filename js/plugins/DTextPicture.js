@@ -531,8 +531,8 @@
         if ($gameScreen.isSettingDText() && !name) {
             this.isDTextPicture = true;
             if ($gameVariables.value(1179) == 2 && $gameScreen.getDTextPictureInfo().originalValue.startsWith("\\oc[black]")) {
-                arguments[4] = scaleX * 10;
-                arguments[5] = scaleY * 10;
+                arguments[4] = scaleX * 5;
+                arguments[5] = scaleY * 5;
             }
             if (origin === 0) {
                 if ($gameScreen.getDTextPictureInfo().size >= 100) {
@@ -561,8 +561,8 @@
         if (this.isDTextPicture) {
             //console.log(this.dTextInfo);
             if ($gameVariables.value(1179) == 2 && this.dTextInfo.originalValue.startsWith("\\oc[black]")) {
-                arguments[3] = scaleX * 10;
-                arguments[4] = scaleY * 10;
+                arguments[3] = scaleX * 5;
+                arguments[4] = scaleY * 5;
             }
             if (origin === 0) {
                 if (this.dTextInfo.size >= 100) {
