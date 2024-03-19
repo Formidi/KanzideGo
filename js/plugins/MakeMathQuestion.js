@@ -112,30 +112,46 @@
         }
     };
 
+    
+    function generateBigNum(digits, sub_digits) {
+      let max = Math.min(digits * 10 - 1,999);
+      let min = Math.min(digits ,100);
+      if (digits === 1 && sub_digits === 1) {
+        max = 19;
+        min = 10;
+      } else if (digits === 10 && sub_digits === 1) {
+        max = 199;
+        min = 100;
+      } else if (digits === 100 && sub_digits === 0) {
+        max = 49;
+        min = 10;
+      }
+      const num = Math.floor(Math.random() * (max - min + 1)) + min;
+      return num % 10 == 0 ? num + Math.floor(Math.random() * 9) + 1 : num;
+    }
 
-    // 問題文を生成する関数
+    function generateSmallNum(digits,sub_digits) {
+      let max = digits < 100 ? 9 : digits - 1;
+      let min = digits < 100 ? 2 : digits / 10;
+      if (digits === 100 && sub_digits === 0) {
+        max = 29;
+        min = 10;
+      }
+      const num = Math.floor(Math.random() * (max - min + 1)) + min;
+      return num % 10 == 0 ? num + Math.floor(Math.random() * 9) + 1 : num;
+    }
+
 
     function GenerateMD(digits, sub_digits) {
+        const BigNum = generateBigNum(digits, sub_digits);
+        const SmallNum = generateSmallNum(digits,sub_digits);
         if (Math.random() < 0.5) {
-            let YaYaBigNum = Math.floor(Math.random() * (5 * sub_digits + 3) * digits) + 2 * digits;
-            if (YaYaBigNum % 10 == 0) YaYaBigNum += Math.floor(Math.random() * 9) + 1;
-            if (digits == 100 && sub_digits == 0) YaYaBigNum = YaYaBigNum % 100 + 100;
-            var SmallNum = Math.floor(Math.random() * 8) + 2;//small_numは難易度が5以下なら1桁の2以上。
-            if ((digits >= 100 && sub_digits == 1) || digits >= 1000) SmallNum += Math.floor(Math.random() * 7) * 10 + 20;//難易度6以上なら2桁に。容赦はない。
-            if (SmallNum % 10 == 0 && digits >= 100) SmallNum += Math.floor(Math.random() * 9) + 1;
-            return [`${YaYaBigNum} × ${SmallNum}`, YaYaBigNum * SmallNum];
+            return [`${BigNum} × ${SmallNum}`, BigNum * SmallNum];
         } else {
-            var YaYaSmallNum = Math.floor(Math.random() * 7 * digits) + 2 * digits;//1→2~9、2→20~90、3→200~900
-            if (digits == 100 && sub_digits == 0) YaYaSmallNum = Math.floor(Math.random() * 70) + 20;
-            if (YaYaSmallNum % 10 == 0) YaYaSmallNum += Math.floor(Math.random() * 9) + 1;
-            var SmallNum = Math.floor(Math.random() * 8) + 2;
-            SmallNum += Math.floor(Math.random() * digits / 10);
-            if (digits >= 100 && sub_digits == 1) SmallNum += Math.floor(Math.random() * digits * 9 / 10) + digits / 10;
-            if (SmallNum % 10 == 0 && digits >= 10) SmallNum += Math.floor(Math.random() * 9) + 1;
-            if (Math.random() < 0.5 && digits <= 10) {
-                return [`${YaYaSmallNum * SmallNum} ÷ ${YaYaSmallNum}`, SmallNum];
+            if (Math.random() < 0.2) {
+                return [`${BigNum * SmallNum} ÷ ${BigNum}`, SmallNum];
             } else {
-                return [`${YaYaSmallNum * SmallNum} ÷ ${SmallNum}`, YaYaSmallNum];
+                return [`${BigNum * SmallNum} ÷ ${SmallNum}`, BigNum];
             }
         }
     }
@@ -153,12 +169,7 @@
                 num_of_md -= 1;
             } else {
                 // digitsが1なら1~9、digitsが10なら10~99、100なら100~999の乱数。
-                if (i != 0 && digits == 100 && sub_digits == 0) {
-                    //難易度5かつ最初の数字でない場合、10~99が抽選される。
-                    randomValue = Math.floor(Math.random() * 90) + 10;
-                } else {
-                    randomValue = Math.floor(Math.random() * 9 * digits) + digits;
-                }
+                randomValue = Math.floor(Math.random() * 9 * digits) + digits;
                 if (i == 0 && sub_digits == 1) {
                     //難易度が偶数かつ最初の数字の場合、ちょっと大きくする。
                     randomValue += digits * 10;
@@ -338,10 +349,7 @@
         const randomonedigitsValue = Math.floor(Math.random() * 7) + 2;//2~9
         const randomminidigitsValue = Math.floor(Math.random() * 4) + 2;//2~5
         
-        var RandomValueNear10n = digits + Math.floor(Math.random() * difficulty) - 3;
-        if (RandomValueNear10n % 10 == 0) {
-            RandomValueNear10n += Math.floor(Math.random() * difficulty) * 10;
-        }
+        const RandomValueNear10n = digits * (Math.floor(Math.random() * 8) + 1) + Math.floor(Math.random() * difficulty) + 1;
 
         var randomPrimeValue = getRandomPrime(difficulty);
         var random10n_minus_randomPrimeValue = digits * (11 + Math.floor(Math.random() * 8)) - randomPrimeValue;
@@ -368,9 +376,9 @@
         var f = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
 
         if (rand <= 10) {
-            if (rand <= 5 || difficulty == 2) {
-                quest = `${just_num[just_num_index][sign]} × ${randomValue_one * 2 - 1} × ${just_num[just_num_index][1 - sign]}`;
-                answer = (randomValue_one * 2 - 1) * just_num[just_num_index][0] * just_num[just_num_index][1];
+            if (difficulty == 5){
+                quest = `${d}${e}${f} ＋ ${e}${f}${d} ＋ ${f}${d}${e} ＋ ${d}${f}${e} ＋${f}${e}${d} ＋ ${e}${d}${f}`;
+                answer = 222 * (d + e + f);
             } else if (difficulty == 3) {
                 if (Math.random() < 0.7) {
                     quest = `㌫${b * d}/${a}㌫ × ㌫${c * e}/${b}㌫ × ㌫${a * f}/${c}㌫`;
@@ -378,23 +386,23 @@
                     quest = `㌫${b * d}/${a}㌫ × ㌫${c * e}/${b}㌫ ÷ ㌫${c}/${a * f}㌫`;
                 }
                 answer = d * e * f;
-            } else if (difficulty == 5){
-                quest = `${d}${e}${f} ＋ ${e}${f}${d} ＋ ${f}${d}${e} ＋ ${d}${f}${e} ＋${f}${e}${d} ＋ ${e}${d}${f}`;
-                answer = 222 * (d + e + f);
             } else {
                 if (Math.random() < 0.7) {
-                    quest = `㌫${b * d}/${a}㌫ × ㌫${a * e}/${b}㌫`;
+                    quest = `㌫${f * d}/${a}㌫ × ㌫${a * e}/${f}㌫`;
                 } else {
-                    quest = `㌫${b * d}/${a}㌫ ÷ ㌫${b}/${a * e}㌫`;
+                    quest = `㌫${f * d}/${a}㌫ ÷ ㌫${f}/${a * e}㌫`;
                 }
                 answer = d * e;
             }
         } else if (rand <= 20) {
             if (difficulty == 5) {
+                quest = `${digits * randomminidigitsValue + randomonedigitsValue} × ${randomValue_two} － ${randomonedigitsValue * randomValue_two}`;
+                answer = digits * randomminidigitsValue * randomValue_two;
+            } if (difficulty == 4) {
                 const { numerator, denominator } = addFractions(a, d, b, e);
                 quest = `㌫${a}/${d}㌫ ＋ ㌫${b}/${e}㌫ ＝ ㌫■/${denominator}㌫`;
                 answer = numerator;
-            } if (difficulty == 4) {
+            } else if (difficulty == 3) {
                 if (e * d - f >= 1) {
                     quest = `㌫${e * a - f}/${a}㌫ ＋ ㌫${f}/${a}㌫`;
                     answer = e;
@@ -402,7 +410,7 @@
                     quest = `㌫${e * a + f}/${a}㌫ － ㌫${f}/${a}㌫`;
                     answer = e;
                 }
-            } else if (difficulty == 3) {
+            } else {
                 if (e * d - f >= 1) {
                     quest = `㌫${e * d - f}/${d}㌫ ＋ ㌫${f}/${d}㌫`;
                     answer = e;
@@ -410,9 +418,6 @@
                     quest = `㌫${e * d + f}/${d}㌫ － ㌫${f}/${d}㌫`;
                     answer = e;
                 }
-            } else {
-                quest = `${digits * randomminidigitsValue + randomonedigitsValue} × ${randomValue_two} － ${randomonedigitsValue * randomValue_two}`;
-                answer = digits * randomminidigitsValue * randomValue_two;
             }
         } else if (rand <= 30) {
             if (sub_digit == 1) {
@@ -423,22 +428,27 @@
                 }
                 answer = randomonedigitsValue * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign];
             } else {
-                quest = `${randomValue_one * just_num[just_num_index][sign]} × ${just_num[just_num_index][1 - sign]}`;
-                answer = randomValue_one * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign];
+                if (randomValue_one * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign] % 100 == 0){
+                    quest = `${insertDecimalPoint(randomValue_one * just_num[just_num_index][sign])} × ${insertDecimalPoint(just_num[just_num_index][1 - sign])}`;
+                    answer = Math.round(randomValue_one * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign] / 100);
+                }else if(randomValue_one * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign] % 10 == 0){
+                    quest = `${insertDecimalPoint(just_num[just_num_index][sign])} × ${randomValue_one * just_num[just_num_index][1 - sign]}`;
+                    answer = Math.round(randomValue_one * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign] / 10);
+                }else {
+                    quest = `${randomValue_one * just_num[just_num_index][sign]} × ${just_num[just_num_index][1 - sign]}`;
+                    answer = randomValue_one * just_num[just_num_index][sign] * just_num[just_num_index][1 - sign];
+                }
             }
         } else if (rand <= 40) {
             if (sub_digit == 1) {
                 quest = `${RandomValueNear10n} × ${digits + randomonedigitsValue}`;
                 answer = RandomValueNear10n * (digits + randomonedigitsValue);
-            } else if(difficulty == 4){
-                quest = `${RandomValueNear10n * 10} × ${randomValue_one}`;
-                answer = RandomValueNear10n * 10 * randomValue_one;
             } else {
-                quest = `${33 * (randomminidigitsValue - 1)} － ${4 * (randomminidigitsValue - 1) }`;
-                answer = 29 * (randomminidigitsValue - 1);
+                quest = `${RandomValueNear10n * 10} × ${insertDecimalPoint(randomValue_one)}`;
+                answer = RandomValueNear10n * randomValue_one;
             }
         } else if (rand <= 50) {
-            if (rand <= 45) {
+            if (rand <= 45 || difficulty <= 3) {
                 if (randomonedigitsValue <= 5 && difficulty >= 4 && Math.random() < 0.7) {
                     quest = `${random10n_minus_randomPrimeValue} × ${randomonedigitsValue} ＋ ${randomonedigitsValue} × ${randomPrimeValue + randomminidigitsValue * 10}`;
                     answer = randomonedigitsValue * (random10n_minus_randomPrimeValue + randomminidigitsValue * 10 + randomPrimeValue);
@@ -451,7 +461,7 @@
                 answer = random10n_minus_randomPrimeValue + randomPrimeValue;
             }
         } else if (rand <= 60) {
-            if (sub_digit == 1) {
+            if (sub_digit == 1 || rand <= 55) {
                 quest = `${randomValue_one * randomonedigitsValue} × ■ ＝ ${randomPrimeValue * randomonedigitsValue} × ${randomValue_one}`;
                 answer = randomPrimeValue;
             } else {
@@ -465,6 +475,23 @@
 
         $gameVariables.setValue(mondai_index, quest);
         $gameVariables.setValue(kotae_index, answer);
+    }
+
+
+    function insertDecimalPoint(number) {
+      const numberString = number.toString();
+      const stringLength = numberString.length;
+
+      // 一桁の整数の場合、頭に "0" を挿入する
+      if (stringLength === 1) {
+          return '0.' + numberString;
+      }
+
+      const secondLastIndex = stringLength - 1;
+      if(numberString.slice(secondLastIndex) == "0"){
+          return numberString.slice(0, secondLastIndex);
+      }
+      return numberString.slice(0, secondLastIndex) + '.' + numberString.slice(secondLastIndex);
     }
 
     function shuffleArray(array) {

@@ -226,7 +226,6 @@
             Promise.all(promises).then(()=>{
                 DataManager.saveCustomData(existingData);
                 DataManager.saveCustomExData(existingExData);
-                console.log(existingExData);
             }
             ).catch(error=>{}
             );
@@ -495,6 +494,7 @@
             }
             $gameVariables.setValue(681, indexesToInclude.length);
         } else if (command === 'Ex_Generator') {
+            //MathQuestionDebug();
             try {
                 ExtraGenerator();
             } catch (e) {
@@ -606,6 +606,8 @@
             await SetQuestionIndex(stagename, data, num);
             $gameVariables.setValue(290, 4);
             await SetQuestionIndex(stagename, data, 2);
+            $gameVariables.setValue(13, 0);
+            $gameVariables.setValue(17, 0);
         } else {
             for (var difficulty = 1; difficulty < 5; difficulty++) {
                 $gameVariables.setValue(1128 + difficulty, "？？？");
@@ -627,6 +629,8 @@
         $gameSwitches.setValue(184, true);
 
     }
+
+
 
     function generateUniqueFileNum(stage_name) {
         var fileNum;
@@ -788,6 +792,17 @@
         // 2で割り、結果を切り上げる
         return Math.ceil(length / 2);
     }
+
+    function MathQuestionDebug() {
+        for (let i = 0; i < 100; i++) {
+          Math.seedrandom(Date.now());
+          $gameVariables.setValue(1177,Math.floor(Math.random() * 100000000));
+          const phase = 2;
+          $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [phase]);
+          console.log(`${$gameVariables.value(8)},${$gameVariables.value(9)}`);
+        }
+    }
+
     function MathQuestion() {
         Math.seedrandom($gameVariables.value(1177) + $gameVariables.value(7) + 100 * $gameVariables.value(380) + 10000 * $gameVariables.value(774));
         var phase = 0;
@@ -813,15 +828,18 @@
                 phase = Math.min(phase + $gameVariables.value(1117) * 2, 13);
             }
         }
+        if(phase >= 1 && $gameVariables.value(1117) <= 10 && ($gameVariables.value(380) != 0 || $gameVariables.value(774) % 4 <= 1)){
+            phase -= 1;
+        }
         
 
-        if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0 && phase == 6) {
+        if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0) {
             $gameVariables.setValue(8, $gameVariables.value(1272));
             $gameVariables.setValue(9, $gameVariables.value(1273));
             $gameVariables.setValue(1271, 0);
         } else if ($gameVariables.value(1265) == 0 && phase >= 8) {
             $gameMap._interpreter.pluginCommand("MakeMathQuestion_Abacus", [phase - 7]);
-        } else if ($gameVariables.value(1265) == 0 && (($gameVariables.value(1117) <= 10 && Math.random() < 0.6 && phase >= 2) || ($gameVariables.value(1117) >= 11 && Math.random() < 0.4 && phase >= 2) || (Math.random() < 0.1 && phase == 1))) {
+        } else if ($gameVariables.value(1265) == 0 && ((Math.random() < 0.5 && phase >= 2) || $gameVariables.value(7) == 16 || (Math.random() < 0.1 && phase == 1))) {
             $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [phase]);
         } else if ($gameVariables.value(1265) >= 1) {
             if (Math.random() < 0.5) {
@@ -835,14 +853,14 @@
     }
 
     const question_seed = [
-        [["1", "0", "1"], ["1", "1", "0"], ["1", "2", "0"], ["2", "0", "1"], ["1", "1", "0", "□"]],
-        [["1", "1", "1"], ["2", "2", "0"], ["1", "2", "1"], ["2", "1", "1"], ["1", "1", "1", "□"]],
-        [["3", "2", "0"], ["3", "0", "1"], ["2", "1", "2"], ["4", "1", "0"], ["2", "1", "1", "□"]],
-        [["3", "3", "0"], ["3", "1", "2"], ["4", "1", "1"], ["5", "2", "0"], ["3", "2", "0", "□"]],
-        [["5", "0", "1"], ["6", "1", "0"], ["5", "3", "0"], ["4", "1", "2"], ["4", "1", "1", "□"]],
-        [["6", "2", "0"], ["4", "2", "1"], ["5", "1", "2"], ["5", "1", "1", "□"], ["6", "2", "0", "□"]],
-        [["6", "0", "1"], ["7", "2", "0"], ["5", "2", "2"], ["7", "2", "0", "□"], ["6", "1", "1", "□"]],
-        [["10", "2", "0"], ["7", "0", "1"], ["6", "1", "2"], ["7", "1", "1", "□"], ["8", "1", "1"],],
+        [["1", "1", "0"], ["1", "2", "0"], ["1", "0", "1"], ["1", "1", "1"], ["1", "1", "0", "□"]],//Lv1.0
+        [["2", "2", "0"], ["2", "1", "1"], ["1", "2", "1"], ["1", "1", "2"], ["1", "1", "1", "□"]],//Lv1.5
+        [["4", "1", "0"], ["3", "2", "0"], ["3", "0", "1"], ["2", "1", "2"], ["2", "1", "1", "□"]],//Lv2.0
+        [["3", "3", "0"], ["4", "2", "0"], ["4", "0", "1"], ["3", "1", "1"], ["3", "2", "0", "□"]],//Lv2.5
+        [["5", "1", "0"], ["4", "1", "1"], ["5", "0", "1"], ["3", "1", "2"], ["4", "1", "1", "□"]],//Lv3.0
+        [["5", "2", "0"], ["5", "1", "1"], ["4", "2", "1"], ["4", "1", "2"], ["4", "2", "1", "□"]],//Lv3.5
+        [["7", "2", "0"], ["6", "0", "1"], ["5", "1", "2"], ["4", "2", "2"], ["5", "2", "1", "□"]],//Lv4.0
+        [["9", "2", "0"], ["7", "0", "1"], ["6", "1", "2"], ["5", "2", "2"], ["6", "1", "1", "□"]],//Lv4.5
     ];
 
     async function ForceQ() {

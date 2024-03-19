@@ -180,11 +180,66 @@
         return result;
     }
 
+    function toFraction(number) {
+        // 整数部分と小数部分に分ける
+        const [integer, decimal] = number.toString().split('.');
+
+        // 小数部分を分数に変換
+        let numerator = decimal;
+        let denominator = 10 ** decimal.length;
+
+        // 最大公約数を求める
+        const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+
+        // 分子を約分する
+        if (numerator !== '0') {
+            const commonDivisor = gcd(numerator, denominator);
+            numerator /= commonDivisor;
+            denominator /= commonDivisor;
+        }
+
+        // 整数部分と小数部分の分数を合成する
+        if (integer !== '0') {
+            if(denominator == 1){
+                return integer;
+            }
+            return `${integer * denominator + numerator}/${denominator}`;
+        } else {
+            return `${numerator}/${denominator}`;
+        }
+    }
+
+    function isProperFraction(str) {
+        // "." が 1 つだけ存在するか確認する
+        const dotCount = str.split('.').length - 1;
+        if (dotCount !== 1) {
+            return false;
+        }
+
+        // 小数部分のみを取り出す
+        const decimal = str.split('.')[1];
+
+        // 小数部分が全て数字であるか確認する
+        if (!/^[0-9]+$/.test(decimal)) {
+            return false;
+        }
+
+        // 分母が 0 にならないことを確認する
+        if (decimal === '0') {
+            return false;
+        }
+
+        return true;
+    }
+
     Game_Interpreter.prototype.pluginCommand = function (command, args) {
         _Game_Interpreter_pluginCommand.call(this, command, args);
         if (command === 'ConvertAnswer') {
             var AnswerList = [];
             $gameVariables.setValue(12, toHalfWidth(convertKatakanaToHiragana($gameVariables.value(12))));
+            if (isProperFraction($gameVariables.value(12))) {
+                $gameVariables.setValue(12, toFraction($gameVariables.value(12)));
+            }
             for (var i = 9; i < 12;i++) {
                 if ($gameVariables.value(i) == "000000000000000000000") {
                     continue;
