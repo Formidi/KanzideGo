@@ -828,7 +828,7 @@
                 phase = Math.min(phase + $gameVariables.value(1117) * 2, 13);
             }
         }
-        if(phase >= 1 && $gameVariables.value(1117) <= 10 && ($gameVariables.value(380) != 0 || $gameVariables.value(774) % 4 <= 1)){
+        if(phase >= 1 && $gameVariables.value(1117) <= 10 && $gameVariables.value(774) != 0 && ($gameVariables.value(380) != 0 || $gameVariables.value(774) % 4 == 0 || $gameVariables.value(774) % 4 == 3)){
             phase -= 1;
         }
         
