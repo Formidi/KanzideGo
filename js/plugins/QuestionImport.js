@@ -91,6 +91,10 @@
         1: 10,
         2: 16,
     };
+    
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const date = today.getDate();
 
     const categoryDict = {
         "生": 1,
@@ -570,7 +574,7 @@
         return [x, y, z];
     }
     async function ExtraGenerator() {
-        await ForceQ();
+        //await ForceQ();
         const num = numDict[$gameVariables.value(1102)];
         if ($gameVariables.value(15) != 901) {
             const data = DataManager.loadCustomExData();
@@ -717,7 +721,7 @@
                 color = 1;
             }
             const roundedLength = calculateLength($gameVariables.value(8).toString());
-            const colored_text = $gameVariables.value(8).toString().replace(/＋/g, `\\C[0]＋\\C[${color}]`).replace(/－/g, `\\C[0]－\\C[${color}]`).replace(/×/g, `\\C[0]×\\C[${color}]`).replace(/÷/g, `\\C[0]÷\\C[${color}]`).replace(/＝/g, `\\C[0]＝\\C[${color}]`);
+            const colored_text = $gameVariables.value(8).toString().replace(/＋/g, `\\C[0]＋\\C[${color}]`).replace(/－/g, `\\C[0]－\\C[${color}]`).replace(/×/g, `\\C[0]×\\C[${color}]`).replace(/÷/g, `\\C[0]÷\\C[${color}]`).replace(/＝/g, `\\C[0]＝\\C[${color}]`).replace(/(/g, `\\C[0](\\C[${color}]`).replace(/)/g, `\\C[0])\\C[${color}]`);
             const q_text = `[\\C[0]]\\C[${color}]${colored_text}`;
             $gameVariables.setValue(8, q_text);
             $gameVariables.setValue(9, $gameVariables.value(9).toString());
@@ -775,6 +779,7 @@
         }
     }
 
+    /*
     function calculateLength(math_length) {
         let length = 0;
 
@@ -792,12 +797,27 @@
         // 2で割り、結果を切り上げる
         return Math.ceil(length / 2);
     }
+    */
+
+    function calculateLength(str) {
+        let length = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str[i];
+            // 韓国語、漢字、ひらがな、特定の記号を全角として扱う
+            if (char.match(/[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af＋－×÷＝■]/)) {
+                length += 2;
+            } else {
+                length += 1;
+            }
+        }
+        return Math.ceil(length / 2);
+    }
 
     function MathQuestionDebug() {
         for (let i = 0; i < 100; i++) {
           Math.seedrandom(Date.now());
           $gameVariables.setValue(1177,Math.floor(Math.random() * 100000000));
-          const phase = 2;
+          const phase = 5;
           $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [phase]);
           console.log(`${$gameVariables.value(8)},${$gameVariables.value(9)}`);
         }
@@ -828,25 +848,41 @@
                 phase = Math.min(phase + $gameVariables.value(1117) * 2, 13);
             }
         }
-        if(phase >= 1 && $gameVariables.value(1117) <= 10 && $gameVariables.value(774) != 0 && ($gameVariables.value(380) != 0 || $gameVariables.value(774) % 4 == 0 || $gameVariables.value(774) % 4 == 3)){
+
+        if(phase >= 1 && $gameVariables.value(1117) <= 10 && $gameVariables.value(774) != 0 && ($gameVariables.value(774) % 4 == 0 || $gameVariables.value(774) % 4 == 3)){
             phase -= 1;
         }
         
+        if((month === 2 && date === 29) || $gameVariables.value(1265) >= 1){
+            const thresholdMap_April = {
+                0: [2,4,2,4,2,4,6],
+                1: [1,3,5,1,3,5,1,3,5,6],
+                2: [1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,6],
+            };
+
+            const thresholds_April = thresholdMap_April[$gameVariables.value(1102)];
+            $gameVariables.setValue(1265, Math.max(1,Math.min(Math.floor(phase / 2) + 1,6)));
+            phase = $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0 ? thresholds_April[$gameVariables.value(7) - 1] : Math.ceil(thresholds_April[$gameVariables.value(7) - 1] / 2);
+        }
 
         if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0) {
             $gameVariables.setValue(8, $gameVariables.value(1272));
             $gameVariables.setValue(9, $gameVariables.value(1273));
             $gameVariables.setValue(1271, 0);
-        } else if ($gameVariables.value(1265) == 0 && phase >= 8) {
-            $gameMap._interpreter.pluginCommand("MakeMathQuestion_Abacus", [phase - 7]);
-        } else if ($gameVariables.value(1265) == 0 && ((Math.random() < 0.5 && phase >= 2) || $gameVariables.value(7) == 16 || (Math.random() < 0.1 && phase == 1))) {
-            $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [phase]);
         } else if ($gameVariables.value(1265) >= 1) {
-            if (Math.random() < 0.5) {
-                $gameMap._interpreter.pluginCommand("MakeMathQuestion", [(Math.min(phase, 5)).toString(), "0", (Math.floor(Math.random() * 2) + 1).toString()]);
+            if (phase == 6) {
+                $gameMap._interpreter.pluginCommand("MakeMathQuestion", ["2", "1", "1"]);
+            }else if (Math.random() < 0.5) {
+                $gameMap._interpreter.pluginCommand("MakeMathQuestion", [(Math.min(phase, 5)).toString(),(Math.floor(Math.random() * 2) + 1).toString(), "0"]);
+            } else if (Math.random() < 0.5) {
+                $gameMap._interpreter.pluginCommand("MakeMathQuestion", [Math.ceil((Math.min(phase, 5)) / 2).toString(), "0", "1"]);
             } else {
-                $gameMap._interpreter.pluginCommand("MakeMathQuestion", [(Math.min(phase, 5)).toString(), "1", "0"]);
+                $gameMap._interpreter.pluginCommand("MakeMathQuestion", [Math.ceil((Math.min(phase, 5)) / 2).toString(), "1", "1"]);
             }
+        } else if (phase >= 8) {
+            $gameMap._interpreter.pluginCommand("MakeMathQuestion_Abacus", [phase - 7]);
+        } else if ((Math.random() < 0.6 && phase >= 2) || (Math.random() < 0.75 && $gameVariables.value(7) == 16) || (Math.random() < 0.2 && phase == 1)) {
+            $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [phase]);
         } else {
             $gameMap._interpreter.pluginCommand("MakeMathQuestion", question_seed[phase][Math.floor(Math.random() * 5)]);
         }
@@ -854,12 +890,12 @@
 
     const question_seed = [
         [["1", "1", "0"], ["1", "2", "0"], ["1", "0", "1"], ["1", "1", "1"], ["1", "1", "0", "□"]],//Lv1.0
-        [["2", "2", "0"], ["2", "1", "1"], ["1", "2", "1"], ["1", "1", "2"], ["1", "1", "1", "□"]],//Lv1.5
-        [["4", "1", "0"], ["3", "2", "0"], ["3", "0", "1"], ["2", "1", "2"], ["2", "1", "1", "□"]],//Lv2.0
+        [["2", "2", "0"], ["1", "2", "1"], ["2", "0", "1"], ["1", "1", "2"], ["3", "1", "0"],//Lv1.5
+        [["4", "1", "0"], ["3", "2", "0"], ["3", "0", "1"], ["2", "1", "1"], ["2", "1", "1", "□"]],//Lv2.0
         [["3", "3", "0"], ["4", "2", "0"], ["4", "0", "1"], ["3", "1", "1"], ["3", "2", "0", "□"]],//Lv2.5
         [["5", "1", "0"], ["4", "1", "1"], ["5", "0", "1"], ["3", "1", "2"], ["4", "1", "1", "□"]],//Lv3.0
-        [["5", "2", "0"], ["5", "1", "1"], ["4", "2", "1"], ["4", "1", "2"], ["4", "2", "1", "□"]],//Lv3.5
-        [["7", "2", "0"], ["6", "0", "1"], ["5", "1", "2"], ["4", "2", "2"], ["5", "2", "1", "□"]],//Lv4.0
+        [["7", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["4", "2", "1"], ["4", "2", "1", "□"]],//Lv3.5
+        [["7", "2", "0"], ["6", "0", "1"], ["5", "1", "2"], ["4", "2", "2"], ["5", "3", "0"]],//Lv4.0
         [["9", "2", "0"], ["7", "0", "1"], ["6", "1", "2"], ["5", "2", "2"], ["6", "1", "1", "□"]],//Lv4.5
     ];
 

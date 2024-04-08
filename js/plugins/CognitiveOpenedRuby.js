@@ -203,9 +203,11 @@
             if(denominator == 1){
                 return integer;
             }
-            return `${integer * denominator + numerator}/${denominator}`;
+            return number;
+            //return `${integer * denominator + numerator}/${denominator}`;
         } else {
-            return `${numerator}/${denominator}`;
+            return number;
+            //return `${numerator}/${denominator}`;
         }
     }
 

@@ -368,7 +368,7 @@
         var g = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
 
         if (rand <= 10 && !exclude_high_level) {//分数の掛け算、割り算、分数と小数
-            if (difficulty >= 4){
+            if (difficulty == 5){
                 const den = just_num[Math.floor(Math.random() * 4)][Math.max(5 - difficulty,0)];
                 if(den * d - e * randomValue_one - 1 >= 1 && Math.random() < 0.7){
                     quest = `㌫${den * d - e * randomValue_one - 1}/${den}㌫ ＋ ${removeTrailingZeros((e * randomValue_one + 1) / den)}`;
@@ -377,19 +377,18 @@
                     quest = `㌫${den * d + (e * randomValue_one + 1)}/${den}㌫ － ${removeTrailingZeros((e * randomValue_one + 1) / den)}`;
                     answer = d;
                 }
-            } else if (difficulty == 3 && Math.random() < 0.7) {
+            } else if (difficulty == 4) {
                 if (Math.random() < 0.7) {
                     quest = `㌫${b * d}/${g}㌫ × ㌫${c * e}/${b}㌫ × ㌫${g * f}/${c}㌫`;
                 } else {
                     quest = `㌫${b * d}/${g}㌫ × ㌫${c * e}/${b}㌫ ÷ ㌫${c}/${g * f}㌫`;
                 }
                 answer = d * e * f;
+            } else if(difficulty == 3){
+                quest = `㌫${f * d}/${g}㌫ ÷ ㌫${f}/${g * e}㌫`;
+                answer = d * e;
             } else {
-                if (Math.random() < 0.7 || difficulty == 2) {
-                    quest = `㌫${f * d}/${g}㌫ × ㌫${g * e}/${f}㌫`;
-                } else {
-                    quest = `㌫${f * d}/${g}㌫ ÷ ㌫${f}/${g * e}㌫`;
-                }
+                quest = `㌫${f * d}/${g}㌫ × ㌫${g * e}/${f}㌫`;
                 answer = d * e;
             }
         } else if (rand <= 20 && !exclude_high_level) {//分数の足し算、引き算、通分
@@ -510,18 +509,9 @@
             } else if(difficulty == 4){
                 quest = `${randomValue_one * 100} × ${randomValue_two * 100}`;
                 answer = randomValue_one * randomValue_two * 10000;
-            } else if(difficulty == 3){
+            } else {
                 quest = `㌫1/■㌫ ＝ ${divide_parts[divide_parts_index][1]}`;
                 answer = divide_parts[divide_parts_index][0];
-            } else {
-                const value = getRandomPrime(6);
-                if(a > b && Math.random() < 0.7){
-                    quest = `${a}.${value} － ${b}.${value}`;
-                    answer = a - b;
-                } else {
-                    quest = `${a}.${value} ＋ ${b}.${1000 - value}`;
-                    answer = a + b + 1;
-                }
             }
         }else if (rand <= 80) {//暗算したい掛け算割り算
             if (rand <= 76) {
@@ -547,14 +537,22 @@
             } else if (difficulty == 3) {
                 quest = `${randomValue_one * randomonedigitsValue} × ■ ＝ ${randomPrimeValue * randomonedigitsValue} × ${randomValue_one}`;
                 answer = randomPrimeValue;
-            } else {
+            } else if(a % b != 0){
                 quest = `㌫${a * d}/${b * d}㌫ ＝ ㌫■/${b}㌫`;
                 answer = a;
+            } else {
+                quest = `㌫${c * d}/${b * d}㌫ ＝ ㌫■/${b}㌫`;
+                answer = c;
             }
         } else if(rand <= 100){//括弧を含む計算
             if (sub_digit == 1) {
-                quest = `(${just_num[just_num_index][sign] * f + a} － ${a}) × ${just_num[just_num_index][1 - sign]}`;
-                answer = just_num[just_num_index][sign] * just_num[just_num_index][1 - sign] * f;
+                if (Math.random() < 0.5){
+                    quest = `(${just_num[just_num_index][0] * f} ＋ ${radomPrimeValue}) × ${just_num[just_num_index][1]}`;
+                    answer = just_num[just_num_index][0] * just_num[just_num_index][1] * f + radomPrimeValue * ${just_num[just_num_index][1]}; 
+                }else {
+                    quest = `(${just_num[just_num_index][0] * just_num[just_num_index][1]} ＋ ${d * just_num[just_num_index][sign]}) ÷ ${just_num[just_num_index][sign]}`;
+                    answer = just_num[just_num_index][1 - sign] + d; 
+                }
             } else {
                 if(a > b){
                     quest = `(${d * a + 1} － ${d * b + 1}) ÷ ${d}`;
