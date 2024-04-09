@@ -721,7 +721,7 @@
                 color = 1;
             }
             const roundedLength = calculateLength($gameVariables.value(8).toString());
-            const colored_text = $gameVariables.value(8).toString().replace(/＋/g, `\\C[0]＋\\C[${color}]`).replace(/－/g, `\\C[0]－\\C[${color}]`).replace(/×/g, `\\C[0]×\\C[${color}]`).replace(/÷/g, `\\C[0]÷\\C[${color}]`).replace(/＝/g, `\\C[0]＝\\C[${color}]`).replace(/(/g, `\\C[0](\\C[${color}]`).replace(/)/g, `\\C[0])\\C[${color}]`);
+            const colored_text = $gameVariables.value(8).toString().replace(/＋/g, `\\C[0]＋\\C[${color}]`).replace(/－/g, `\\C[0]－\\C[${color}]`).replace(/×/g, `\\C[0]×\\C[${color}]`).replace(/÷/g, `\\C[0]÷\\C[${color}]`).replace(/＝/g, `\\C[0]＝\\C[${color}]`).replace(/\(/g, `\\C[0](\\C[${color}]`).replace(/\)/g, `\\C[0])\\C[${color}]`);
             const q_text = `[\\C[0]]\\C[${color}]${colored_text}`;
             $gameVariables.setValue(8, q_text);
             $gameVariables.setValue(9, $gameVariables.value(9).toString());
@@ -890,7 +890,7 @@
 
     const question_seed = [
         [["1", "1", "0"], ["1", "2", "0"], ["1", "0", "1"], ["1", "1", "1"], ["1", "1", "0", "□"]],//Lv1.0
-        [["2", "2", "0"], ["1", "2", "1"], ["2", "0", "1"], ["1", "1", "2"], ["3", "1", "0"],//Lv1.5
+        [["2", "2", "0"], ["1", "2", "1"], ["2", "0", "1"], ["1", "1", "2"], ["3", "1", "0"]],//Lv1.5
         [["4", "1", "0"], ["3", "2", "0"], ["3", "0", "1"], ["2", "1", "1"], ["2", "1", "1", "□"]],//Lv2.0
         [["3", "3", "0"], ["4", "2", "0"], ["4", "0", "1"], ["3", "1", "1"], ["3", "2", "0", "□"]],//Lv2.5
         [["5", "1", "0"], ["4", "1", "1"], ["5", "0", "1"], ["3", "1", "2"], ["4", "1", "1", "□"]],//Lv3.0

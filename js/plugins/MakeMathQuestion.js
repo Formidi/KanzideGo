@@ -548,7 +548,7 @@
             if (sub_digit == 1) {
                 if (Math.random() < 0.5){
                     quest = `(${just_num[just_num_index][0] * f} ＋ ${radomPrimeValue}) × ${just_num[just_num_index][1]}`;
-                    answer = just_num[just_num_index][0] * just_num[just_num_index][1] * f + radomPrimeValue * ${just_num[just_num_index][1]}; 
+                    answer = just_num[just_num_index][0] * just_num[just_num_index][1] * f + radomPrimeValue * just_num[just_num_index][1]; 
                 }else {
                     quest = `(${just_num[just_num_index][0] * just_num[just_num_index][1]} ＋ ${d * just_num[just_num_index][sign]}) ÷ ${just_num[just_num_index][sign]}`;
                     answer = just_num[just_num_index][1 - sign] + d; 
