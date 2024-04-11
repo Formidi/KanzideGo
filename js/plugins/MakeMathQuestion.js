@@ -545,15 +545,15 @@
                 answer = c;
             }
         } else if(rand <= 100){//括弧を含む計算
-            if (sub_digit == 1) {
+            if (difficulty >= 4) {
                 if (Math.random() < 0.5){
-                    quest = `(${just_num[just_num_index][0] * f} ＋ ${radomPrimeValue}) × ${just_num[just_num_index][1]}`;
-                    answer = just_num[just_num_index][0] * just_num[just_num_index][1] * f + radomPrimeValue * just_num[just_num_index][1]; 
+                    quest = `(${just_num[just_num_index][0] * f} ＋ ${randomPrimeValue}) × ${just_num[just_num_index][1]}`;
+                    answer = just_num[just_num_index][0] * just_num[just_num_index][1] * f + randomPrimeValue * just_num[just_num_index][1]; 
                 }else {
                     quest = `(${just_num[just_num_index][0] * just_num[just_num_index][1]} ＋ ${d * just_num[just_num_index][sign]}) ÷ ${just_num[just_num_index][sign]}`;
                     answer = just_num[just_num_index][1 - sign] + d; 
                 }
-            } else {
+            } else (difficulty == 3){
                 if(a > b){
                     quest = `(${d * a + 1} － ${d * b + 1}) ÷ ${d}`;
                     answer = a - b;
@@ -561,6 +561,9 @@
                     quest = `(${d * a + 1} ＋ ${d * b - 1}) ÷ ${d}`;
                     answer = a + b;
                 }
+            } else {
+                quest = `(${just_num[just_num_index][0]} ＋ ${randomPrimeValue}) × ${just_num[just_num_index][1]}`;
+                answer = just_num[just_num_index][0] * just_num[just_num_index][1] + randomPrimeValue * just_num[just_num_index][1]; 
             }
         }
 
@@ -622,7 +625,7 @@
             const randomonedigitsValue = Math.floor(Math.random() * 3);
             const quotient = Math.floor(randomPrimeBigValue / randomPrimeValue);
             const surplus = randomPrimeBigValue % randomPrimeValue;
-            quest = `${randomPrimeBigValue} ÷ ${randomPrimeValue} ＝ ${quotient - randomonedigitsValue} ＋ ■ ÷ ${randomPrimeValue}`;
+            quest = `${randomPrimeBigValue} ÷ ${randomPrimeValue} ＝ ${quotient - randomonedigitsValue} ＋ (■ ÷ ${randomPrimeValue})`;
             answer = surplus + randomonedigitsValue * randomPrimeValue;
         } else if (rand <= 30) {
             const randomTwoPower = Math.pow(2, Math.floor(Math.random() * 6) + 3);
