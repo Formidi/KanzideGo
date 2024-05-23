@@ -44,11 +44,13 @@
 
     const isLong = 7;
     const isTooLong = 11;
-    const isVeryLong = 19;
+    const isVeryLong = 17;
+    const isVeryVeryLong = 35;
     const size1_default = 250;
     const size2_long = 200;
     const size3_toolong = 150;
     const size4_verylong = 100;
+    const size5_veryverylong = 50;
 
     const offset_switch = 281;
 
@@ -273,7 +275,10 @@
             var inputString = pureText(pictureName);
             var size = size1_default;
             var outline = $gameVariables.value(force) == 1 ? size1_default / 2 : size1_default / 10;
-            if (inputString.length >= isVeryLong) {
+            if (inputString.length >= isVeryVeryLong) {
+                size = size5_veryverylong;
+                outline = $gameVariables.value(force) == 1 ? size5_veryverylong / 2 : size5_veryverylong / 10;
+            } else if (inputString.length >= isVeryLong) {
                 size = size4_verylong;
                 outline = $gameVariables.value(force) == 1 ? size4_verylong / 2 : size4_verylong / 10;
             } else if (inputString.length >= isTooLong) {
@@ -293,7 +298,7 @@
         }
     };
     function pureText(text) {
-        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '').replace(/㌫[^㌫]*㌫/g, '');
+        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '').replace(/㌫[^㌫]*㌫/g, '分数');
     }
 
     let previousProcess = Promise.resolve(); // 初期のPromise
@@ -737,7 +742,6 @@
             const before_Xscale = 50 * magnification;
             const before_Yscale = 50 * magnification;
             const before_Xposition = 640 + (- all_length / 2 + relativePos + squareSize / 2) * before_Xscale / 200;
-            console.log(`与えられた文字列${$gameVariables.value(18)},全長,${all_length}1つの四角は${squareSize},${$gameVariables.value(18)}の時の中心位置は${before_Xposition},相対位置${relativePos}`);
             const after_Xscale = $gameVariables.value(167);
             const after_Yscale = $gameVariables.value(168);
             const after_Xposition = 640 + (- all_length / 2 + relativePos + squareSize / 2) * after_Xscale / 200;

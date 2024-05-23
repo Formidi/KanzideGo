@@ -220,8 +220,8 @@
 (function () {
     'use strict';
 
-    var padempty = 600;
-    var padempty_lite = 100;
+    var padempty = 1000;
+    var padempty_lite = 200;
     var getCommandName = function (command) {
         return (command || '').toUpperCase();
     };

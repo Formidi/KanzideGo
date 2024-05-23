@@ -378,10 +378,10 @@
                     answer = d;
                 }
             } else if (difficulty == 4) {
-                if (Math.random() < 0.7) {
-                    quest = `㌫${b * d}/${g}㌫ × ㌫${c * e}/${b}㌫ × ㌫${g * f}/${c}㌫`;
+                if (Math.random() < 0.6) {
+                    quest = `㌫${randomonedigitsValue * d}/${g}㌫ × ㌫${randomminidigitsValue * e}/${randomonedigitsValue}㌫ × ㌫${g * f}/${randomminidigitsValue}㌫`;
                 } else {
-                    quest = `㌫${b * d}/${g}㌫ × ㌫${c * e}/${b}㌫ ÷ ㌫${c}/${g * f}㌫`;
+                    quest = `㌫${randomonedigitsValue * d}/${g}㌫ × ㌫${randomminidigitsValue * e}/${randomonedigitsValue}㌫ ÷ ㌫${randomminidigitsValue}/${g * f}㌫`;
                 }
                 answer = d * e * f;
             } else if(difficulty == 3){
@@ -459,14 +459,14 @@
             }
         } else if (rand <= 50) {//分配法則(基礎)
             if (difficulty == 5) {
-                quest = `${d * randomminidigitsValue} ÷ ${randomminidigitsValue} ＋ ${(f - 1) * d * randomminidigitsValue} × ${randomminidigitsValue} ÷ ${randomminidigitsValue * randomminidigitsValue}`;
-                answer = f * d;
+                quest = `${a * d} ÷ ${d} ＋ ${(f - 1) * a * d} × ${d} ÷ ${d * d}`;
+                answer = f * a;
             } else if (difficulty == 4) {
                 quest = `${random10n_minus_randomPrimeValue} × ${randomonedigitsValue} ＋ ${randomonedigitsValue} × ${randomPrimeValue + randomminidigitsValue * 10}`;
                 answer = randomonedigitsValue * (random10n_minus_randomPrimeValue + randomminidigitsValue * 10 + randomPrimeValue);
             } else if (difficulty == 3) {
-                quest = `${randomonedigitsValue} × ${RandomValueNear10n * 11} － ${RandomValueNear10n} × ${randomonedigitsValue} `;
-                answer = randomonedigitsValue * RandomValueNear10n * 10;
+                quest = `${randomonedigitsValue} × ${randomBigValue_one} － ${randomBigValue_one % 100} × ${randomonedigitsValue} `;
+                answer = randomonedigitsValue * (randomBigValue_one - randomBigValue_one % 100);
             } else {
                 quest = `${randomonedigitsValue} × ${random10n_minus_randomPrimeValue} ＋ ${randomPrimeValue} × ${randomonedigitsValue} `;
                 answer = randomonedigitsValue * (random10n_minus_randomPrimeValue + randomPrimeValue);
@@ -609,23 +609,166 @@
         return array;
     }
 
+    function pow10(number, exponent) {
+      // 10のexponent乗を求める
+      const base10 = Math.pow(10, exponent);
+
+      // number * base10 を文字列に変換
+      const str = (number * base10).toString();
+
+      // 末尾の`.`を除去する正規表現
+      const regex = /\.$/;
+
+      // 末尾の`.`を除去した文字列を返す
+      return str.replace(regex, "");
+    }
+
+    function removeTrailingZeros(number) {
+      // 小数点以下の部分を取得
+      const decimalPart = parseFloat(number).toFixed(6);
+
+      // 末尾のゼロと`.`を除去する正規表現
+      const regex = /0*(\.)?0+$/;
+
+      // 末尾のゼロと`.`を除去した文字列を返す
+      return decimalPart.replace(regex, "");
+    }
+
+    // 最大公約数を計算するユーティリティ関数
+    function gcd(x, y) {
+        while (y !== 0) {
+            let temp = y;
+            y = x % y;
+            x = temp;
+        }
+        return x;
+    }
+
+    // 与えられた分数 a/b と c/d に対する差の最小化とその値を求める関数
+    function minimizeFractionDifference(a, b, c, d) {
+        // e を計算する
+        const numerator = c * b;
+        const denominator = a * d;
+
+        // e を最も近い整数に丸める
+        const e = Math.round(numerator / denominator);
+
+        // e を用いて差を計算する
+        const productNumerator = a * e * d - c * b;
+        const productDenominator = b * d;
+
+        // 差を既約分数にするために最大公約数で約分
+        const commonDivisor = gcd(Math.abs(productNumerator), productDenominator);
+        const differenceNumerator = productNumerator / commonDivisor;
+        const differenceDenominator = productDenominator / commonDivisor;
+
+        // 最小差とその差の既約分数を返す
+        return {
+            e: e,
+            f: differenceNumerator,
+            g: differenceDenominator
+        };
+    }
+
+        // 与えられた条件に基づいてランダムな整数を生成する関数
+    function generateRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // a, b, c, d をランダムに生成する関数
+    function generateRandomValues() {
+        // b と d は互いに素であり、2以上10以下の整数
+        let b = generateRandomInt(2, 10);
+        let d = generateRandomInt(2, 10);
+
+        // a は 2以上20以下の整数で b と互いに素
+        let a;
+        do {
+            a = generateRandomInt(10, 30);
+        } while (gcd(a, b) !== 1); // gcd(a, b) が1でない場合は再生成
+
+        // c は 2以上20以下の整数で d と互いに素
+        let c;
+        do {
+            c = generateRandomInt(2, 20);
+        } while (gcd(c, d) !== 1); // gcd(c, d) が1でない場合は再生成
+
+        // 生成された値をオブジェクトとして返す
+        return { a, b, c, d };
+    }
+
+    // 最大公約数を計算するユーティリティ関数
+    function gcd(x, y) {
+        while (y !== 0) {
+            let temp = y;
+            y = x % y;
+            x = temp;
+        }
+        return x;
+    }
+
+    // 使用例
+
     function Ingenuity_Hard(level) {
         var rand = Math.floor(Math.random() * 60) + 1 + 60 * (parseInt(level) - 6);
         var quest = "";
         var answer = 0;
-        if (rand <= 5) {
+        if (rand <= 15) {
+            let attempts = 0;
+            while (attempts < 5) {
+                let { a, b, c, d } = generateRandomValues();
+                let { e, f, g } =  minimizeFractionDifference(a, b, c, d);
+                if ((e >= -1 && e <= 1) || a / b == c / d || f == 0 || g == 1 || a / b <= 1) {
+                    attempts++;
+                    if(attempts >= 5){
+                        const randomPrimeValue = getRandomPrime(5);
+                        if(rand % 2 == 0){
+                            quest = `${randomPrimeValue * 100} × 1.05`;
+                            answer = randomPrimeValue * 105;
+                        } else {
+                            quest = `${randomPrimeValue * 100} × 1.08`;
+                            answer = randomPrimeValue * 108;
+                        }
+                        break;
+                    }
+                } else {
+                     if (f > 0){
+                        const x = Math.floor(a / b);
+                        const y = a % b;
+                        if(rand <= 5){
+                            quest = `(${x} ＋ ㌫${y}/${b}㌫) × ${e} － ㌫${c}/${d}㌫ ＝ ㌫■/${g}㌫`;
+                            answer = f;
+                        } else if(rand <= 10){
+                            quest = `(${x} ＋ ㌫${y}/${b}㌫) × ■ － ㌫${c}/${d}㌫ ＝ ㌫${f}/${g}㌫`;
+                            answer = e;
+                        }else{
+                            quest = `(■ ＋ ㌫${y}/${b}㌫) × ${e} － ㌫${c}/${d}㌫ ＝ ㌫${f}/${g}㌫`;
+                            answer = x;
+                        }
+                    } else {
+                        const x = Math.floor(a / b);
+                        const y = a % b;
+                        if(rand <= 5){
+                            quest = `㌫${c}/${d}㌫ － ${e} × (${x + 1} － ㌫${b - y}/${b}㌫) ＝ ㌫■/${g}㌫`;
+                            answer = -1 * f;
+                        } else if(rand <= 10){
+                            quest = `㌫${c}/${d}㌫ － ■ × (${x + 1} － ㌫${b - y}/${b}㌫) ＝ ㌫${-1 * f}/${g}㌫`;
+                            answer = e;
+                        }else{
+                            quest = `㌫■/${d}㌫ － ${e} × (${x + 1} － ㌫${b - y}/${b}㌫) ＝ ㌫${-1 * f}/${g}㌫`;
+                            answer = c;
+                        }
+                    }
+                    break;
+                }
+            }
+        }else if (rand <= 20) {
             const randomPrimeValue = getRandomPrime(3);
             const myArray = [2, 8];
             const shuffledArray = shuffleArray(myArray);
             quest = `${shuffledArray[0]} × ${shuffledArray[1] * randomPrimeValue} × 625`;
             answer = 10000 * randomPrimeValue;
-        }else if (rand <= 10) {
-            const randomPrimeValue = getRandomPrime(3);
-            const myArray = [2, 8];
-            const shuffledArray = shuffleArray(myArray);
-            quest = `${shuffledArray[0]} × ${shuffledArray[1] * randomPrimeValue} × 625`;
-            answer = 10000 * randomPrimeValue;
-        } else if (rand <= 20) {
+        } else if (rand <= 25) {
             const randomPrimeBigValue = getRandomPrime(6) * (Math.floor(Math.random() * 20) + 10);
             const randomPrimeValue = getRandomPrime(3);
             const randomonedigitsValue = Math.floor(Math.random() * 3);
@@ -634,10 +777,24 @@
             quest = `${randomPrimeBigValue} ÷ ${randomPrimeValue} ＝ ${quotient - randomonedigitsValue} ＋ (■ ÷ ${randomPrimeValue})`;
             answer = surplus + randomonedigitsValue * randomPrimeValue;
         } else if (rand <= 30) {
-            const randomTwoPower = Math.pow(2, Math.floor(Math.random() * 6) + 3);
+            const numbers = [3,5,7,9];
+            const rad = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
+            quest = `3.14 × ■ ＝ ${157 * rad}`;
+            answer = 50 * rad;
+        } else if (rand <= 33) {
+            const randomTwoPower = Math.pow(2, Math.floor(Math.random() * 6) + 4);
             quest = `65536 ÷ ${randomTwoPower}`;
             answer = parseInt(65536 / randomTwoPower);
+        } else if (rand <= 36) {
+            const randomThreePower = Math.pow(3, Math.floor(Math.random() * 4) + 3);
+            quest = `59049 ÷ ${randomThreePower}`;
+            answer = parseInt(59049 / randomThreePower);
         } else if (rand <= 40) {
+            const numbers = [7,27,37,77];//27*7*11*13*37
+            const num = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
+            quest = `999999 ÷ ${num}`;
+            answer = parseInt(999999 / num);
+        } else if (rand <= 45) {
             const randomPrimeValue_one = getRandomPrime(2);
             const randomPrimeValue_two = getRandomPrime(2);
             const randomPrimeValue_three = getRandomPrime(2);
@@ -645,50 +802,115 @@
             quest = `${10000 - randomPrimeValue_one} ＋ ${10000 - randomPrimeValue_two} ＋ ${10000 - randomPrimeValue_three} ＋ ${10000 - randomPrimeValue_four}`;
             answer = 40000 - randomPrimeValue_one - randomPrimeValue_two - randomPrimeValue_three - randomPrimeValue_four;
         } else if (rand <= 50) {
+            const numbers = [128,180,314];
+            const num = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
+            const numbers_num = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            const a = numbers_num.splice(Math.floor(Math.random() * numbers_num.length), 1)[0];
+            const b = numbers_num.splice(Math.floor(Math.random() * numbers_num.length), 1)[0];
+            const c = numbers_num.splice(Math.floor(Math.random() * numbers_num.length), 1)[0];
+            const d = numbers_num.splice(Math.floor(Math.random() * numbers_num.length), 1)[0];
+            if((d * 10 - a - b - c) >= 1 && rand <= 41){
+                quest = `${num * a} ＋ ${num * b} ＋ ${num * c} ＋ ${num * (d * 10 - a - b - c)}`;
+                answer = d * 10 * num;
+            } else {
+                quest = `${num * d} × ${a} ＋ ${num / 2} × ${2 * b} ＋ ${num * c}`;
+                answer = num * (d * a + b + c);
+            }
+        } else if (rand <= 56) {
             const randomPrimeValue = getRandomPrime(5);
-            const myArray = ["0.375", "0.625", "0.875"];
-            const myArray_ToMulti = [3, 5, 7];
-            const choice = Math.floor(Math.random() * 3);
+            const myArray = ["0.375", "0.625", "0.875","1.125"];
+            const myArray_ToMulti = [3, 5, 7, 9];
+            const choice = Math.floor(Math.random() * 4);
             quest = `${randomPrimeValue * 8} × ${myArray[choice]}`;
             answer = randomPrimeValue * myArray_ToMulti[choice];
         } else if (rand <= 60) {
-            const randomPrimeValue = getRandomPrime(3);
-            quest = `${1000 + randomPrimeValue} × ${1000 - randomPrimeValue}`;
-            answer = 1000000 - randomPrimeValue * randomPrimeValue;
-        } else if (rand <= 70) {
-            const randomThreePower = Math.pow(3, Math.floor(Math.random() * 4) + 3);
-            quest = `59049 ÷ ${randomThreePower}`;
-            answer = parseInt(59049 / randomThreePower);
-        } else if (rand <= 80) {
-            const randomPrimeValue_one = getRandomPrime(3);
-            const randomPrimeValue_two = getRandomPrime(3);
-            const randomPrimeValue_three = getRandomPrime(3);
-            const randomPrimeValue_four = getRandomPrime(4);
-            quest = `${10000 - randomPrimeValue_one} ＋ ${10000 - randomPrimeValue_two} ＋ ${10000 - randomPrimeValue_three} ＋ ${10000 - randomPrimeValue_four}`;
-            answer = 40000 - randomPrimeValue_one - randomPrimeValue_two - randomPrimeValue_three - randomPrimeValue_four;
-        } else if (rand <= 90) {
-            const randomPrimeValue = getRandomPrime(6);
-            const myArray = [7, 11, 13];
-            const shuffledArray = shuffleArray(myArray);
-            quest = `${shuffledArray[0] * randomPrimeValue} × ${shuffledArray[1]} × ${shuffledArray[2]}`;
-            answer = 1001 * randomPrimeValue;
-        } else if (rand <= 100) {
-            const randomPrimeValue = getRandomPrime(6);
-            const myArray = [73, 137, randomPrimeValue];
-            const shuffledArray = shuffleArray(myArray);
-            quest = `${shuffledArray[0]} × ${shuffledArray[1]} × ${shuffledArray[2]}`;
-            answer = 10001 * randomPrimeValue;
-        } else if (rand <= 110) {
-            const randomPrimeValue = getRandomPrime(6);
-            const myArray = [7, 11, 13];
-            const shuffledArray = shuffleArray(myArray);
-            quest = `${shuffledArray[0] * randomPrimeValue} × ${shuffledArray[1] * shuffledArray[2]}`;
-            answer = 1001 * randomPrimeValue;
-        } else if (rand <= 120) {
             const v_start = Math.floor(Math.random() * 2) + 1;
             const v_differ = Math.floor(Math.random() * 2) + 1;
             quest = `㌫${v_differ}/${v_start * (v_start + v_differ)}㌫ ＋ ㌫${v_differ}/${(v_start + v_differ) * (v_start + v_differ * 2)}㌫ ＋ ㌫${v_differ}/${(v_start + v_differ * 2) * (v_start + v_differ * 3)}㌫ ＝ ㌫${3 * v_differ}/■㌫`;
             answer = v_start * (v_start + 3 * v_differ);
+        } else if (rand <= 65) {
+            const numbers = [128,256,314,360];
+            const num = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
+            const numbers_num = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            const a = numbers_num.splice(Math.floor(Math.random() * numbers_num.length), 1)[0];
+            const b = numbers_num.splice(Math.floor(Math.random() * numbers_num.length), 1)[0];
+            const c = numbers_num.splice(Math.floor(Math.random() * numbers_num.length), 1)[0];
+            const d = numbers_num.splice(Math.floor(Math.random() * numbers_num.length), 1)[0];
+            quest = `${num * d * 5} × ${insertDecimalPoint(a * 2)} ＋ ${num * c} ＋ ${insertDecimalPoint(num / 2)} × ${20 * b}`;
+            answer = num * (d * a + b + c);
+        } else if (rand <= 80) {
+            let attempts = 0;
+            while (attempts < 5) {
+                let { a, b, c, d } = generateRandomValues();
+                let { e, f, g } =  minimizeFractionDifference(a, b, c, d);
+                if ((e >= -1 && e <= 1) || a / b == c / d || f == 0 || g == 1 || a / b <= 1) {
+                    attempts++;
+                    if(attempts >= 5){
+                        const randomPrimeValue = getRandomPrime(5);
+                        if(rand % 2 == 0){
+                            quest = `${randomPrimeValue * 105} ÷ 1.05`;
+                        } else {
+                            quest = `${randomPrimeValue * 108} ÷ 1.08`;
+                        }
+                        answer = randomPrimeValue * 100;
+                        break;
+                    }
+                } else {
+                     if (f > 0){
+                        const x = Math.floor(a / b);
+                        const y = a % b;
+                        if(rand <= 72){
+                            quest = `(${x} ＋ ㌫${y}/■㌫) × ${e} － ㌫${c}/${d}㌫ ＝ ㌫${f}/${g}㌫`;
+                            answer = b;
+                        } else{
+                            quest = `(${x} ＋ ㌫${y}/${b}㌫) × ${e} － ㌫${c}/${d}㌫ ＝ ㌫${f}/■㌫`;
+                            answer = g;
+                        }
+                    } else {
+                        const x = Math.floor(a / b);
+                        const y = a % b;
+                        if(rand <= 72){
+                            quest = `㌫${c}/${d}㌫ － ${e} × (${x + 1} － ㌫${b - y}/■㌫) ＝ ㌫${-1 * f}/${g}㌫`;
+                            answer = b;
+                        } else{
+                            quest = `㌫${c}/${d}㌫ － ${e} × (${x + 1} － ㌫${b - y}/${b}㌫) ＝ ㌫${-1 * f}/■㌫`;
+                            answer = g;
+                        }
+                    }
+                    break;
+                }
+            }
+        } else if (rand <= 90) {
+            const numbers = [9,16,25,36,49,64,81];
+            const rad = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
+            quest = `3.14 × ■ ＝ ${314 * rad}`;
+            answer = 100 * rad;
+        } else if (rand <= 92) {
+            const randomonedigitsValue = Math.floor(Math.random() * 3) + 2;
+            const v = randomonedigitsValue * 10 + 1;
+            quest = `${v} × ${v} × ${v}`;
+            answer = v * v * v;
+        } else if (rand <= 100) {
+            const randomPrimeValue_one = getRandomPrime(3);
+            const randomPrimeValue_two = getRandomPrime(3);
+            const myArray = [73, 137, randomPrimeValue_one,randomPrimeValue_two];
+            const shuffledArray = shuffleArray(myArray);
+            quest = `${shuffledArray[0]} × ${shuffledArray[1]} × ${shuffledArray[2]} × ${shuffledArray[3]}`;
+            answer = 10001 * randomPrimeValue_one * randomPrimeValue_two;
+        } else if (rand <= 110) {
+            const randomPrimeValue = getRandomPrime(6);
+            const myArray = [7, 11, 13];
+            const shuffledArray = shuffleArray(myArray);
+            if(rand % 2 == 0){
+                quest = `${shuffledArray[0] * randomPrimeValue} × ${shuffledArray[1]} × ${shuffledArray[2]}`;
+            } else {
+                quest = `${shuffledArray[0] * randomPrimeValue} × ${shuffledArray[1] * shuffledArray[2]}`;
+            }
+            answer = 1001 * randomPrimeValue;
+        } else if (rand <= 120) {
+            const randomPrimeValue = getRandomPrime(3);
+            quest = `${1000 + randomPrimeValue} × ${1000 - randomPrimeValue}`;
+            answer = 1000000 - randomPrimeValue * randomPrimeValue;
         }
         $gameVariables.setValue(mondai_index, quest);
         $gameVariables.setValue(kotae_index, answer);

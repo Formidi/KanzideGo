@@ -46,6 +46,7 @@
 
     //this._customListに直接リストを代入する関数
     DataManager.SetCustomList = function (data) {
+        console.log("新しいリストをセット");
         this._customList = data;
     };
 
@@ -349,6 +350,7 @@
         }, 0);
 
         if (count >= limit) {
+            console.log(`リストをリセットします`);
             list = list.filter(function (currentItem) {
                 return !currentItem.includes(substring);
             });
@@ -377,15 +379,15 @@
 
         //console.log(availableNumbers);
         //a~bまでの数字が入ったリストから、過去問で出た問題を除く
-        if (availableNumbers.length === 0 && grad >= 1) {//もし利用できる乱数がなく、かつgradが1以上なら
-            //console.log("勾配無し");
+        if (availableNumbers.length <= 1 && grad >= 1) {//もし利用できる乱数がなく、かつgradが1以上なら
+            console.log("勾配無し" + identifier);
             return getRandomNumberInIdentifierRangeNotInCustomlist(identifier, a_save, b, customlist, 0);
             //新問は出し切ったということなので、勾配をなくしてやり直す
         } else if (availableNumbers.length <= 1) {
+            console.log("リセット: " + identifier);
             //利用できる乱数が1以下になったら
             DataManager.SetCustomList(removeItemsForceWithSubstring(DataManager.getCustomList(), identifier));
             //いったん過去問リストにリセットをかけて
-            console.log("リセット");
             return getRandomNumberInIdentifierRangeNotInCustomlist(identifier, a, b, customlist, 0);
             //再度この関数を実行する
         }
