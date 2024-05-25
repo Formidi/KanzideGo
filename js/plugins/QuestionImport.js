@@ -131,8 +131,8 @@
             console.log("ローカル取得");
             ImportQuestionFromLocal();
         }
-    }
-    ;
+    };
+
     function ImportQuestionFromGitHub(refShaOrBranch) {
         directoryPath = 'excelData';
         const existingData = {};
@@ -498,7 +498,7 @@
             }
             $gameVariables.setValue(681, indexesToInclude.length);
         } else if (command === 'Ex_Generator') {
-            //MathQuestionDebug();
+            MathQuestionDebug();
             try {
                 ExtraGenerator();
             } catch (e) {
@@ -576,7 +576,7 @@
     async function ExtraGenerator() {
         //await ForceQ();
         const num = numDict[$gameVariables.value(1102)];
-        if ($gameVariables.value(15) != 901) {
+        if ($gameVariables.value(15) != 901 && $gameVariables.value(15) != 904) {
             const data = DataManager.loadCustomExData();
             const stagename = `${stageDict[$gameVariables.value(15)]}_` || "";
             const filteredData = Object.keys(data)
@@ -731,8 +731,10 @@
             $gameVariables.setValue(14, 0);
             $gameVariables.setValue(16, 0);
             $gameVariables.setValue(18, parseInt('2'.repeat(Math.min(roundedLength,9))));
-            $gameVariables.setValue(19, "　");
-            $gameVariables.setValue(20, "　");
+            if($gameVariables.value(15) != 904){
+                $gameVariables.setValue(19, "　");
+                $gameVariables.setValue(20, "　");
+            }
             if (roundedLength >= 8) {
                 $gameVariables.setValue(169, 2);
             } else if (roundedLength >= 5) {
@@ -814,13 +816,16 @@
     }
 
     function MathQuestionDebug() {
-        for (let i = 0; i < 100; i++) {
-          Math.seedrandom(Date.now());
-          $gameVariables.setValue(1177,Math.floor(Math.random() * 100000000));
-          const phase = 6;
-          $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [phase]);
-          console.log(`${$gameVariables.value(8)},${$gameVariables.value(9)}`);
-        }
+        /*
+        for (let level = 2; level < 8; level++) {
+            for (let i = 0; i < 100; i++) {
+              Math.seedrandom(Date.now());
+              $gameVariables.setValue(1177,Math.floor(Math.random() * 100000000));
+              $gameMap._interpreter.pluginCommand("MakeMathQuestion_Original", [level]);
+              console.log(`${$gameVariables.value(8)},${$gameVariables.value(9)}`);
+            }
+          }
+          */
     }
 
     function MathQuestion() {
@@ -848,12 +853,8 @@
                 phase = Math.min(phase + $gameVariables.value(1117) * 2, 13);
             }
         }
-
-        if(phase >= 1 && $gameVariables.value(1117) <= 10 && $gameVariables.value(774) != 0 && ($gameVariables.value(774) % 4 == 0 || $gameVariables.value(774) % 4 == 3)){
-            phase -= 1;
-        }
         
-        if((month === 2 && date === 29) || $gameVariables.value(1265) >= 1){
+        if($gameVariables.value(15) == 904){
             const thresholdMap_April = {
                 0: [2,4,2,4,2,4,6],
                 1: [1,3,5,1,3,5,1,3,5,6],
@@ -861,17 +862,42 @@
             };
 
             const thresholds_April = thresholdMap_April[$gameVariables.value(1102)];
-            $gameVariables.setValue(1265, Math.max(1,Math.min(Math.floor(phase / 2) + 1,6)));
+            if ($gameVariables.value(1117) >= 11) {
+                phase_d = Math.min($gameVariables.value(1117) - 11,7);
+            }else{
+                const thresholdMap = {
+                    0: [1, 2, 3, 4, 5, 6, 7],
+                    1: [2, 3, 5, 6, 8, 9, 10],
+                    2: [2, 5, 7, 10, 12, 15, 16],
+                };
+    
+                const thresholds = thresholdMap[$gameVariables.value(1102)];
+    
+                for (var i = 0; i < thresholds.length; i++) {
+                    if ($gameVariables.value(7) <= thresholds[i]) {
+                        phase_d = i;
+                        break;
+                    }
+                }
+            }
+            $gameVariables.setValue(1265, phase_d + 1);
             phase = $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0 ? thresholds_April[$gameVariables.value(7) - 1] : Math.ceil(thresholds_April[$gameVariables.value(7) - 1] / 2);
         }
-
+        
+        if(phase >= 1 && $gameVariables.value(1117) <= 10 && $gameVariables.value(774) != 0 && ($gameVariables.value(774) % 4 == 0 || $gameVariables.value(774) % 4 == 3)){
+            phase -= 1;
+        }
+        /*
         if ($gameVariables.value(1271) == 1 && $gameVariables.value(1274) == $gameVariables.value(7) && $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0) {
             $gameVariables.setValue(8, $gameVariables.value(1272));
             $gameVariables.setValue(9, $gameVariables.value(1273));
             $gameVariables.setValue(1271, 0);
-        } else if ($gameVariables.value(1265) >= 1) {
+        } else 
+        */
+        
+        if ($gameVariables.value(1265) >= 1) {
             if (phase == 6) {
-                $gameMap._interpreter.pluginCommand("MakeMathQuestion", ["2", "1", "1"]);
+                $gameMap._interpreter.pluginCommand("MakeMathQuestion", ["3", "1", "1"]);
             }else if (Math.random() < 0.5) {
                 $gameMap._interpreter.pluginCommand("MakeMathQuestion", [(Math.min(phase, 5)).toString(),(Math.floor(Math.random() * 2) + 1).toString(), "0"]);
             } else if (Math.random() < 0.5) {
@@ -936,7 +962,7 @@
         }
     }
     function pureText(text) {
-        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '').replace(/㌫[^㌫]*㌫/g, '');
+        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '').replace(/㌫[^㌫]*㌫/g, '分');
     }
     async function waitForCommonEventToEnd(eventId) {
         return new Promise((resolve) => {
