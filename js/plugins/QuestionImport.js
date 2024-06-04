@@ -138,9 +138,13 @@
             console.log("テストプレイ");
             directoryPath = './';
          } else {
+            }
             if (!(typeof cordova === "undefined")) {
                 directoryPath = './';
             } else {
+                if ( Utils.isNwjs() ) {
+                    directoryPath = './';
+                } else {    
                 directoryPath = 'www';
             }
             }
