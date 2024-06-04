@@ -32,7 +32,7 @@ var $plugins =
 {"name":"SAN_Imp_ColorCache","status":false,"description":"カラーキャッシュ 1.0.0\nパフォーマンス改善プラグインです。","parameters":{}},
 {"name":"SAN_Imp_SkipParallelEventPreload","status":true,"description":"並列イベントプリロードスキップ 1.0.0\nパフォーマンス改善プラグインです。","parameters":{}},
 {"name":"EasingPicture","status":true,"description":"ピクチャーの移動パターンを増やします。","parameters":{}},
-{"name":"LoadingExtend","status":true,"description":"ロード中画像拡張プラグイン","parameters":{"イメージ列数":"2","イメージ行数":"7","表示タイプ":"1","セル指定変数":"1","アニメーション間隔":"800","表示位置X座標":"","表示位置Y座標":"","待機フレーム数":"30","点滅なし":"OFF"}},
+{"name":"LoadingExtend","status":true,"description":"ロード中画像拡張プラグイン","parameters":{"イメージ列数":"2","イメージ行数":"9","表示タイプ":"1","セル指定変数":"1","アニメーション間隔":"800","表示位置X座標":"","表示位置Y座標":"","待機フレーム数":"30","点滅なし":"OFF"}},
 {"name":"PictureVariableSetting","status":true,"description":"ピクチャ関連のイベント機能拡張プラグイン","parameters":{"初期値":"OFF","ピクチャ表示最大数":"180"}},
 {"name":"GraphicsRenderFix","status":true,"description":"放置していると画面がフリーズするのを修正","parameters":{}},
 {"name":"SNZ_randomXorshiftOnline","status":false,"description":"ランダムに何かをする処理の精度を上げます　ブラウザプレイ対応","parameters":{}},
@@ -43,8 +43,8 @@ var $plugins =
 {"name":"RGenRandomizer","status":true,"description":"ランダムな変数出力","parameters":{"exported_value":"6","group":"1084","numofQ":"681","seeds":"1264"}},
 {"name":"GetStageFromGitHub","status":true,"description":"GitHubからエディットステージを持ってくる関数。","parameters":{"extra_page":"1172","extra_sub_place":"1173","font_edit":"NotoSansJP-Bold","font_outline":"1179"}},
 {"name":"CognitiveOpenedRuby","status":true,"description":"ルビの感知+入力された文字列の処理","parameters":{"replacehalf":"272"}},
-{"name":"QuestionImport","status":true,"description":"jsonで問題保存","parameters":{"Owner":"Formidi","Repo":"KanzideGoQuestion","SHAForApp":"","IsLocal":"0","length_tmp":"1167","Replace":"1"}},
-{"name":"ApplicationPictureRename","status":true,"description":"区切りのピクチャ名をスマホプレイ時に置換します","parameters":{"RenameStrings":"Select_Ctrl_A,Select_Ctrl_B,Select_Ctrl_C,Select_Ctrl_D,Select_Ctrl_E,Select_Ctrl_F,Select_Ctrl_G,Select_D,Select_D_b,Select_D_c,Select_Down_A,Select_Down_B,Select_Down_C,Select_Down_D,Select_Down_E,Select_Shift_A,Select_Shift_B,Select_Shift_C,Select_Shift_D,Select_Shift_E,Select_Shift_F,Select_Shift_G,Select_Shift_H,Select_Shift_I,Select_Space_A,Select_Space_B,Select_Space_C,Select_Space_D,Select_Space_E,Select_Space_F,Select_Space_G,Select_Space_H,Select_Space_I,Select_Space_J,Select_Space_K,Select_Space_L,Select_Space_M,Select_Space_N,Select_Space_O,Select_U,Select_U_a,Select_U_b,Select_U2,Select_Up_A,Select_Up_B,Select_Up_C,Update_SelectA,Update_SelectB,Window_Text_N,Window_Text_Y,Miss_Mes_A,Window_length_bg,Select_D_cA,Select_C_A,Select_C_B"}},
+{"name":"QuestionImport","status":true,"description":"jsonで問題保存","parameters":{"Owner":"Formidi","Repo":"KanzideGoQuestion","SHAForApp":"","IsLocal":"2","length_tmp":"1167","Replace":"1"}},
+{"name":"ApplicationPictureRename","status":true,"description":"区切りのピクチャ名をスマホプレイ時に置換します","parameters":{"RenameStrings":"Select_Ctrl_A,Select_Ctrl_B,Select_Ctrl_C,Select_Ctrl_D,Select_Ctrl_E,Select_Ctrl_F,Select_Ctrl_G,Select_D,Select_D_b,Select_D_c,Select_Down_A,Select_Down_B,Select_Down_C,Select_Down_D,Select_Down_E,Select_Down_F,Select_Shift_A,Select_Shift_B,Select_Shift_C,Select_Shift_D,Select_Shift_E,Select_Shift_F,Select_Shift_G,Select_Shift_H,Select_Shift_I,Select_Space_A,Select_Space_B,Select_Space_C,Select_Space_D,Select_Space_E,Select_Space_F,Select_Space_G,Select_Space_H,Select_Space_I,Select_Space_J,Select_Space_K,Select_Space_L,Select_Space_M,Select_Space_N,Select_Space_O,Select_U,Select_U_a,Select_U_b,Select_U2,Select_Up_A,Select_Up_B,Select_Up_C,Update_SelectA,Update_SelectB,Window_Text_N,Window_Text_Y,Miss_Mes_A,Window_length_bg,Select_D_cA,Select_C_A,Select_C_B"}},
 {"name":"GitHubAutoUpdater","status":true,"description":"Allows automatic updates from a GitHub repository.","parameters":{"Owner":"Formidi","Repo":"KanzideGo","DPath":"./www/","InitialSHA":"97518b6b329b2e3596fbab33c7a66079b76e8de3","Judge":"232","isUpdate":"230","pictureName":"Version_Latest"}},
 {"name":"MakeMathQuestion","status":true,"description":"数字アタック用のスクリプトです。","parameters":{"question":"8","answer":"9"}},
 {"name":"seedrandom","status":true,"description":"","parameters":{}},
@@ -56,5 +56,5 @@ var $plugins =
 {"name":"UR65_SmartPhoneUI","status":false,"description":"スマホ用UI  ver 1.0.0\nUIのサイズをスマートフォン向けに最適化します。","parameters":{"タイトル":"0","メニュー":"0","アイテム":"0","スキル":"0","装備":"0","オプション":"1","ゲーム終了":"0","戦闘":"0","ショップ":"0","イベント関係":"1","アイコン位置修正":"0"}},
 {"name":"Nuka_VersionFetch","status":false,"description":"アプリが最新バージョンで無い場合は注意ダイアログを表示","parameters":{}},
 {"name":"--------------------------------","status":false,"description":"--------------------------------","parameters":{}},
-{"name":"DRS_BoostEngineMV","status":false,"description":"ゲームスピードを動的に変更します。","parameters":{}}
+{"name":"DRS_BoostEngineMV","status":true,"description":"ゲームスピードを動的に変更します。","parameters":{}}
 ];

@@ -89,175 +89,6 @@
         return this._CustomStageArray || null;
     }
 
-    var _Scene_Boot_start = Scene_Boot.prototype.start;
-    Scene_Boot.prototype.start = function () {
-        _Scene_Boot_start.call(this);
-        /*
-        try {
-            console.log("GitHubから問題一覧を取得");
-            fetch(`https://api.github.com/repos/${userName}/${repoName}/contents`)
-                .then(response => response.json())
-                .then(subdirectories => {
-                    // 各サブディレクトリごとにdata.txtのコミット情報と中身を取得
-                    const promises = subdirectories.map(subdirectory => {
-                        const subdirectoryPath = `${subdirectory.name}/data.txt`;
-
-                        // ファイルの中身を取得するPromise
-                        const getFileContentPromise = fetch(`https://api.github.com/repos/${userName}/${repoName}/contents/${subdirectoryPath}`)
-                            .then(response => response.json())
-                            .then(fileContent => {
-                                // ファイルの中身をBase64デコードしてUTF-8でデコード
-                                const content = atob(fileContent.content);
-                                const decoder = new TextDecoder('utf-8');
-                                return decoder.decode(new Uint8Array([...content].map(char => char.charCodeAt(0))));
-                            });
-
-                        // ファイルのコミット情報を取得するPromise
-                        const getCommitInfoPromise = fetch(`https://api.github.com/repos/${userName}/${repoName}/commits?path=${subdirectoryPath}`)
-                            .then(response => response.json())
-                            .then(commits => ({
-                                filename: subdirectoryPath,
-                                created_at: commits[0].commit.author.date || null, // 最新のコミットの日時を使用
-                            }));
-
-                        // Promise.allで2つのPromiseを同時に解決
-                        return Promise.all([getFileContentPromise, getCommitInfoPromise])
-                            .then(([fileContent, commitInfo]) => {
-                                const contentLines = fileContent.split('\n');
-                                return {
-                                    filename: commitInfo.filename,
-                                    fileIdentifier: subdirectory.name,
-                                    created_at: commitInfo.created_at,
-                                    name: contentLines[0],
-                                    discription_1: contentLines[1],
-                                    discription_2: contentLines[2],
-                                    difficulty: contentLines[3],
-                                    QuestionCount: contentLines[4],
-                                    isRise: contentLines[5],
-                                    isBonus: contentLines[6],
-                                    author: contentLines[7],
-                                };
-                            });
-                    });
-
-                    // 全てのPromiseを解決してファイル情報を取得
-                    Promise.all(promises)
-                        .then(filesInfo => {
-                            // 作成日時でファイルをソート
-                            filesInfo.sort((a, b) => {
-                                const dateComparison = new Date(a.created_at) - new Date(b.created_at);
-                                if (dateComparison !== 0) {
-                                    return dateComparison;
-                                }
-                                // 日付が等しい場合はファイル名で辞書順にソート
-                                return a.filename.localeCompare(b.filename);
-                            });
-                            // ソートされたファイル情報を使って必要な処理を行う
-                            SetEditStageList(filesInfo);
-                        })
-                        .catch(error => console.error(error));
-                })
-                .catch(error => console.error(error));
-        } catch (e) {
-            console.error(e);
-        }
-        try {
-            console.log("ローカル問題取得");
-            const fs = require('fs');
-            const path = require('path');
-            const stageData = {};
-            var directoryPath = './www/excelData/editStage';
-            const promises = [];
-
-            fs.readdir(directoryPath, (err, folderList) => {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                for (const folder of folderList) {
-                    const folderpath = path.join(directoryPath, folder);
-                    const files = ['question.csv', 'data.txt'];
-                    const jsonData = {};
-                    for (const file of files) {
-                        const promise = new Promise((resolve, reject) => {
-                            fs.readFile(path.join(folderpath, file), 'utf8', (err, fileData) => {
-                                switch (file.split('.').pop().toLowerCase()) {
-                                    case 'csv':
-                                        ImportQuestionData(folder, fileData, jsonData);
-                                        resolve();
-                                        break;
-                                    case 'txt':
-                                        ImportMetaData(folder, fileData, stageData, jsonData);
-                                        resolve();
-                                        break;
-                                    default:
-                                        reject(err);
-                                        break;
-                                }
-
-                            });
-                        });
-                        promises.push(promise);
-                    }
-                }
-
-                Promise.all(promises)
-                    .then(() => {
-                        SetCustomStageList(stageData);
-                    })
-                    .catch(error => {
-                        // Handle errors if needed
-                    });
-
-            });
-        } catch (e) {
-
-        }
-        */
-    };
-
-    async function downloadStage(levelname) {
-        const fileUrl = `https://github.com/${userName}/${repoName}/raw/main/${levelname}/question.csv`;
-        const fileName = `./www/excelData/editStage/${levelname}/question.csv`;
-        await downloadFile(fileUrl, fileName);
-        const dataUrl = `https://github.com/${userName}/${repoName}/raw/main/${levelname}/data.txt`;
-        const dataName = `./www/excelData/editStage/${levelname}/data.txt`;
-        await downloadFile(dataUrl, dataName);
-    }
-    async function downloadFile(file, fileName) {
-        const fs = require('fs');
-        const path = require('path');
-        return new Promise(async (resolve, reject) => {
-            try {
-                const response = await fetch(file);
-                if (!response.ok) {
-                    reject(new Error(`Failed to download file: ${response.statusText}`));
-                    return;
-                }
-
-                const fileContent = await response.arrayBuffer();
-                createDirectoryRecursive(path.dirname(fileName.replace(/\\/g, '/')));
-                fs.writeFileSync(fileName, Buffer.from(fileContent), 'binary');
-                resolve();
-            } catch (error) {
-                reject(new Error(`ファイルのダウンロード中にエラーが発生しました: ${error.message}`));
-            }
-        });
-    }
-    function createDirectoryRecursive(dirPath) {
-        const fs = require('fs');
-        const path = require('path');
-        var normalizedPath = path.normalize(dirPath);
-        var parts = normalizedPath.split(path.sep);
-
-        for (var i = 1; i <= parts.length; i++) {
-            var directoryPath = path.join.apply(null, parts.slice(0, i));
-            if (!fs.existsSync(directoryPath)) {
-                fs.mkdirSync(directoryPath);
-            }
-        }
-    }
-
     // 既存のshowPicture関数を保持
     var originalShowPicture = Game_Screen.prototype.showPicture;
     Game_Screen.prototype.showPicture = function (pictureId, pictureName, origin, x, y, scaleX, scaleY, opacity, blendMode) {
@@ -273,7 +104,11 @@
             $gameMap._interpreter.pluginCommand("D_TEXT_SETTING", ["FONT", font_edit]);
             $gameMap._interpreter.pluginCommand("D_TEXT_SETTING", ["ALIGN", "1"]);
             var inputString = pureText(pictureName);
-            var size = size1_default;
+            var size = Math.min(250,Math.ceil(1280 / calculateLength(inputString)));
+            //console.log(`${inputString},${calculateLength(inputString)},${size}`);
+            var outline = $gameVariables.value(force) == 1 ? Math.ceil(size / 2) : Math.ceil(size / 10);
+            
+            /*
             var outline = $gameVariables.value(force) == 1 ? size1_default / 2 : size1_default / 10;
             if (inputString.length >= isVeryVeryLong) {
                 size = size5_veryverylong;
@@ -288,6 +123,7 @@
                 size = size2_long;
                 outline = $gameVariables.value(force) == 1 ? size2_long / 2 : size2_long / 10;
             }
+            */
             if ($gameVariables.value(1179) == 2) {
                 size = Math.ceil(size / 5);
                 outline = Math.ceil(outline / 5);
@@ -298,7 +134,7 @@
         }
     };
     function pureText(text) {
-        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '').replace(/㌫[^㌫]*㌫/g, '分数');
+        return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '').replace(/㌫[^㌫]*㌫/g, '分');
     }
 
     let previousProcess = Promise.resolve(); // 初期のPromise
@@ -1123,4 +959,17 @@
         return [x, y, z];
     }
 
+    function calculateLength(str) {
+        let length = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str[i];
+            // 韓国語、漢字、ひらがな、特定の記号を全角として扱う
+            if (char.match(/[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af＋－×÷＝■]/)) {
+                length += 2;
+            } else {
+                length += 1;
+            }
+        }
+        return Math.ceil(length / 2);
+    }
 })();

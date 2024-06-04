@@ -46,7 +46,7 @@
 
     //this._customListに直接リストを代入する関数
     DataManager.SetCustomList = function (data) {
-        console.log("新しいリストをセット");
+        //console.log("新しいリストをセット");
         this._customList = data;
     };
 
@@ -152,13 +152,12 @@
             if (!DataManager._customList) {
                 DataManager.initCustomList();
             }
-            //ステージ判別用のアイデンティファイアー
-            var variableId = args[0];
+            var variableId = args[0];//ステージ判別用のアイデンティファイアー
             var min = parseInt(args[1]);//問題抽選の最小値
             var max = parseInt(args[2]);//問題抽選の最大値
             var probability = parseInt(args[3]);//重複がなくなる確率
-            var addedQuestion_num = args.length >= 5 ? parseInt(args[4]) : 0;
-            var addedQuestion_probability = args.length >= 5 ? parseInt(args[5]) : 0;
+            var addedQuestion_num = args.length >= 5 ? parseInt(args[4]) : 0;//追加問題の数
+            var addedQuestion_probability = args.length >= 5 ? parseInt(args[5]) : 0;//追加問題が優先される確率
             var Customlist = DataManager.getCustomList();
             if (variableId && min && max && probability >= 0 && probability <= 100) {
                 if (variableId.startsWith("Ca")) {
@@ -350,7 +349,7 @@
         }, 0);
 
         if (count >= limit) {
-            console.log(`リストをリセットします`);
+            //console.log(`リストをリセットします`);
             list = list.filter(function (currentItem) {
                 return !currentItem.includes(substring);
             });
@@ -380,11 +379,11 @@
         //console.log(availableNumbers);
         //a~bまでの数字が入ったリストから、過去問で出た問題を除く
         if (availableNumbers.length <= 1 && grad >= 1) {//もし利用できる乱数がなく、かつgradが1以上なら
-            console.log("勾配無し" + identifier);
+            //console.log("勾配無し" + identifier);
             return getRandomNumberInIdentifierRangeNotInCustomlist(identifier, a_save, b, customlist, 0);
             //新問は出し切ったということなので、勾配をなくしてやり直す
         } else if (availableNumbers.length <= 1) {
-            console.log("リセット: " + identifier);
+            //console.log("リセット: " + identifier);
             //利用できる乱数が1以下になったら
             DataManager.SetCustomList(removeItemsForceWithSubstring(DataManager.getCustomList(), identifier));
             //いったん過去問リストにリセットをかけて

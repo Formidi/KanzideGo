@@ -134,17 +134,26 @@
     };
 
     function ImportQuestionFromGitHub(refShaOrBranch) {
-        directoryPath = 'excelData';
+        if ($gameTemp.isPlaytest()) {
+            console.log("テストプレイ");
+            directoryPath = './';
+         } else {
+            if (!(typeof cordova === "undefined")) {
+                directoryPath = './';
+            } else {
+                directoryPath = 'www';
+            }
+            }
         const existingData = {};
         const existingExData = {};
         const promises = [];
-        var files = ["Lv01.txt", "Lv02.txt", "Lv03.txt", "Lv04.txt", "Lv05.txt", "Lv06.txt", "Lv07.txt", "LvCa004.txt", "LvEnglish.csv", "LvGenso.csv", "question.json"];
+        var files = ["img/battlebacks2/Lv01.xcf", "img/battlebacks2/Lv02.xcf", "img/battlebacks2/Lv03.xcf", "img/battlebacks2/Lv04.xcf", "img/battlebacks2/Lv05.xcf", "img/battlebacks2/Lv06.xcf", "img/battlebacks2/Lv07.xcf", "img/battlebacks2/LvCa004.xcf", "excelData/LvEnglish.csv", "excelData/LvGenso.csv"];
         const filePromises = files.map(async(file)=>{
             const filePath = directoryPath + "/" + file;
             const fileResponse = await fetch(filePath);
             if (fileResponse.ok) {
                 const data = await fileResponse.text();
-                if (file.indexOf(".txt") !== -1) {
+                if (file.indexOf(".xcf") !== -1) {
                     AddData(existingData, data);
                 } else if (file.indexOf(".csv") !== -1) {
                     const dirs = file.split("/")
@@ -199,10 +208,10 @@
             const promises = [];
             files.forEach(file=>{
                 const filePath = path.join(directoryPath, file);
-                if (path.extname(filePath) === '.txt' || path.extname(filePath) === '.csv') {
+                if (path.extname(filePath) === '.xcf' || path.extname(filePath) === '.csv') {
                     const promise = new Promise((resolve,reject)=>{
                         fs.readFile(filePath, 'utf8', (err,data)=>{
-                            if (path.extname(filePath) === '.txt') {
+                            if (path.extname(filePath) === '.xcf') {
                                 if (err) {
                                     console.error(`ファイル ${file} を読み込む際にエラーが発生しました:`, err);
                                     reject(err);
@@ -508,6 +517,13 @@
             $gameVariables.setValue(length_tmp, pureText($gameVariables.value(8).toString()).length);
         } else if (command === 'CompareGitHubVersion') {
             CompareVersionFile();
+        } else if (command === 'DetermineMaxAndMin'){
+            var inputString = pureText($gameVariables.value(8));
+            var size = Math.min(250,Math.ceil(1280 / calculateLength(inputString)));
+            $gameVariables.setValue(165, size >= 150 ? 80 : 100);
+            $gameVariables.setValue(166, size >= 150 ? 80 : 100);
+            $gameVariables.setValue(479, size >= 150 ? 25 : 50);
+            $gameVariables.setValue(480, size >= 150 ? 25 : 50);
         }
     };
     function parseOrReturnOriginal(inputString) {
@@ -863,25 +879,11 @@
 
             const thresholds_April = thresholdMap_April[$gameVariables.value(1102)];
             if ($gameVariables.value(1117) >= 11) {
-                phase_d = Math.min($gameVariables.value(1117) - 11,7);
+                $gameVariables.setValue(1265, Math.min($gameVariables.value(1117) - 10,7));
             }else{
-                const thresholdMap = {
-                    0: [1, 2, 3, 4, 5, 6, 7],
-                    1: [2, 3, 5, 6, 8, 9, 10],
-                    2: [2, 5, 7, 10, 12, 15, 16],
-                };
-    
-                const thresholds = thresholdMap[$gameVariables.value(1102)];
-    
-                for (var i = 0; i < thresholds.length; i++) {
-                    if ($gameVariables.value(7) <= thresholds[i]) {
-                        phase_d = i;
-                        break;
-                    }
-                }
+                $gameVariables.setValue(1265, $gameVariables.value(1117) + $gameVariables.value(290));
             }
-            $gameVariables.setValue(1265, phase_d + 1);
-            phase = $gameVariables.value(380) == 0 && $gameVariables.value(774) == 0 ? thresholds_April[$gameVariables.value(7) - 1] : Math.ceil(thresholds_April[$gameVariables.value(7) - 1] / 2);
+            phase = (($gameVariables.value(380) == 0 && $gameVariables.value(774) == 0) || thresholds_April[$gameVariables.value(7) - 1] == 6) ? thresholds_April[$gameVariables.value(7) - 1] : 3;
         }
         
         if(phase >= 1 && $gameVariables.value(1117) <= 10 && $gameVariables.value(774) != 0 && ($gameVariables.value(774) % 4 == 0 || $gameVariables.value(774) % 4 == 3)){
@@ -897,9 +899,9 @@
         
         if ($gameVariables.value(1265) >= 1) {
             if (phase == 6) {
-                $gameMap._interpreter.pluginCommand("MakeMathQuestion", ["3", "1", "1"]);
+                $gameMap._interpreter.pluginCommand("MakeMathQuestion", ["4", "1", "1"]);
             }else if (Math.random() < 0.5) {
-                $gameMap._interpreter.pluginCommand("MakeMathQuestion", [(Math.min(phase, 5)).toString(),(Math.floor(Math.random() * 2) + 1).toString(), "0"]);
+                $gameMap._interpreter.pluginCommand("MakeMathQuestion", [(Math.min(phase, 5)).toString(),(Math.max(Math.min(6 - phase,Math.floor(Math.random() * 2)),0) + 1).toString(), "0"]);
             } else if (Math.random() < 0.5) {
                 $gameMap._interpreter.pluginCommand("MakeMathQuestion", [Math.ceil((Math.min(phase, 5)) / 2).toString(), "0", "1"]);
             } else {
@@ -916,51 +918,15 @@
 
     const question_seed = [
         [["1", "1", "0"], ["1", "2", "0"], ["1", "0", "1"], ["1", "1", "1"], ["1", "1", "0", "□"]],//Lv1.0
-        [["2", "2", "0"], ["1", "2", "1"], ["2", "0", "1"], ["1", "1", "2"], ["3", "1", "0"]],//Lv1.5
+        [["2", "2", "0"], ["2", "0", "1"], ["1", "1", "2"], ["3", "1", "0"], ["1", "1", "1", "□"]],//Lv1.5
         [["4", "1", "0"], ["3", "2", "0"], ["3", "0", "1"], ["2", "1", "1"], ["2", "1", "1", "□"]],//Lv2.0
         [["3", "3", "0"], ["5", "1", "0"], ["4", "0", "1"], ["3", "1", "1"], ["3", "2", "0", "□"]],//Lv2.5
-        [["3", "4", "0"], ["4", "1", "1"], ["5", "0", "1"], ["3", "1", "2"], ["4", "1", "1", "□"]],//Lv3.0
-        [["7", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["4", "2", "1"], ["4", "2", "1", "□"]],//Lv3.5
+        [["4", "2", "0"], ["4", "1", "1"], ["5", "0", "1"], ["3", "1", "2"], ["3", "3", "0", "□"]],//Lv3.0
+        [["7", "1", "0"], ["5", "2", "0"], ["5", "1", "1"], ["4", "2", "1"], ["4", "1", "1", "□"]],//Lv3.5
         [["7", "2", "0"], ["6", "0", "1"], ["5", "1", "2"], ["4", "2", "2"], ["5", "3", "0", "□"]],//Lv4.0
-        [["9", "2", "0"], ["7", "0", "1"], ["6", "1", "1"], ["5", "2", "2"], ["6", "1", "1", "□"]],//Lv4.5
+        [["9", "2", "0"], ["5", "4", "0"], ["6", "1", "1"], ["5", "2", "2"], ["6", "1", "1", "□"]],//Lv4.5
     ];
 
-    async function ForceQ() {
-        const folderUrl = `https://raw.githubusercontent.com/edenad/question/main/data.txt`;
-
-        const fileResponse = await fetch(folderUrl, { cache: "no-store" });
-
-        if (fileResponse.ok) {
-            try {
-                const forcelist = await fileResponse.text();
-                const lines = forcelist.split('\n');
-                var count = 0;
-                for (const line of lines) {
-                    if (line == "") break;
-                    const list_force = line.split(':');
-                    if (list_force.length < 4) continue;
-                    if (parseInt($gameVariables.value(1275)) == parseInt(list_force[3]) && count >= parseInt($gameVariables.value(1276))) {
-                        $gameVariables.setValue(1271, 1);
-                        if (isNaN(list_force[0])) {
-                            if (list_force[0] != "") {
-                                $gameVariables.setValue(1272, String(list_force[0]).replace("+", "＋").replace("-", "－").replace("=", "＝"));
-                            }
-                        } else {
-                            $gameVariables.setValue(1272, parseInt(list_force[0]));
-                        }
-                        $gameVariables.setValue(1273, parseInt(list_force[1]));
-                        $gameVariables.setValue(1274, parseInt(list_force[2]));
-                        break;
-                    }
-                    count += 1;
-                }
-            } catch (e) {
-                console.error(`Failed to Input`);
-            }
-        } else {
-            console.error(`Failed to fetch file: ${folderUrl}`);
-        }
-    }
     function pureText(text) {
         return text.toString().replace(/\\C\[[^\]]+\]/g, "").replace(/\\OC\[[^\]]+\]/g, "").replace(/\\ow\[\d+\]/g, "").replace(/\|(.*?)>/g, "").replace(/\[|\]/g, "").replace(/</g, "").replace(/㊦[^㊦]*㊦/g, '').replace(/㌫[^㌫]*㌫/g, '分');
     }
