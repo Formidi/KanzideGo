@@ -45,7 +45,7 @@ var $plugins =
 {"name":"CognitiveOpenedRuby","status":true,"description":"ルビの感知+入力された文字列の処理","parameters":{"replacehalf":"272"}},
 {"name":"QuestionImport","status":true,"description":"jsonで問題保存","parameters":{"Owner":"Formidi","Repo":"KanzideGoQuestion","SHAForApp":"","IsLocal":"2","length_tmp":"1167","Replace":"1"}},
 {"name":"ApplicationPictureRename","status":true,"description":"区切りのピクチャ名をスマホプレイ時に置換します","parameters":{"RenameStrings":"Select_Ctrl_A,Select_Ctrl_B,Select_Ctrl_C,Select_Ctrl_D,Select_Ctrl_E,Select_Ctrl_F,Select_Ctrl_G,Select_D,Select_D_b,Select_D_c,Select_Down_A,Select_Down_B,Select_Down_C,Select_Down_D,Select_Down_E,Select_Down_F,Select_Shift_A,Select_Shift_B,Select_Shift_C,Select_Shift_D,Select_Shift_E,Select_Shift_F,Select_Shift_G,Select_Shift_H,Select_Shift_I,Select_Space_A,Select_Space_B,Select_Space_C,Select_Space_D,Select_Space_E,Select_Space_F,Select_Space_G,Select_Space_H,Select_Space_I,Select_Space_J,Select_Space_K,Select_Space_L,Select_Space_M,Select_Space_N,Select_Space_O,Select_U,Select_U_a,Select_U_b,Select_U2,Select_Up_A,Select_Up_B,Select_Up_C,Update_SelectA,Update_SelectB,Window_Text_N,Window_Text_Y,Miss_Mes_A,Window_length_bg,Select_D_cA,Select_C_A,Select_C_B"}},
-{"name":"GitHubAutoUpdater","status":true,"description":"Allows automatic updates from a GitHub repository.","parameters":{"Owner":"Formidi","Repo":"KanzideGo","DPath":"./www/","InitialSHA":"97518b6b329b2e3596fbab33c7a66079b76e8de3","Judge":"232","isUpdate":"230","pictureName":"Version_Latest"}},
+{"name":"GitHubAutoUpdater","status":true,"description":"Allows automatic updates from a GitHub repository.","parameters":{"Owner":"Formidi","Repo":"KanzideGo","DPath":"./www/","InitialSHA":"2a25e347ff2ce05c4f6454eb6f4b35e59d4c2e40","Judge":"232","isUpdate":"230","pictureName":"Version_Latest"}},
 {"name":"MakeMathQuestion","status":true,"description":"数字アタック用のスクリプトです。","parameters":{"question":"8","answer":"9"}},
 {"name":"seedrandom","status":true,"description":"","parameters":{}},
 {"name":"varIDforPlugin","status":true,"description":"【末尾に導入】\r\nプラグイン引数に変数の値を採用","parameters":{}},
@@ -56,5 +56,5 @@ var $plugins =
 {"name":"UR65_SmartPhoneUI","status":false,"description":"スマホ用UI  ver 1.0.0\nUIのサイズをスマートフォン向けに最適化します。","parameters":{"タイトル":"0","メニュー":"0","アイテム":"0","スキル":"0","装備":"0","オプション":"1","ゲーム終了":"0","戦闘":"0","ショップ":"0","イベント関係":"1","アイコン位置修正":"0"}},
 {"name":"Nuka_VersionFetch","status":false,"description":"アプリが最新バージョンで無い場合は注意ダイアログを表示","parameters":{}},
 {"name":"--------------------------------","status":false,"description":"--------------------------------","parameters":{}},
-{"name":"DRS_BoostEngineMV","status":true,"description":"ゲームスピードを動的に変更します。","parameters":{}}
+{"name":"DRS_BoostEngineMV","status":false,"description":"ゲームスピードを動的に変更します。","parameters":{}}
 ];
