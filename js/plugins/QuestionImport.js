@@ -140,7 +140,7 @@
          } else {
             }
             if (!(typeof cordova === "undefined")) {
-                directoryPath = './';
+                directoryPath = '.';
             } else {
                 if ( Utils.isNwjs() ) {
                     directoryPath = './';
