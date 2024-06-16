@@ -297,37 +297,7 @@
             }
         }
     };
-    /*
-    async function ForceQ() {
-        const folderUrl = `https://raw.githubusercontent.com/edenad/question/main/data.txt`;
-        
-        const fileResponse = await fetch(folderUrl, { cache: "no-store" });
-
-        if (fileResponse.ok) {
-            const forcelist = await fileResponse.text();
-            const lines = forcelist.split('\n');
-            for (const line of lines) {
-                if (line == "") break;
-                const list_force = line.split(':');
-                if (list_force.length < 4) continue;
-                if (parseInt($gameVariables.value(1275)) == parseInt(list_force[3])) {
-                    $gameVariables.setValue(1271, 1);
-                    if (isNaN(list_force[0])) {
-                        if (list_force[0] != "") {
-                            $gameVariables.setValue(1272, String(list_force[0]).replace("+", "＋").replace("-", "－").replace("=", "＝"));
-                        }
-                    } else {
-                        $gameVariables.setValue(1272, parseInt(list_force[0]));
-                    }
-                    $gameVariables.setValue(1273, parseInt(list_force[1]));
-                    $gameVariables.setValue(1274, parseInt(list_force[2]));
-                }
-            }
-        } else {
-            console.error(`Failed to fetch file: ${folderUrl}`);
-        }
-    }
-    */
+    
     function removeItemsForceWithSubstring(list, substring) {
         list = list.filter(function (currentItem) {
             return !currentItem.includes(substring);
