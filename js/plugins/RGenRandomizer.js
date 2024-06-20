@@ -164,18 +164,26 @@
                     var plusnum = parseInt(0);
                     if ($gameVariables.value(15) == 103) {
                         plusnum = parseInt(2);
-                    } else if (104 <= $gameVariables.value(15) && $gameVariables.value(15) <= 109 && $gameVariables.value(15) != 105) {
+                    } else if ( 104 <= $gameVariables.value(15) && $gameVariables.value(15) <= 500 && $gameVariables.value(15) ) {
                         plusnum = parseInt(1);
                     }
-                    variableId = `${variableId}_${String(parseInt($gameVariables.value(15)) - 100).padStart(3, '0')}_Lv${$gameVariables.value(290) + $gameVariables.value(757) + plusnum}`;
-                    max = $gameVariables.value(200 + parseInt($gameVariables.value(290) + $gameVariables.value(757) + plusnum));
+                    
+                    //レベル固定
+                    if ( $gameVariables.value(757) >= 10) {
+                        variableId = `${variableId}_${String(parseInt($gameVariables.value(15)) - 100).padStart(3, '0')}_Lv${ $gameVariables.value(757) - 10 }`;
+                        max = $gameVariables.value(200 + parseInt ( $gameVariables.value(757) - 10 ) );
+                    } else {
+                        variableId = `${variableId}_${String(parseInt($gameVariables.value(15)) - 100).padStart(3, '0')}_Lv${$gameVariables.value(290) + $gameVariables.value(757)}`;
+                        max = $gameVariables.value(200 + parseInt( $gameVariables.value(290) + $gameVariables.value(757) ));
+                    }
+
                     if ($gameVariables.value(290) + $gameVariables.value(757) + plusnum == 7) {
                         max = $gameVariables.value(209);
                     }
                 }
                 var value = 0;//まず0を付与
                 if (addedQuestion_probability > Math.random() * 100) {//もし新規問題割込みプログラムが起きたなら
-                    value = getRandomNumberInIdentifierRangeNotInCustomlist(variableId, min, max, Customlist, addedQuestion_num);//新規問題優先で重複なしの抽選
+                    value = andomNumberInIdentifierRgetRangeNotInCustomlist(variableId, min, max, Customlist, addedQuestion_num);//新規問題優先で重複なしの抽選
                 } else if (probability > Math.random() * 100) {//もし重複無しプログラムが起きたなら
                     value = getRandomNumberInIdentifierRangeNotInCustomlist(variableId, min, max, Customlist, 0);//重複なしの抽選
                 } else if ($gameVariables.value(group) != 0) {//もしカジュアルのステージなら
@@ -343,10 +351,12 @@
         //過去問があるときは、a~bまでの数字が入ったリストを作成
         const matchingNumbersInRange = matchingNumbers.map(item => parseInt(item.split('_').slice(-1)[0]));
         const level = identifier.slice(-1);
-        //console.log(`${level}, ${$gameVariables.value(group)}`);
+
+        console.log(`${level}, ${$gameVariables.value(group)}`);
         const availableNumbers = allNumbersInRange.filter(number => !matchingNumbersInRange.includes(number) && ($gameVariables.value(group) == 0 || questionList[`Lv0${level}_${String(number).padStart(4, '0')}`]["1087"].split(',').some(value => value == $gameVariables.value(group))));
 
-        //console.log(availableNumbers);
+        console.log(availableNumbers);
+        
         //a~bまでの数字が入ったリストから、過去問で出た問題を除く
         if (availableNumbers.length <= 1 && grad >= 1) {//もし利用できる乱数がなく、かつgradが1以上なら
             //console.log("勾配無し" + identifier);
