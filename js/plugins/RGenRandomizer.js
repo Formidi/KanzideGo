@@ -352,7 +352,7 @@
         const matchingNumbersInRange = matchingNumbers.map(item => parseInt(item.split('_').slice(-1)[0]));
         const level = identifier.slice(-1);
 
-        console.log(`${level}, ${$gameVariables.value(group)}`);
+        //console.log(`${level}, ${$gameVariables.value(group)}`);
         const availableNumbers = allNumbersInRange.filter(number => !matchingNumbersInRange.includes(number) && ($gameVariables.value(group) == 0 || questionList[`Lv0${level}_${String(number).padStart(4, '0')}`]["1087"].split(',').some(value => value == $gameVariables.value(group))));
 
         console.log(availableNumbers);
