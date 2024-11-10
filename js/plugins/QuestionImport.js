@@ -56,6 +56,9 @@
     var IsLocal = Number(parameters['IsLocal'] || 0);
     var Replace = Number(parameters['Replace'] || 1);
     var length_tmp = Number(parameters['length_tmp'] || 1123);
+
+    var existingData = {};
+
     const keyDictionary = {
         '問題': '8',
         '解１': '9',
@@ -148,8 +151,9 @@
                 directoryPath = 'www';
             }
             }
-        const existingData = {};
+ //       const existingData = {};
         const existingExData = {};
+        
         const promises = [];
         var files = ["img/battlebacks2/Lv01.xcf", "img/battlebacks2/Lv02.xcf", "img/battlebacks2/Lv03.xcf", "img/battlebacks2/Lv04.xcf", "img/battlebacks2/Lv05.xcf", "img/battlebacks2/Lv06.xcf", "img/battlebacks2/Lv07.xcf", "img/battlebacks2/LvCa004.xcf", "excelData/LvEnglish.csv", "excelData/LvGenso.csv"];
         const filePromises = files.map(async(file)=>{
@@ -459,6 +463,19 @@
     var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
     Game_Interpreter.prototype.pluginCommand = function (command, args) {
         _Game_Interpreter_pluginCommand.call(this, command, args);
+        if (command === 'Qjson_GetCaList') {
+            const levelId = String($gameVariables.value(5)).padStart(2, '0');
+            const targetId = $gameVariables.value(6);
+            const fileKey = `Lv${levelId}_${String(targetId).padStart(4, '0')}`; // LvXX_xxxx形式でデータを指定
+        
+            // existingData から該当するデータを検索
+            const data = existingData[fileKey];
+            if (data && data["1087"]) { 
+                $gameVariables.setValue(1606, data["1087"]); 
+            } else {
+                console.error("該当するデータが見つかりませんでした。");
+            }
+        }
         if (command === 'Qjson') {
             var list = DataManager.loadCustomData();
             var dict = list[args[0]];
@@ -594,7 +611,6 @@
         return [x, y, z];
     }
     async function ExtraGenerator() {
-        //await ForceQ();
         const num = numDict[$gameVariables.value(1102)];
         if ($gameVariables.value(15) != 901 && $gameVariables.value(15) != 904) {
             const data = DataManager.loadCustomExData();
