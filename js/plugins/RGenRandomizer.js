@@ -183,7 +183,7 @@
                 }
                 var value = 0;//まず0を付与
                 if (addedQuestion_probability > Math.random() * 100) {//もし新規問題割込みプログラムが起きたなら
-                    value = getRandomNumberInIdentifierRgetRangeNotInCustomlist(variableId, min, max, Customlist, addedQuestion_num);//新規問題優先で重複なしの抽選
+ //                   value = getRandomNumberInIdentifierRgetRangeNotInCustomlist(variableId, min, max, Customlist, addedQuestion_num);//新規問題優先で重複なしの抽選
                 } else if (probability > Math.random() * 100) {//もし重複無しプログラムが起きたなら
                     value = getRandomNumberInIdentifierRangeNotInCustomlist(variableId, min, max, Customlist, 0);//重複なしの抽選
                 } else if ($gameVariables.value(group) != 0) {//もしカジュアルのステージなら

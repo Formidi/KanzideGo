@@ -57,7 +57,20 @@
     var Replace = Number(parameters['Replace'] || 1);
     var length_tmp = Number(parameters['length_tmp'] || 1123);
 
+    var globalMatchingNumbers = [];
+    var globalRangeMatchingNumbers = [];
+    var usedNumbersB = []; // リストBの順番管理用配列
+    var usedNumbersA = []; // リストAの順番管理用配列
+    var currentIndexB = 0; // リストB内の現在のインデックス
+    var currentIndexA = 0; // リストA内の現在のインデックス
     var existingData = {};
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
 
     const keyDictionary = {
         '問題': '8',
@@ -463,19 +476,126 @@
     var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
     Game_Interpreter.prototype.pluginCommand = function (command, args) {
         _Game_Interpreter_pluginCommand.call(this, command, args);
+
+    if (command === 'Qjson_GetCaNum') {
+    const levelId = String($gameVariables.value(5)).padStart(2, '0');  // 2桁ゼロ埋めのレベルID
+    const targetValue = String($gameVariables.value(1084)); // 変数1084番の値
+    globalMatchingNumbers = []; // リストAの初期化
+    globalRangeMatchingNumbers = []; // リストBの初期化
+    usedNumbersB = []; // 使用済みリストBの初期化
+    usedNumbersA = []; // 使用済みリストAの初期化
+    currentIndexB = 0; // リストBのインデックスを初期化
+    currentIndexA = 0; // リストAのインデックスを初期化
+
+    // リストAを生成
+    for (const key in existingData) {
+        if (key.startsWith(`Lv${levelId}_`)) {
+            const questionId = key.split('_')[1].replace(/^0+/, '');  // 4桁の数字（ゼロ埋めなし）
+            const caValue = existingData[key]["1087"];  // カジ: の値を取得
+
+            if (caValue && caValue.split(',').some(val => val === targetValue)) {
+                globalMatchingNumbers.push(Number(questionId)); // リストAに追加
+            }
+        }
+    }
+
+    // 変数1608番と1611番の範囲に基づいてリストBを作成
+    let rangeMin = $gameVariables.value(1608);
+    let rangeMax = $gameVariables.value(1611);
+
+    // リストAの各要素が指定範囲に含まれるか確認し、範囲内の値を持つもののみリストBに追加
+    for (const num of globalMatchingNumbers) {
+        if (num >= rangeMin && num <= rangeMax) {
+            globalRangeMatchingNumbers.push(num);
+        }
+    }
+
+    // リストBとリストAをシャッフル
+    shuffleArray(globalRangeMatchingNumbers);
+    shuffleArray(globalMatchingNumbers);
+
+//    console.log("生成されたリストA:", globalMatchingNumbers);
+//    console.log("範囲に基づいて生成されたリストB:", globalRangeMatchingNumbers);
+}
+        
+if (command === 'Qjson_GetCaNum_Direct') {
+    const variableId = Number(args[0]); // 任意の変数IDを取得
+
+    if (!isNaN(variableId) && variableId > 0) {
+        // リストAの総数を指定された変数IDに代入
+        $gameVariables.setValue(variableId, globalMatchingNumbers.length);
+//        console.log(`リストAの総数を変数${variableId}番に代入:`, globalMatchingNumbers.length);
+    } else {
+        console.error("無効な変数IDが指定されました。");
+    }
+}
+
+
+    if (command === 'Qjson_GetCaRandom_L') {
+        let selectedValue;
+
+        // リストBにまだ未使用の値がある場合
+        if (currentIndexB < globalRangeMatchingNumbers.length) {
+            selectedValue = globalRangeMatchingNumbers[currentIndexB];
+            currentIndexB++; // 次のインデックスに進める
+            $gameVariables.setValue(6, selectedValue);  // 選ばれた値を変数6番に代入
+//            console.log("リストBから選ばれた番号:", selectedValue);
+        } 
+        // リストBが尽き、リストAに未使用の値がある場合
+        else if (currentIndexA < globalMatchingNumbers.length) {
+            selectedValue = globalMatchingNumbers[currentIndexA];
+            currentIndexA++; // 次のインデックスに進める
+            $gameVariables.setValue(6, selectedValue);  // 選ばれた値を変数6番に代入
+//            console.log("リストAから選ばれた番号:", selectedValue);
+        } 
+        // リストAも尽きた場合、リストA内からランダムに選択
+        else if (globalMatchingNumbers.length > 0) {
+            selectedValue = globalMatchingNumbers[Math.floor(Math.random() * globalMatchingNumbers.length)];
+            $gameVariables.setValue(6, selectedValue);  // 選ばれた値を変数6番に代入
+//            console.log("リストAからランダムに選ばれた番号:", selectedValue);
+        } 
+        else {
+            console.error("リストAもリストBも空です。Qjson_GetCaNum を先に実行してください。");
+        }
+    }
+
+
+        if (command === 'Qjson_GetCaRandom') {
+            if (globalMatchingNumbers.length > 0) {
+                // リストからランダムな値を選択し、変数6番に代入
+                const randomValue = globalMatchingNumbers[Math.floor(Math.random() * globalMatchingNumbers.length)];
+                $gameVariables.setValue(6, Number(randomValue));
+//                console.log("選ばれた番号:", randomValue);
+            } else {
+                console.error("リストが空です。Qjson_GetCaNum を先に実行してください。");
+            }
+        }
+
+
         if (command === 'Qjson_GetCaList') {
             const levelId = String($gameVariables.value(5)).padStart(2, '0');
             const targetId = $gameVariables.value(6);
-            const fileKey = `Lv${levelId}_${String(targetId).padStart(4, '0')}`; // LvXX_xxxx形式でデータを指定
+            const fileKey = `Lv${levelId}_${String(targetId).padStart(4, '0')}`;
         
-            // existingData から該当するデータを検索
-            const data = existingData[fileKey];
-            if (data && data["1087"]) { 
-                $gameVariables.setValue(1606, data["1087"]); 
+            // fileKey が existingData に存在するか確認
+            if (existingData && existingData[fileKey]) {
+//                console.log("Data found for fileKey:", fileKey, existingData[fileKey]);
+        
+                // existingData[fileKey]["1087"] に「カジ:」の値が格納されているか確認
+                const kagiValue = existingData[fileKey]["1087"];
+                if (kagiValue) {
+                    $gameVariables.setValue(1606, kagiValue); // 変数1606番に「カジ:」の値を代入
+//                    console.log("「カジ:」の値を取得:", kagiValue);
+                } else {
+                    console.error("カジの値が見つかりませんでした。");
+                }
             } else {
-                console.error("該当するデータが見つかりませんでした。");
+                console.error(`fileKey "${fileKey}" が existingData に存在しません。`);
             }
         }
+
+
+
         if (command === 'Qjson') {
             var list = DataManager.loadCustomData();
             var dict = list[args[0]];
@@ -547,6 +667,7 @@
             $gameVariables.setValue(480, size >= 150 ? 25 : 50);
         }
     };
+
     function parseOrReturnOriginal(inputString) {
         const parsedInt = parseInt(inputString);
 
