@@ -514,8 +514,8 @@
     shuffleArray(globalRangeMatchingNumbers);
     shuffleArray(globalMatchingNumbers);
 
-//    console.log("生成されたリストA:", globalMatchingNumbers);
-//    console.log("範囲に基づいて生成されたリストB:", globalRangeMatchingNumbers);
+    console.log("生成されたリストA:", globalMatchingNumbers);
+    console.log("範囲に基づいて生成されたリストB:", globalRangeMatchingNumbers);
 }
         
 if (command === 'Qjson_GetCaNum_Direct') {
