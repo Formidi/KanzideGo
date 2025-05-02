@@ -152,11 +152,14 @@
             //処理が終わったことを伝え、3秒後にシャットダウン
             $gameMap._interpreter.pluginCommand("D_TEXT", [`処理完了`, "20"]);
             $gameScreen.showPicture(55, null, 0, 10, 10, 100, 100, 255, 0);
-            performShutdownSequence();
+            
+            await performShutdownSequence(commitChanges);
+
         } else {
             $gameSwitches.setValue(Judge, true);
             $gameScreen.showPicture(55, pictureName, 0, 0, 0, 100, 100, 255, 0);
         }
+
     }
 
     async function shutdownAfterDelay(delayMs) {
