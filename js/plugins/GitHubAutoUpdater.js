@@ -150,10 +150,19 @@
             $gameSwitches.setValue(isUpdate, false);
 
             //処理が終わったことを伝え、3秒後にシャットダウン
-            $gameMap._interpreter.pluginCommand("D_TEXT", [`処理完了`, "20"]);
+            $gameScreen.erasePicture(56);
+            $gameScreen.erasePicture(57);
+            $gameMap._interpreter.pluginCommand("D_TEXT", [`${commitChanges.length}個のファイルを処理しました。`, "20"]);
+            $gameMap._interpreter.pluginCommand("D_TEXT", [`今一度、ゲームを閉じていただき、再起動してください。`, "20"]);
+            $gameMap._interpreter.pluginCommand("D_TEXT", [`ファイル数が200個を超えていた場合は、右下の案内をご覧ください。`, "20"]);
             $gameScreen.showPicture(55, null, 0, 10, 10, 100, 100, 255, 0);
-            
+
+            this.wait(60000);
+            window.close();
+
+            this.wait(10000);
             await performShutdownSequence(commitChanges);
+
 
         } else {
             $gameSwitches.setValue(Judge, true);
@@ -173,22 +182,12 @@
         const false_eternity = 100000000;
 
         await shutdownAfterDelay(one_second);
-
-
-        if (commitChanges.length >= 200){
-            $gameMap._interpreter.pluginCommand("D_TEXT", [`【注意】アップデート総数が200を超えました。右下の案内をご覧ください。`, "20"]);
-            $gameScreen.showPicture(55, null, 0, 10, 10, 100, 100, 255, 0);
-            await shutdownAfterDelay(false_eternity);
-
-            window.close();
-        } else {
         
         $gameMap._interpreter.pluginCommand("D_TEXT", [`アップデートが完了しました。一旦ゲームを閉じ、もう一度起動してください。`, "20"]);
         $gameScreen.showPicture(55, null, 0, 10, 10, 100, 100, 255, 0);
         await shutdownAfterDelay(false_eternity);
 
         window.close();
-        }
     }
 
     //最新のコミットを取得
