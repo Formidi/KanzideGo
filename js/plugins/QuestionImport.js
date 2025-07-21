@@ -65,6 +65,9 @@
     var currentIndexA = 0; // リストA内の現在のインデックス
     var existingData = {};
 
+    var globalPRandomList = [];
+    var globalPRandomIndex = 0;
+
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -158,9 +161,11 @@
             if (!(typeof cordova === "undefined")) {
                 directoryPath = '.';
             } else {
+                //DL版
                 if ( Utils.isNwjs() ) {
                     directoryPath = './';
-                } else {    
+                } else {
+                //ブラウザ版    
                 directoryPath = 'www';
             }
             }
@@ -168,7 +173,7 @@
         const existingExData = {};
         
         const promises = [];
-        var files = ["img/battlebacks2/Lv01.xcf", "img/battlebacks2/Lv02.xcf", "img/battlebacks2/Lv03.xcf", "img/battlebacks2/Lv04.xcf", "img/battlebacks2/Lv05.xcf", "img/battlebacks2/Lv06.xcf", "img/battlebacks2/Lv07.xcf", "img/battlebacks2/LvCa004.xcf", "excelData/LvEnglish.csv", "excelData/LvGenso.csv"];
+        var files = ["img/battlebacks2/Lv01.xcf", "img/battlebacks2/Lv02.xcf", "img/battlebacks2/Lv03.xcf", "img/battlebacks2/Lv04.xcf", "img/battlebacks2/Lv05.xcf", "img/battlebacks2/Lv06.xcf", "img/battlebacks2/Lv07.xcf", "img/battlebacks2/LvCa004.xcf", "img/battlebacks2/Lv02_Ca013.xcf", "img/battlebacks2/Lv03_Ca013.xcf", "img/battlebacks2/Lv04_Ca013.xcf", "img/battlebacks2/Lv05_Ca013.xcf", "excelData/LvEnglish.csv", "excelData/LvGenso.csv"];
         const filePromises = files.map(async(file)=>{
             const filePath = directoryPath + "/" + file;
             const fileResponse = await fetch(filePath);
@@ -306,8 +311,14 @@
                 } else {
                     if (keyDictionary[key] != undefined && keyDictionary[key] !== null && keyDictionary[key] !== "") {
                         existing[datakey][keyDictionary[key]] = value;
-                        if (Replace == 0) {
-                            existing[datakey][keyDictionary[key]] = existing[datakey][keyDictionary[key]].toString().replace(/I\[\d+\]/g, '');
+                        //0 のとき消す
+                        if (Replace == 0 || !(typeof cordova === "undefined")) {
+                            existing[datakey][keyDictionary[key]] = existing[datakey][keyDictionary[key]]
+                             .toString()
+                             .replace(/\x1bI\[(\d+)\]/g, function(match, p1) {
+                                 const num = Number(p1);
+                                 return (num >= 0 && num <= 11) ? '' : match;
+                              });
                         }
                     }
                 }
@@ -594,6 +605,43 @@ if (command === 'Qjson_GetCaNum_Direct') {
             }
         }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
+
+    if (command === 'Qjson_PRandom') {
+        const count = $gameVariables.value(681);
+
+        if (count > 0) {
+            // 1～countまでの配列を生成
+            globalPRandomList = Array.from({ length: count }, (_, i) => i + 1);
+
+            // 配列をシャッフル
+            shuffleArray(globalPRandomList);
+
+            // インデックス初期化
+            globalPRandomIndex = 0;
+
+            console.log("生成されたPRandom配列:", globalPRandomList);
+        } else {
+            console.error("変数681番が1未満です。PRandom配列を作成できません。");
+        }
+    }
+
+    if (command === 'Qjson_GetPRandom') {
+        if (globalPRandomList.length === 0) {
+            console.error("PRandom配列が未生成です。Qjson_PRandom を先に実行してください。");
+        } else {
+            // 配列の現在の値を取得して変数6番にセット
+            const value = globalPRandomList[globalPRandomIndex];
+            $gameVariables.setValue(6, value);
+
+            // インデックスを進める（末尾なら0にループ）
+            globalPRandomIndex = (globalPRandomIndex + 1) % globalPRandomList.length;
+
+            console.log("PRandom抽選値:", value, "| 次インデックス:", globalPRandomIndex);
+        }
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
         if (command === 'Qjson') {

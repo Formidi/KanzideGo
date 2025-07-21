@@ -41,7 +41,35 @@
  *
  */
 
+function countPictureFiles() {
+  if (!Utils.isNwjs()) return;
+
+  const fs = require("fs");
+  const path = require("path");
+
+  const dirPath = path.join(process.cwd(), "img", "pictures");
+  const isPlaytest = $gameTemp.isPlaytest();
+  const extension = isPlaytest ? ".png" : ".rpgmvp";
+  const variableId = 1655;
+
+  try {
+    const files = fs.readdirSync(dirPath);
+    const count = files.filter(file => file.endsWith(extension)).length;
+    $gameVariables.setValue(variableId, count);
+    console.log(`[PictureFileCounter] ファイル数: ${count}（拡張子: ${extension}）`);
+  } catch (e) {
+    console.error("画像フォルダの読み込みに失敗しました:", e);
+  }
+}
+
 (function () {
+  // 起動時に画像数をカウント
+  const _Scene_Map_start = Scene_Map.prototype.start;
+  Scene_Map.prototype.start = function() {
+    _Scene_Map_start.call(this);
+    countPictureFiles();
+  };
+
     var parameters = PluginManager.parameters('GitHubAutoUpdater');
     var owner = String(parameters['Owner'] || 'your_owner');
     var repo = String(parameters['Repo'] || 'your_repo');

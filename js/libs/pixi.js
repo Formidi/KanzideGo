@@ -16385,6 +16385,10 @@ var CanvasMaskManager = function () {
     CanvasMaskManager.prototype.pushMask = function pushMask(maskData) {
         var renderer = this.renderer;
 
+        if (!context) {
+         console.warn('Canvas context is null. Rendering skipped.');
+         return;
+        }
         renderer.context.save();
 
         var cacheAlpha = maskData.alpha;

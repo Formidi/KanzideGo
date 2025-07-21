@@ -168,7 +168,7 @@
                         plusnum = parseInt(1);
                     }
                     
-                    //レベル固定
+                    //カジュアルのレベル固定
                     if ( $gameVariables.value(757) >= 10) {
                         variableId = `${variableId}_${String(parseInt($gameVariables.value(15)) - 100).padStart(3, '0')}_Lv${ $gameVariables.value(757) - 10 }`;
                         max = $gameVariables.value(200 + parseInt ( $gameVariables.value(757) - 10 ) );

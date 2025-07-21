@@ -179,10 +179,10 @@ Galv.CACHE = Galv.CACHE || {};          // Galv's stuff
 
 (function() {
 
-ImageManager.reserveSpecific = function(filename, folder, hue, reservationId) {
-	var folder = folder ? folder + '/' : '';
-    return this.reserveBitmap('img/' + folder, filename, hue, false, reservationId || this._systemReservationId);
-};
+//ImageManager.reserveSpecific = function(filename, folder, hue, reservationId) {
+//	var folder = folder ? folder + '/' : '';
+//    return this.reserveBitmap('img/' + folder, filename, hue, false, reservationId || this._systemReservationId);
+//};
 
 Galv.CACHE.loadOnBoot = function() {
 	var params = PluginManager.parameters('Galv_ImageCache')
@@ -210,14 +210,70 @@ Galv.CACHE.loadOnBoot = function() {
 };
 
 
-Galv.CACHE.load = function(folder,img) {
-	ImageManager.reserveSpecific(img,folder);
+Galv.CACHE.load = function(folder, img) {
+    if (typeof cordova !== "undefined") {
+        // cordova
+        console.warn(`Galv.CACHE.load('${folder}','${img}') は cordova 環境のためスキップされました`);
+        return;
+    }
+
+    ImageManager.reserveSpecific(img, folder);
+
 };
 
 Galv.CACHE.Scene_Boot_loadSystemImages = Scene_Boot.loadSystemImages;
-Scene_Boot.loadSystemImages = function() {
+Scene_Boot.loadSystemImages = async function() {
+//	Galv.CACHE.Scene_Boot_loadSystemImages.call(this);
+//	Galv.CACHE.loadOnBoot();
 	Galv.CACHE.Scene_Boot_loadSystemImages.call(this);
-	Galv.CACHE.loadOnBoot();
+	await Galv.CACHE.loadOnBootDelayed(20, 100);
 };
+
+Galv.CACHE.loadOnBootDelayed = async function(batchSize = 20, delayMs = 100) {
+	const params = PluginManager.parameters('Galv_ImageCache');
+	let i = 1;
+	let images = [];
+
+	while (true) {
+		const txt = params['Folder ' + i];
+		if (!txt) break;
+
+		const [folder, listStr] = txt.split('|');
+		if (folder && listStr) {
+			const list = listStr.split(',').filter(x => x);
+			for (const img of list) {
+				images.push({ folder, img });
+			}
+		}
+		i++;
+	}
+
+	for (let j = 0; j < images.length; j += batchSize) {
+		const batch = images.slice(j, j + batchSize);
+		for (const { folder, img } of batch) {
+			ImageManager.reserveSpecific(img, folder);
+		}
+		await new Promise(resolve => setTimeout(resolve, delayMs));
+	}
+};
+
+   const ORIGINAL_reserveSpecific = ImageManager.reserveSpecific || function(filename, folder, hue, reservationId) {
+        const path = 'img/' + folder + '/';
+        return this.reserveBitmap(path, filename, hue, false, reservationId || this._systemReservationId);
+    };
+
+		ImageManager.reserveSpecific = function(folder, filename, hue, smooth) {
+		const bitmap = ORIGINAL_reserveSpecific.call(this, folder, filename, hue, smooth);
+
+		const timer = setTimeout(() => {
+			if (!bitmap.isReady()) {
+			bitmap._image.src = ""; // 強制破棄
+			}
+		}, 8000);
+		bitmap.addLoadListener(() => {
+			clearTimeout(timer);
+		});
+		return bitmap;
+		};
 
 })();
