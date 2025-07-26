@@ -275,6 +275,9 @@
                 console.log("拡大率:", scaleX, " 座標ズレ:", offsetX);
             }
 
+            //------------------------------
+            // HintReplace left
+            //------------------------------
 
                 else if (args[0] === 'left') {
                     const input = $gameVariables.value(9);
@@ -363,30 +366,21 @@
         
 
             // 通常の HintReplace a b の処理
+            
             else if (args.length >= 2) {
                 const inputVarId = Number(args[0]);
                 const outputVarId = Number(args[1]);
                 const input = $gameVariables.value(inputVarId);
 
-                const keepList = [];
-                for (let i = 0; i < input.length - 1; i++) {
-                    if (input[i] === '₨' && /[ぁ-んー・a-zA-Z0-9]/.test(input[i + 1])) {
-                        keepList.push(input[i + 1]);
-                    }
-                }
-
                 let output = '';
                 for (let i = 0; i < input.length; i++) {
                     const char = input[i];
                     if (char === '₨') continue;
-                    if (/[ぁ-んー・a-zA-Z0-9]/.test(char)) {
-                        const index = keepList.indexOf(char);
-                        if (index !== -1) {
-                            output += char;
-                            keepList.splice(index, 1);
-                        } else {
-                            output += '●';
-                        }
+                    // ₨の右隣だけそのまま、それ以外は●
+                    if (i > 0 && input[i - 1] === '₨') {
+                        output += char;
+                    } else {
+                        output += /[ぁ-んー・a-zA-Z0-9]/.test(char) ? '●' : char;
                     }
                 }
 
