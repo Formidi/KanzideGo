@@ -48,40 +48,41 @@
                     console.log("core:", core);
                     console.log("tail:", JSON.stringify(tail));
 
-                    const keepList = [];
+                    const chars = core.split("");
+                    let keepIndices = [];
+                    let isolatedIndices = [];
 
-                    for (let i = 0; i < core.length - 1; i++) {
-                        if (core[i] === '₨' && /[ぁ-んー・a-zA-Z0-9]/.test(core[i + 1])) {
-                            keepList.push(core[i + 1]);
+                    // ₨の右隣インデックス
+                    for (let i = 0; i < chars.length - 1; i++) {
+                        if (chars[i] === '₨' && /[ぁ-んー・a-zA-Z0-9]/.test(chars[i + 1])) {
+                            keepIndices.push(i + 1);
                         }
                     }
 
-                    const isolatedChars = [];
-                    for (let i = 0; i < core.length; i++) {
-                        const c = core[i];
-                        if (c === '₨') continue;
-                        if (core[i - 1] !== '₨') {
-                            isolatedChars.push(c);
+                    // ₨なし孤立文字
+                    for (let i = 0; i < chars.length; i++) {
+                        if (chars[i] === '₨') continue;
+                        if (i === 0 || chars[i - 1] !== '₨') {
+                            isolatedIndices.push(i);
                         }
                     }
 
-                    if (isolatedChars.length >= 2) {
-                        keepList.push(isolatedChars[0]);
+                    if (isolatedIndices.length >= 2) {
+                        keepIndices.push(isolatedIndices[0]);
                     } else {
                         console.log("孤立文字が1個以下のため、righthint終了");
                         return;
                     }
 
                     let convertedCore = '';
-                    for (let i = 0; i < core.length; i++) {
-                        const c = core[i];
-                        if (c === '₨') continue;
-                        const idx = keepList.indexOf(c);
-                        if (idx !== -1) {
-                            convertedCore += c;
-                            keepList.splice(idx, 1);
-                        } else {
+                    for (let i = 0; i < chars.length; i++) {
+                        if (chars[i] === '₨') continue;
+                        if (keepIndices.includes(i)) {
+                            convertedCore += chars[i];
+                        } else if (/[ぁ-んー・a-zA-Z0-9]/.test(chars[i])) {
                             convertedCore += '●';
+                        } else {
+                            convertedCore += chars[i];
                         }
                     }
 
