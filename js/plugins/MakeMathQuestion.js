@@ -430,8 +430,10 @@
                     quest = `㌫${b * g + f}/${g}㌫ ＋ ㌫${c * g - 1}/${g}㌫ ＋ ㌫${d * g - f + 1}/${g}㌫`;
                     answer = b + c + d;
                 } else {
-                    quest = `㌫${b * g + e}/${g}㌫ ＋ ㌫${c * g + f}/${g}㌫ － ㌫${e + f}/${g}㌫`;
-                    answer = b + c;
+ //                   quest = `㌫${b * g + e}/${g}㌫ ＋ ㌫${c * g + f}/${g}㌫ － ㌫${e + f}/${g}㌫`;
+ //                   answer = b + c;
+                    quest = `㌫${b * g + f}/${g}㌫ ＋ ㌫${c * g - 1}/${g}㌫ ＋ ㌫${d * g - f + 1}/${g}㌫`;
+                    answer = b + c + d;
                 }
             } else {
                 if (c * g - f >= 1 && Math.random() < 0.9) {
