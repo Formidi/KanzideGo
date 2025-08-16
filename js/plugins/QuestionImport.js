@@ -173,7 +173,7 @@
         const existingExData = {};
         
         const promises = [];
-        var files = ["img/battlebacks2/Lv01.xcf", "img/battlebacks2/Lv02.xcf", "img/battlebacks2/Lv03.xcf", "img/battlebacks2/Lv04.xcf", "img/battlebacks2/Lv05.xcf", "img/battlebacks2/Lv06.xcf", "img/battlebacks2/Lv07.xcf", "img/battlebacks2/LvCa004.xcf", "img/battlebacks2/Lv02_Ca013.xcf", "img/battlebacks2/Lv03_Ca013.xcf", "img/battlebacks2/Lv04_Ca013.xcf", "img/battlebacks2/Lv05_Ca013.xcf", "excelData/LvEnglish.csv", "excelData/LvGenso.csv"];
+        var files = ["img/battlebacks2/Lv01.xcf", "img/battlebacks2/Lv02.xcf", "img/battlebacks2/Lv03.xcf", "img/battlebacks2/Lv04.xcf", "img/battlebacks2/Lv05.xcf", "img/battlebacks2/Lv06.xcf", "img/battlebacks2/Lv07.xcf", "img/battlebacks2/Lv08.xcf", "img/battlebacks2/LvCa004.xcf", "img/battlebacks2/Lv02_Ca013.xcf", "img/battlebacks2/Lv03_Ca013.xcf", "img/battlebacks2/Lv04_Ca013.xcf", "img/battlebacks2/Lv05_Ca013.xcf", "excelData/LvEnglish.csv", "excelData/LvGenso.csv"];
         const filePromises = files.map(async(file)=>{
             const filePath = directoryPath + "/" + file;
             const fileResponse = await fetch(filePath);

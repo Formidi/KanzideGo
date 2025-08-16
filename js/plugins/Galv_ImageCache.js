@@ -226,10 +226,10 @@ Scene_Boot.loadSystemImages = async function() {
 //	Galv.CACHE.Scene_Boot_loadSystemImages.call(this);
 //	Galv.CACHE.loadOnBoot();
 	Galv.CACHE.Scene_Boot_loadSystemImages.call(this);
-	await Galv.CACHE.loadOnBootDelayed(20, 100);
+	await Galv.CACHE.loadOnBootDelayed(15, 100);
 };
 
-Galv.CACHE.loadOnBootDelayed = async function(batchSize = 20, delayMs = 100) {
+Galv.CACHE.loadOnBootDelayed = async function(batchSize = 15, delayMs = 100) {
 	const params = PluginManager.parameters('Galv_ImageCache');
 	let i = 1;
 	let images = [];
