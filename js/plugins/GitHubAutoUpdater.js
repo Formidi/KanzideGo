@@ -122,7 +122,7 @@ function countPictureFiles() {
         //最後の更新と保存されている更新が異なる場合は更新処理に入る
         if (lastCommitSHA !== latestCommitSHA) {
             //アップデート中スイッチのオン
-            $gameSwitches.setValue(isUpdate, true);
+            $gameSwitches.setValue(230, true);
 
             //バージョン更新の通知
             $gameMap._interpreter.pluginCommand("D_TEXT", [`バージョン更新:${lastCommitSHA}→${latestCommitSHA}`, "20"]);
