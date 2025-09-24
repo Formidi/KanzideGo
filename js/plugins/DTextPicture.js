@@ -1135,6 +1135,12 @@
 
     Sprite_Picture.prototype._processDrawIcon = function (iconIndex, textState, bitmap) {
         var iconBitmap = ImageManager.loadSystem('IconSet');
+        if (!iconBitmap.isReady()) {
+            iconBitmap.addLoadListener(function(){
+                this.makeDynamicBitmap();
+            }.bind(this));
+            return;
+        }
         var pw = Window_Base._iconWidth;
         var ph = Window_Base._iconHeight;
         var sx = iconIndex % 16 * pw;

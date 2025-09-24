@@ -245,7 +245,12 @@ function countPictureFiles() {
         }
 
     async function getCommitChanges(owner, repo, fromSHA, toSHA) {
-        const url = `https://api.github.com/repos/${owner}/${repo}/compare/${fromSHA}...${toSHA}`;
+    let allFiles = [];
+    let page = 1;
+    const perPage = 300; // GitHub APIの最大値
+    
+    while (true) {
+        const url = `https://api.github.com/repos/${owner}/${repo}/compare/${fromSHA}...${toSHA}?page=${page}&per_page=${perPage}`;
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -253,8 +258,37 @@ function countPictureFiles() {
         }
 
         const data = await response.json();
-        return data.files;
+        
+        // 最初のページでtotal_commitsをチェック
+        if (page === 1) {
+            console.log(`合計ファイル数: ${data.files.length}個のファイルが見つかりました`);
+            
+            // 300個未満なら従来通り
+            if (data.files.length < 300) {
+                return data.files;
+            }
+        }
+
+        // ファイルを配列に追加
+        allFiles = allFiles.concat(data.files);
+        
+        // 次のページがあるかチェック
+        const linkHeader = response.headers.get('link');
+        if (!linkHeader || !linkHeader.includes('rel="next"')) {
+            break; // 次のページがない場合は終了
+        }
+        
+        page++;
+        
+        // API制限回避のため少し待機
+        await delayAsync(100);
     }
+    
+    console.log(`全${allFiles.length}個のファイルを取得しました`);
+    return allFiles;
+    }
+
+
     async function downloadFile(file, fileName) {
         const fileUrl = file.raw_url;
         const fs = require('fs');

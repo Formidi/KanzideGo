@@ -173,7 +173,7 @@
         const existingExData = {};
         
         const promises = [];
-        var files = ["img/battlebacks2/Lv01.xcf", "img/battlebacks2/Lv02.xcf", "img/battlebacks2/Lv03.xcf", "img/battlebacks2/Lv04.xcf", "img/battlebacks2/Lv05.xcf", "img/battlebacks2/Lv06.xcf", "img/battlebacks2/Lv07.xcf", "img/battlebacks2/Lv08.xcf", "img/battlebacks2/LvCa004.xcf", "img/battlebacks2/Lv02_Ca013.xcf", "img/battlebacks2/Lv03_Ca013.xcf", "img/battlebacks2/Lv04_Ca013.xcf", "img/battlebacks2/Lv05_Ca013.xcf", "excelData/LvEnglish.csv", "excelData/LvGenso.csv"];
+        var files = ["img/battlebacks2/Lv01.xcf", "img/battlebacks2/Lv02.xcf", "img/battlebacks2/Lv03.xcf", "img/battlebacks2/Lv04.xcf", "img/battlebacks2/Lv05.xcf", "img/battlebacks2/Lv06.xcf", "img/battlebacks2/Lv07.xcf", "img/battlebacks2/Lv08.xcf", "img/battlebacks2/LvCa004.xcf", "img/battlebacks2/Lv02_Ca013.xcf", "img/battlebacks2/Lv03_Ca013.xcf", "img/battlebacks2/Lv04_Ca013.xcf", "img/battlebacks2/Lv05_Ca013.xcf", "img/battlebacks2/Lv02_Ca014.xcf", "img/battlebacks2/Lv03_Ca014.xcf", "img/battlebacks2/Lv04_Ca014.xcf", "img/battlebacks2/Lv05_Ca014.xcf", "excelData/LvEnglish.csv", "excelData/LvGenso.csv"];
         const filePromises = files.map(async(file)=>{
             const filePath = directoryPath + "/" + file;
             const fileResponse = await fetch(filePath);
@@ -312,7 +312,8 @@
                     if (keyDictionary[key] != undefined && keyDictionary[key] !== null && keyDictionary[key] !== "") {
                         existing[datakey][keyDictionary[key]] = value;
                         //0 のとき消す
-                        if (Replace == 0 || !(typeof cordova === "undefined")) {
+//                        if (Replace == 0 || !(typeof cordova === "undefined") || Utils.isNwjs()) {
+                        if (Replace == 0) {
                             existing[datakey][keyDictionary[key]] = existing[datakey][keyDictionary[key]]
                              .toString()
                              .replace(/\x1bI\[(\d+)\]/g, function(match, p1) {

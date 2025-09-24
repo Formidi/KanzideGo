@@ -211,9 +211,13 @@ Galv.CACHE.loadOnBoot = function() {
 
 
 Galv.CACHE.load = function(folder, img) {
+//	if (Utils.isNwjs()) {
+//
+//      return;
+//	}
     if (typeof cordova !== "undefined") {
         // cordova
-        console.warn(`Galv.CACHE.load('${folder}','${img}') は cordova 環境のためスキップされました`);
+
         return;
     }
 
