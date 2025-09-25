@@ -313,7 +313,7 @@
                         existing[datakey][keyDictionary[key]] = value;
                         //0 のとき消す
 //                        if (Replace == 0 || !(typeof cordova === "undefined") || Utils.isNwjs()) {
-                        if (Replace == 0) {
+                        if (Replace == 0 || !(typeof cordova === "undefined")) {
                             existing[datakey][keyDictionary[key]] = existing[datakey][keyDictionary[key]]
                              .toString()
                              .replace(/\x1bI\[(\d+)\]/g, function(match, p1) {
