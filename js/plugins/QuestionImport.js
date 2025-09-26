@@ -606,6 +606,44 @@ if (command === 'Qjson_GetCaNum_Direct') {
             }
         }
 
+
+    if (command === 'Question_Bekkai') {
+    // 1) 問題ID（変数8）をキーとして existingData を引く
+    const fileKey = String($gameVariables.value(8) || "");
+    let out = [];
+    if (existingData && existingData[fileKey]) {
+        const kagi = existingData[fileKey]["1087"]; // 「カジ:」はキー1087
+        if (kagi) {
+        // 2) カンマ区切りを取得（全角/半角カンマ両対応）
+        const tokens = String(kagi).split(/[，,]/).map(v => v.trim()).filter(v => v);
+
+        // 非数字の要素を集める
+        const nonNumeric = tokens.filter(v => !/^\d+$/.test(v));
+
+        if (nonNumeric.length === 0) {
+            // 数字しか無かった場合 → ["0"]
+            out = ["0"];
+        } else {
+            // 非数字要素ごとに加工処理
+            for (const v of nonNumeric) {
+            if (v.includes("₨")) {
+                // ② 「₨」を全部消す
+                out.push(v.replace(/₨/g, ""));
+                // ③ 「₨」と右隣1文字をペアで消す
+                out.push(v.replace(/₨./g, ""));
+            } else {
+                out.push(v);
+            }
+            }
+        }
+        }
+    }
+    // 重複排除（順序保持）
+    const seen = new Set(), result = [];
+    for (const x of out) if (!seen.has(x)) { seen.add(x); result.push(x); }
+    // 配列を変数1670へ
+    $gameVariables.setValue(1669, result);
+    }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
 
     if (command === 'Qjson_PRandom') {
