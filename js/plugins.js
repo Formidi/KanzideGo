@@ -14,6 +14,7 @@ var $plugins =
 {"name":"MadeWithMv","status":false,"description":"メイン画面へ進む前に、\"Made with MV\"のスプラッシュ画面もしくはカスタマイズされたスプラッシュ画面を表示します。","parameters":{"Show Made With MV":"true","Made with MV Image":"MadeWithMv","Show Custom Splash":"false","Custom Image":"","Fade Out Time":"120","Fade In Time":"120","Wait Time":"160"}},
 {"name":"AutoLoad","status":true,"description":"タイトル画面仕様変更プラグイン","parameters":{"効果音演奏":"ON","完全スキップ":"OFF","タイトルマップID":"1"}},
 {"name":"111_InputForm","status":true,"description":"フォーム作って文字入力（修正版）","parameters":{}},
+{"name":"111_InputForm_ForceClose","status":true,"description":"","parameters":{}},
 {"name":"AcceptAllKeys","status":true,"description":"使えるキーを拡張します","parameters":{"key_a":"a","key_b":"b","key_c":"c","key_d":"d","key_e":"e","key_f":"f","key_g":"g","key_h":"h","key_i":"i","key_j":"j","key_k":"k","key_l":"l","key_m":"m","key_n":"n","key_o":"o","key_p":"p","key_q":"pageup","key_r":"r","key_s":"s","key_t":"t","key_u":"u","key_v":"v","key_w":"pagedown","key_x":"escape","key_y":"y","key_z":"ok","key_backspace":"escape","key_tab":"tab","key_enter":"ok","key_shift":"escape","key_control":"control","key_alt":"alt","key_escape":"escape","key_space":"ok","key_pageup":"pageup","key_pagedown":"pagedown","key_left":"left","key_right":"right","key_up":"up","key_down":"down","key_insert":"escape","numpad_0":"escape","numpad_2":"down","numpad_4":"left","numpad_6":"right","numpad_8":"up","F9":"debug"}},
 {"name":"FixSimultaneouslyPress","status":true,"description":"同時押し仕様変更プラグイン","parameters":{}},
 {"name":"Chikuwa","status":true,"description":"「どのデータをロードしても共有した変数を読み込める」プラグイン","parameters":{"FileName":"Assign","WebStorageKey":"Chikuwa"}},
@@ -48,7 +49,7 @@ var $plugins =
 {"name":"QuestionImport","status":true,"description":"jsonで問題保存","parameters":{"Owner":"Formidi","Repo":"KanzideGoQuestion","SHAForApp":"","IsLocal":"2","length_tmp":"1167","Replace":"1"}},
 {"name":"HintReplace","status":true,"description":"ヒント用文字列を変換","parameters":{}},
 {"name":"ApplicationPictureRename","status":true,"description":"区切りのピクチャ名をスマホプレイ時に置換します","parameters":{"RenameStrings":"Select_Ctrl_A,Select_Ctrl_B,Select_Ctrl_C,Select_Ctrl_D,Select_Ctrl_E,Select_Ctrl_F,Select_Ctrl_G,Select_D,Select_D_b,Select_D_c,Select_Down_A,Select_Down_B,Select_Down_C,Select_Down_D,Select_Down_E,Select_Down_F,Select_Down_G,Select_Shift_A,Select_Shift_B,Select_Shift_C,Select_Shift_D,Select_Shift_E,Select_Shift_F,Select_Shift_G,Select_Shift_H,Select_Shift_I,Select_Space_A,Select_Space_B,Select_Space_C,Select_Space_D,Select_Space_E,Select_Space_F,Select_Space_G,Select_Space_H,Select_Space_I,Select_Space_J,Select_Space_K,Select_Space_L,Select_Space_M,Select_Space_N,Select_Space_O,Select_Space_Z,Select_U,Select_U_a,Select_U_b,Select_U2,Select_Up_A,Select_Up_B,Select_Up_C,Update_SelectA,Update_SelectB,Window_Text_N,Window_Text_Y,Miss_Mes_A,Window_length_bg,Select_D_cA,Select_C_A,Select_C_B,Gameover_Select_A1,Gameover_Select_A2,Gameover_Select_A3,Howto_Select_A1,Howto_Select_A2,Num_ID_bg,Num_ID_bg_r"}},
-{"name":"GitHubAutoUpdater","status":true,"description":"Allows automatic updates from a GitHub repository.","parameters":{"Owner":"Formidi","Repo":"KanzideGo","DPath":"./www/","InitialSHA":"af26c1601bfc62015207e16db6260a6ca5b51a85","Judge":"232","isUpdate":"230","pictureName":"Version_Latest"}},
+{"name":"GitHubAutoUpdater","status":true,"description":"Allows automatic updates from a GitHub repository.","parameters":{"Owner":"Formidi","Repo":"KanzideGo","DPath":"./www/","InitialSHA":"8c422c3ce2d1022b267841674caaacd7e55d3b1a","Judge":"232","isUpdate":"230","pictureName":"Version_Latest"}},
 {"name":"CheckImageFromList","status":true,"description":"外部リストで指定された画像名が存在するか（拡張子問わず）チェックし、なければ変数1655に1を代入します。","parameters":{}},
 {"name":"PictureFileCounter","status":true,"description":"img/pictures内のファイル数をカウントして指定変数に代入します（ローカル版限定）。","parameters":{"variableId":"1655"}},
 {"name":"MakeMathQuestion","status":true,"description":"数字アタック用のスクリプトです。","parameters":{"question":"8","answer":"9"}},
@@ -61,6 +62,7 @@ var $plugins =
 {"name":"FixImageLoading","status":false,"description":"画像ロード時のチラつき防止プラグイン","parameters":{}},
 {"name":"UR65_SmartPhoneUI","status":false,"description":"スマホ用UI  ver 1.0.0\nUIのサイズをスマートフォン向けに最適化します。","parameters":{"タイトル":"0","メニュー":"0","アイテム":"0","スキル":"0","装備":"0","オプション":"1","ゲーム終了":"0","戦闘":"0","ショップ":"0","イベント関係":"1","アイコン位置修正":"0"}},
 {"name":"Nuka_VersionFetch","status":false,"description":"アプリが最新バージョンで無い場合は注意ダイアログを表示","parameters":{}},
+{"name":"BrowserHiddenChecker","status":true,"description":"Detect tab/app switching (MV/MZ). If hidden >= 1s, set var 1430 = 1.","parameters":{}},
 {"name":"--------------------------------","status":false,"description":"--------------------------------","parameters":{}},
 {"name":"DRS_BoostEngineMV","status":true,"description":"ゲームスピードを動的に変更します。","parameters":{}}
 ];
