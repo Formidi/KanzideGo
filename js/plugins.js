@@ -63,6 +63,7 @@ var $plugins =
 {"name":"UR65_SmartPhoneUI","status":false,"description":"スマホ用UI  ver 1.0.0\nUIのサイズをスマートフォン向けに最適化します。","parameters":{"タイトル":"0","メニュー":"0","アイテム":"0","スキル":"0","装備":"0","オプション":"1","ゲーム終了":"0","戦闘":"0","ショップ":"0","イベント関係":"1","アイコン位置修正":"0"}},
 {"name":"Nuka_VersionFetch","status":false,"description":"アプリが最新バージョンで無い場合は注意ダイアログを表示","parameters":{}},
 {"name":"BrowserHiddenChecker","status":true,"description":"Detect tab/app switching (MV/MZ). If hidden >= 1s, set var 1430 = 1.","parameters":{}},
+{"name":"ChikuwaBackUp","status":true,"description":"Backup Assign.rpgsave to www/save/backup as Assign_YYYYMMDD (MV / NW.js)","parameters":{}},
 {"name":"--------------------------------","status":false,"description":"--------------------------------","parameters":{}},
 {"name":"DRS_BoostEngineMV","status":true,"description":"ゲームスピードを動的に変更します。","parameters":{}}
 ];
