@@ -649,11 +649,31 @@
     };
 
     Sprite_Picture.prototype.updateAnimationFrame = function(sprite, cellCount) {
+    // ★ ガード：このフレームで使うビットマップが未読込(0x0)なら何もしない
+    var pic = this.picture();
+    var bmp = null;
+    if (pic && pic.isMulti()) {
+        // 連番モード：そのセルの画像だけを確認
+        bmp = (this._bitmaps && this._bitmaps[cellCount]) || null;
+    } else {
+        // 縦・横モード：現在の bitmap を確認
+        bmp = sprite.bitmap || this.bitmap || null;
+    }
+    if (!bmp || !bmp.isReady || !bmp.isReady() || !bmp.width || !bmp.height) {
+        return; // まだ使えないので、次フレームまで待つ
+    }
+
+
         switch (this.picture().direction()) {
+//            case '連番':
+//            case 'N':
+//                sprite.bitmap = this._bitmaps[cellCount];
+//                sprite.setFrame(0, 0, sprite.bitmap.width, sprite.bitmap.height);
             case '連番':
             case 'N':
-                sprite.bitmap = this._bitmaps[cellCount];
-                sprite.setFrame(0, 0, sprite.bitmap.width, sprite.bitmap.height);
+                // すでに上のガードで bmp を確認済み
+                sprite.bitmap = bmp;
+                sprite.setFrame(0, 0, bmp.width, bmp.height);
                 break;
             case '縦':
             case 'V':
