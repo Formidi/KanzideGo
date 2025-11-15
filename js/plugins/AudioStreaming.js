@@ -306,11 +306,18 @@ WebAudio.prototype.clear = function() {
 
 WebAudio.prototype._load = async function(url) {
     if (WebAudio._context) {
-        if (Decrypter.hasEncryptedAudio) {
-            url = Decrypter.extToEncryptExt(url);
+        try {
+            if (Decrypter.hasEncryptedAudio) {
+                url = Decrypter.extToEncryptExt(url);
+            }
+            const reader = await ResourceHandler.fetchWithRetry('stream', url);
+            this._loading(reader);
+        } catch (e) {
+            console.warn('Audio load failed but continued:', url, e);
+            // 続行可能にするため、空のバッファを用意してonLoadを呼ぶ
+            this._isReady = true;
+            this._onLoad();
         }
-        const reader = await ResourceHandler.fetchWithRetry('stream', url);
-        this._loading(reader);
     }
 };
 
