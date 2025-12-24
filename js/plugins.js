@@ -49,7 +49,7 @@ var $plugins =
 {"name":"QuestionImport","status":true,"description":"jsonで問題保存","parameters":{"Owner":"Formidi","Repo":"KanzideGoQuestion","SHAForApp":"","IsLocal":"2","length_tmp":"1167","Replace":"1"}},
 {"name":"HintReplace","status":true,"description":"ヒント用文字列を変換","parameters":{}},
 {"name":"ApplicationPictureRename","status":true,"description":"区切りのピクチャ名をスマホプレイ時に置換します","parameters":{"RenameStrings":"Select_Ctrl_A,Select_Ctrl_B,Select_Ctrl_C,Select_Ctrl_D,Select_Ctrl_E,Select_Ctrl_F,Select_Ctrl_G,Select_D,Select_D_b,Select_D_c,Select_Down_A,Select_Down_B,Select_Down_C,Select_Down_D,Select_Down_E,Select_Down_F,Select_Down_G,Select_Shift_A,Select_Shift_B,Select_Shift_C,Select_Shift_D,Select_Shift_E,Select_Shift_F,Select_Shift_G,Select_Shift_H,Select_Shift_I,Select_Space_A,Select_Space_B,Select_Space_C,Select_Space_D,Select_Space_E,Select_Space_F,Select_Space_G,Select_Space_H,Select_Space_I,Select_Space_J,Select_Space_K,Select_Space_L,Select_Space_M,Select_Space_N,Select_Space_O,Select_Space_Z,Select_U,Select_U_a,Select_U_b,Select_U2,Select_Up_A,Select_Up_B,Select_Up_C,Update_SelectA,Update_SelectB,Window_Text_N,Window_Text_Y,Miss_Mes_A,Window_length_bg,Select_D_cA,Select_C_A,Select_C_B,Gameover_Select_A1,Gameover_Select_A2,Gameover_Select_A3,Howto_Select_A1,Howto_Select_A2,Num_ID_bg,Num_ID_bg_r"}},
-{"name":"GitHubAutoUpdater","status":true,"description":"Allows automatic updates from a GitHub repository.","parameters":{"Owner":"Formidi","Repo":"KanzideGo","DPath":"./www/","InitialSHA":"656891a84ff3d8cf02f8758ebd089bb3387694a4","Judge":"232","isUpdate":"230","pictureName":"Version_Latest"}},
+{"name":"GitHubAutoUpdater","status":true,"description":"Allows automatic updates from a GitHub repository.","parameters":{"Owner":"Formidi","Repo":"KanzideGo","DPath":"./www/","InitialSHA":"a464081d48c51883b7b01c932b77da36b8d3f5e0","Judge":"232","isUpdate":"230","pictureName":"Version_Latest"}},
 {"name":"CheckImageFromList","status":true,"description":"外部リストで指定された画像名が存在するか（拡張子問わず）チェックし、なければ変数1655に1を代入します。","parameters":{}},
 {"name":"PictureFileCounter","status":true,"description":"img/pictures内のファイル数をカウントして指定変数に代入します（ローカル版限定）。","parameters":{"variableId":"1655"}},
 {"name":"MakeMathQuestion","status":true,"description":"数字アタック用のスクリプトです。","parameters":{"question":"8","answer":"9"}},
@@ -62,8 +62,12 @@ var $plugins =
 {"name":"FixImageLoading","status":false,"description":"画像ロード時のチラつき防止プラグイン","parameters":{}},
 {"name":"UR65_SmartPhoneUI","status":false,"description":"スマホ用UI  ver 1.0.0\nUIのサイズをスマートフォン向けに最適化します。","parameters":{"タイトル":"0","メニュー":"0","アイテム":"0","スキル":"0","装備":"0","オプション":"1","ゲーム終了":"0","戦闘":"0","ショップ":"0","イベント関係":"1","アイコン位置修正":"0"}},
 {"name":"Nuka_VersionFetch","status":false,"description":"アプリが最新バージョンで無い場合は注意ダイアログを表示","parameters":{}},
+{"name":"PAD_PicturesLoader","status":false,"description":"PADアセット対応ピクチャ表示（カテゴリ別プリロード）","parameters":{}},
 {"name":"BrowserHiddenChecker","status":true,"description":"Detect tab/app switching (MV/MZ). If hidden >= 1s, set var 1430 = 1.","parameters":{}},
 {"name":"ChikuwaBackUp","status":true,"description":"Backup Assign.rpgsave to www/save/backup as Assign_YYYYMMDD (MV / NW.js)","parameters":{}},
+{"name":"PicCacheManager","status":true,"description":"[MV] Track & clear img/pictures cache by filename prefix (e.g., Enemy*)","parameters":{}},
+{"name":"DataCheck","status":true,"description":"日付チェック用プラグイン（12/24～12/31で xmas をセット）","parameters":{}},
+{"name":"WeatherFrontOfPictures","status":true,"description":"Weatherをピクチャより前に表示する（マップ）","parameters":{}},
 {"name":"--------------------------------","status":false,"description":"--------------------------------","parameters":{}},
 {"name":"DRS_BoostEngineMV","status":true,"description":"ゲームスピードを動的に変更します。","parameters":{}}
 ];

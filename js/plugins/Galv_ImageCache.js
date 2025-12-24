@@ -211,10 +211,10 @@ Galv.CACHE.loadOnBoot = function() {
 
 
 Galv.CACHE.load = function(folder, img) {
-//	if (Utils.isNwjs()) {
-//
-//      return;
-//	}
+/* 	if (Utils.isNwjs()) {
+
+      return;
+	} */
     if (typeof cordova !== "undefined") {
         // cordova
 
